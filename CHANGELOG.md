@@ -1,6 +1,9 @@
 # Change Log
 
-## [0.0.7] - 2021-01-25
+## [0.0.8] - 2021-01-25
+* better parameter grammar
+
+* ## [0.0.7] - 2021-01-25
 * better for grammar
 
 ## [0.0.6] - 2021-01-25

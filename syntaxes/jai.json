@@ -106,19 +106,27 @@
 					"match": "\\b(using|operator)\\b"
 				},
 				{
-					"name": "constant.language.jai",
-					"match": "\\b(true|false|null)\\b"
+					"name": "constant.language.true.jai",
+					"match": "\\b(true)\\b"
 				},
 				{
-					"name": "keyword.declaration.struct",
+					"name": "constant.language.false.jai",
+					"match": "\\b(false)\\b"
+				},
+				{
+					"name": "constant.language.null.jai",
+					"match": "\\b(null)\\b"
+				},
+				{
+					"name": "keyword.declaration.struct.jai",
 					"match": "\\b(struct)\\b"
 				},
 				{
-					"name": "keyword.declaration.enum",
+					"name": "keyword.declaration.enum.jai",
 					"match": "\\b(enum)\\b"
 				},
 				{
-					"name": "keyword.declaration.union",
+					"name": "keyword.declaration.union.jai",
 					"match": "\\b(union)\\b"
 				},
 				{
@@ -596,7 +604,7 @@
 					"patterns":
 					[
 						{
-							"match": "(,)?\\s*((\\$*)[a-zA-Z_]\\w*)\\s*(:=)([^,\\)])*",
+							"match": "(,)?\\s*((\\$*)[a-zA-Z_]\\w*)\\s*(:=)([^,\\)]*)",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -613,7 +621,7 @@
 							}
 						},
 						{
-							"match": "(,)?\\s*((\\$*)[a-zA-Z_]\\w*)\\s*(:)\\s*(\\.\\.)?\\s*(\\[[^\\]*]\\])?\\s*((\\**)($)?[a-zA-Z_]\\w*)?\\s*(=)?([^,\\)])*",
+							"match": "(,)?\\s*((\\$*)[a-zA-Z_]\\w*)\\s*(:)\\s*(\\.\\.)?\\s*(\\[[^\\]*]\\])?\\s*((\\**)($)?[a-zA-Z_]\\w*)?\\s*(=)?([^,\\)]*)",
 							"captures":
 							{
 								"1":  {"name": "punctuation.separator.parameters.jai"},
@@ -734,8 +742,6 @@
 				{ "include": "#support" },
 				{ "include": "#numbers" },
 				{ "include": "#enum-members" },
-				{ "include": "#function-calls" },
-				{ "include": "#variables" },
 				{ "include": "#deprecated" },
 				{ "include": "#more-numbers" }
 			]
