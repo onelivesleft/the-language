@@ -8,7 +8,7 @@
 		{ "include": "#imports" },
 		{ "include": "#strings" },
 		{ "include": "#proc" },
-		{ "include": "#for-with-identifiers"},
+		{ "include": "#fors"},
 		{ "include": "#structs"},
 		{ "include": "#enums"},
 		{ "include": "#keywords" },
@@ -323,28 +323,38 @@
 				}
 			]
 		},
-		"for-with-identifiers":
+		"fors":
 		{
 			"patterns":
 			[
 				{
-					"match": "\\b(for)\\s+([a-zA-Z_]\\w*)\\s*(,)\\s*([a-zA-Z_]\\w*)\\s*(:)",
+					"match": "\\b(for)\\s+([*< ]*)([a-zA-Z_]\\w*)\\s*(,)\\s*([a-zA-Z_]\\w*)\\s*(:)",
 					"captures":
 					{
 						"1": {"name": "keyword.control.jai"},
-						"2": {"name": "variable.other.declaration.jai"},
-						"3": {"name": "punctuation.separator.jai"},
-						"4": {"name": "variable.other.declaration.jai"},
-						"5": {"name": "keyword.declaration.jai"}
+						"2": {"name": "keyword.operator.jai"},
+						"3": {"name": "variable.other.declaration.jai"},
+						"4": {"name": "punctuation.separator.jai"},
+						"5": {"name": "variable.other.declaration.jai"},
+						"6": {"name": "keyword.declaration.jai"}
 					}
 				},
 				{
-					"match": "\\b(for)\\s+([a-zA-Z_]\\w*)\\s*(:)",
+					"match": "\\b(for)\\s+([*< ]*)([a-zA-Z_]\\w*)\\s*(:)",
 					"captures":
 					{
 						"1": {"name": "keyword.control.jai"},
-						"2": {"name": "variable.other.declaration.jai"},
-						"3": {"name": "keyword.declaration.jai"}
+						"2": {"name": "keyword.operator.jai"},
+						"3": {"name": "variable.other.declaration.jai"},
+						"4": {"name": "keyword.declaration.jai"}
+					}
+				},
+				{
+					"match": "\\b(for)\\s+([*< ]*)",
+					"captures":
+					{
+						"1": {"name": "keyword.control.jai"},
+						"2": {"name": "keyword.operator.jai"}
 					}
 				}
 			]
