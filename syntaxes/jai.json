@@ -1,0 +1,651 @@
+{
+	"name": "Jai",
+	"patterns":
+	[
+		{ "include": "#block-comments" },
+		{ "include": "#comments" },
+		{ "include": "#imports" },
+		{ "include": "#strings" },
+		{ "include": "#proc" },
+		{ "include": "#for-with-both"},
+		{ "include": "#structs"},
+		{ "include": "#enums"},
+		{ "include": "#keywords" },
+		{ "include": "#symbols" },
+		{ "include": "#support" },
+		{ "include": "#numbers" },
+		{ "include": "#notes" },
+		{ "include": "#enum-members" },
+		{ "include": "#function-calls" },
+		{ "include": "#declarations" },
+		{ "include": "#variables" },
+		{ "include": "#deprecated" },
+		{ "include": "#more-numbers" }
+	],
+	"repository":
+	{
+		"block-comments":
+		{
+			"name": "comment.block.jai",
+			"begin": "\\/\\*",
+			"end": "\\*\\/"
+		},
+		"comments":
+		{
+			"patterns":
+			[
+				{
+					"name": "comment.line.double-slash.jai",
+					"match": "(//.*)"
+				}
+			]
+		},
+		"imports":
+		{
+			"patterns":
+			[
+				{
+					"match": "(#import|#load)\\s*(\")([^\"]+)(\")",
+					"captures":
+					{
+						"1": {"name": "keyword.control.import"},
+						"2": {"name": "punctuation.definition.string.import.begin"},
+						"3": {"name": "string-quoted.other"},
+						"4": {"name": "punctuation.definition.string.import.end"}
+					}
+				}
+			]
+		},
+		"keywords":
+		{
+			"patterns":
+			[
+				{
+					"name": "keyword.control.conditional.jai",
+					"match": "\\b(if|ifx|then|else|case)\\b"
+				},
+				{
+					"name": "keyword.control.jump.jai",
+					"match": "\\b(return|break|continue)\\b"
+				},
+				{
+					"name": "keyword.control.loop.jai",
+					"match": "\\b(while|for)\\b"
+				},
+				{
+					"name": "keyword.control.jai",
+					"match": "\\b(defer)\\b"
+				},
+				{
+					"name": "keyword.control.cast.jai",
+					"match": "\\b(cast|,no_check|,trunc)\\b"
+				},
+				{
+					"name": "keyword.other.jai",
+					"match": "(#assert|#bake_arguments|#bake|#caller_location|#char|#compiler|#complete|#dump|#expand|#foreign|#foreign-library|#if|#insert|#intrinsic|#modify|#must|#run|#scope_export|#scope_file|#scope_module|#string|#through)\\b"
+				},
+				{
+					"name": "keyword.other.jai",
+					"match": "\\b(using|xx|operator)\\b"
+				},
+				{
+					"name": "constant.language.jai",
+					"match": "\\b(true|false|null)\\b"
+				},
+				{
+					"name": "keyword.declaration.struct",
+					"match": "\\b(struct)\\b"
+				},
+				{
+					"name": "keyword.declaration.enum",
+					"match": "\\b(enum)\\b"
+				},
+				{
+					"name": "keyword.declaration.union",
+					"match": "\\b(union)\\b"
+				},
+				{
+					"name": "storage.type.jai",
+					"match": "\\b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void)\\b"
+				},
+				{
+					"name": "support.variable.jai",
+					"match": "\\b(it|it_index)\\b"
+				}
+			]
+		},
+		"symbols":
+		{
+			"patterns":
+			[
+				{
+					"name": "keyword.declaration.jai",
+					"match": "(::|:=|:)+"
+				},
+				{
+					"name": "keyword.operator.jai",
+					"match": "(=|\\+|-|\\*|/|<|>|~|&|%|!|\\^)+"
+				},
+				{
+					"name": "punctuation.jai",
+					"match": "(\\.\\.)"
+				},
+
+				{
+					"name": "punctuation.section.parens.begin.jai",
+					"match": "\\("
+				},
+				{
+					"name": "punctuation.section.parens.end.jai",
+					"match": "\\)"
+				},
+
+				{
+					"name": "punctuation.section.braces.begin.jai",
+					"match": "\\{"
+				},
+				{
+					"name": "punctuation.section.braces.end.jai",
+					"match": "\\}"
+				},
+
+				{
+					"name": "punctuation.section.brackets.begin.jai",
+					"match": "\\["
+				},
+				{
+					"name": "punctuation.section.brackets.end.jai",
+					"match": "\\]"
+				},
+
+				{
+					"name": "punctuation.accessor.jai",
+					"match": "(\\.)"
+				},
+				{
+					"name": "punctuation.separator.jai",
+					"match": "(,)"
+				},
+				{
+					"name": "punctuation.terminator.jai",
+					"match": "(;)"
+				}
+			]
+		},
+		"numbers":
+		{
+			"patterns":
+			[
+				{
+					"match": "[(\\[{:\\s=.,\/*+<>-](0b[01_]+)",
+					"captures": {
+						"1": { "name": "constant.numeric.jai" }
+					}
+				},
+				{
+					"match": "[(\\[{:\\s=.,\/*+<>-](0x[a-fA-F_\\d]+)",
+					"captures": {
+						"1": { "name": "constant.numeric.jai" }
+					}
+				},
+				{
+					"match": "[(\\[\\{:\\s=.,\/*+<>-](\\d[\\d_]*)",
+					"captures": {
+						"1": { "name": "constant.numeric.jai" }
+					}
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.jai",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.jai",
+					"match": "\\\\."
+				}
+			]
+		},
+		"support": {
+			"patterns":
+			[
+				{
+					"name": "support.function.jai",
+					"match": "\\b(Construct|New|NewArray|Swap|__temporary_allocator|alloc|alloc_string|assert|atomic_swap|auto_release_temp|compare_and_swap|compare_and_swap2|clamp|decode_relative_pointer|enum_highest_value|enum_names|enum_range|enum_range_given_info|enum_values|exit|free|get_command_line_arguments|get_field|get_system_time|get_system_time_local|get_temporary_storage_mark|get_time|get_working_directory|init_time|max|memcpy|memcmp|memset|min|print|push_allocator|realloc|reset_temporary_storage|reset_temporary_storage|running_at_compile_time|set_temporary_storage_mark|set_working_directory|sprint|talloc|talloc_string|temporary_alloc|tprint|write_relative_pointer)\\b"
+				},
+				{
+					"name": "support.function.jai",
+					"match": "\\b(type_of|size_of|debug_break|pause|rdtsc|rdtscp|rdseed|rdrand|prefetch|read_gs_qword|atomic_add|atomic_increment|atomic_and|atomic_or|atomic_xor|mfence|cpuid|xgetbv|byte_swap|bit_scan_forward|bit_scan_reverse|popcount|write_string|write_strings|write_number|write_nonnegative_number)\\b"
+				},
+				{
+					"name": "support.class.jai",
+					"match": "\\b(Any|Source_Code_Location|Source_Code_Range)\\b"
+				}
+			]
+		},
+		"deprecated":
+		{
+			"name": "meta.function.declaration.jai",
+			"patterns":
+			[
+				{
+					"name": "invalid.deprecated.jai",
+					"match": "\\b(ALL_SOURCE_CODE_THAT_CAN_CURRENTLY_BE_INFERRED_IS_INFERRED)\\b"
+				}
+			]
+		},
+		"notes":
+		{
+			"patterns":
+			[
+				{
+					"match": "(@)([a-zA-Z_]\\w*)",
+					"captures":
+					{
+						"1": {"name": "punctuation.definition.annotation.jai"},
+						"2": {"name": "variable.annotation.jai"}
+					}
+				}
+			]
+		},
+		"for-with-both":
+		{
+			"patterns":
+			[
+				{
+					"match": "\\b(for)\\s+([a-zA-Z_]\\w*)\\s*(,)\\s*([a-zA-Z_]\\w*)\\s*(:)",
+					"captures":
+					{
+						"1": {"name": "keyword.control.jai"},
+						"2": {"name": "variable.other.declaration.jai"},
+						"3": {"name": "punctuation.separator.jai"},
+						"4": {"name": "variable.other.declaration.jai"},
+						"5": {"name": "keyword.declaration.jai"}
+					}
+				}
+			]
+		},
+		"function-calls":
+		{
+			"name": "meta.function-call.jai",
+			"patterns":
+			[
+				{
+					"match": "\\b([a-zA-Z_]\\w*)\\s*(?=\\()",
+					"name": "meta.function.call.jai"
+				}
+			]
+		},
+		"enum-members":
+		{
+			"match": "\\s(\\.[a-zA-Z_]\\w*)",
+			"name": "variable.enum.jai"
+		},
+		"structs":
+		{
+			"patterns":
+			[
+				{
+					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(::)\\s*(struct)",
+					"captures":
+					{
+						"1": {"name": "entity.name.struct.jai"},
+						"2":
+						{
+							"patterns":
+							[
+								{"include": "#comma-joined-variables"}
+							]
+						},
+						"3": {"name": "keyword.declaration.jai"},
+						"4": {"name": "keyword.declaration.struct.jai"}
+					}
+				},
+				{
+					"match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(struct)",
+					"captures":
+					{
+						"1": {"name": "entity.name.struct.jai"},
+						"2": {"name": "keyword.declaration.jai"},
+						"3": {"name": "keyword.declaration.struct.jai"}
+					}
+				}
+			]
+		},
+		"enums":
+		{
+			"patterns":
+			[
+				{
+					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(::)\\s*(enum)",
+					"captures":
+					{
+						"1": {"name": "entity.name.enum.jai"},
+						"2":
+						{
+							"patterns":
+							[
+								{"include": "#comma-joined-variables"}
+							]
+						},
+						"3": {"name": "keyword.declaration.jai"},
+						"4": {"name": "keyword.declaration.enum.jai"}
+					}
+				},
+				{
+					"match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(enum)",
+					"captures":
+					{
+						"1": {"name": "entity.name.enum.jai"},
+						"2": {"name": "keyword.declaration.jai"},
+						"3": {"name": "keyword.declaration.enum.jai"}
+					}
+				}
+			]
+		},
+		"declarations":
+		{
+			"patterns":
+			[
+				{
+					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*((\\*)*([a-zA-Z_]\\w*))?\\s*(:)",
+					"captures":
+					{
+						"1": {"name": "variable.other.constant.declaration.jai"},
+						"2":
+						{
+							"patterns":
+							[
+								{"include": "#comma-joined-variables"}
+							]
+						},
+						"4": {"name": "storage.type.jai"},
+						"5": {"name": "keyword.operator.jai"},
+						"7": {"name": "keyword.declaration.jai"}
+					}
+				},
+				{
+					"match": "\\b([a-zA-Z_]\\w*)\\s*(:)\\s*((\\*)*([a-zA-Z_]\\w*))?\\s*(:)",
+					"captures":
+					{
+						"1": {"name": "variable.other.constant.declaration.jai"},
+						"2": {"name": "keyword.declaration.jai"},
+						"3": {"name": "storage.type.jai"},
+						"4": {"name": "keyword.operator.jai"},
+						"6": {"name": "keyword.declaration.jai"}
+					}
+				},
+				{
+					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*((\\*)*([a-zA-Z_]\\w*))?\\s*(=)?",
+					"captures":
+					{
+						"1": {"name": "variable.other.declaration.jai"},
+						"2":
+						{
+							"patterns":
+							[
+								{"include": "#comma-joined-variables"}
+							]
+						},
+						"4": {"name": "storage.type.jai"},
+						"5": {"name": "keyword.operator.jai"},
+						"7": {"name": "keyword.declaration.jai"}
+					}
+				},
+				{
+					"match": "\\b([a-zA-Z_]\\w*)\\s*(:)\\s*((\\*)*([a-zA-Z_]\\w*))?\\s*(=)?",
+					"captures":
+					{
+						"1": {"name": "variable.other.declaration.jai"},
+						"2": {"name": "keyword.declaration.jai"},
+						"3": {"name": "storage.type.jai"},
+						"4": {"name": "keyword.operator.jai"},
+						"6": {"name": "keyword.declaration.jai"}
+					}
+				}
+			]
+		},
+		"variables":
+		{
+			"patterns":
+			[
+				{
+					"match": "\\b([a-zA-Z_]\\w*)(\\.[a-zA-Z0-9_.]+)?\\b",
+					"captures":
+					{
+						"1": {"name": "variable.other.jai"},
+						"2":
+						{
+							"patterns":
+							[
+								{"include": "#members"}
+							]
+						}
+					}
+				}
+			],
+			"repository":
+			{
+				"members":
+				{
+					"match": "(\\.)([a-zA-Z_]\\w*)",
+					"captures":
+					{
+						"1": {"name": "punctuation.accessor.jai"},
+						"2": {"name": "variable.other.member.jai"}
+					}
+				}
+			}
+		},
+		"proc":
+		{
+			"name": "meta.function.declaration.jai",
+			"patterns":
+			[
+				{
+					"match": "\\b([A-Za-z_]\\w*|(operator)([^ :]+))\\s*(::)\\s*(inline\\s*)?(\\()(.*)(\\))\\s*((->)([^{]+))?",
+					"captures":
+					{
+						"1":
+						{
+							"name": "entity.name.function.jai"
+						},
+						"2":
+						{
+							"name": "keyword.other.jai"
+						},
+						"3":
+						{
+							"name": "keyword.operator.jai"
+						},
+						"4":
+						{
+							"name": "keyword.declaration.jai"
+						},
+						"5":
+						{
+							"name": "storage.modifier.jai"
+						},
+						"6":
+						{
+							"name": "punctuation.section.parens.begin.jai"
+						},
+						"7":
+						{
+							"name": "meta.function.parameters.jai",
+							"patterns": [
+								{"include": "#parameter-declarations"}
+							]
+						},
+						"8":
+						{
+							"name": "punctuation.section.parens.end.jai"
+						},
+						"10":
+						{
+							"name": "punctuation.return.jai"
+						},
+						"11":
+						{
+							"name": "meta.function.return-type.jai",
+							"patterns": [
+								{"include": "#return-declarations"}
+							]
+						}
+					}
+				}
+			],
+			"repository":
+			{
+				"parameter-declarations":
+				{
+					"patterns":
+					[
+						{
+							"match": "(,)?\\s*((\\$)*[a-zA-Z_]\\w*)\\s*(:=)([^,\\)])*",
+							"captures":
+							{
+								"1": {"name": "punctuation.separator.parameters.jai"},
+								"2": {"name": "variable.parameter.jai"},
+								"3": {"name": "punctuation.definition.generic.jai"},
+								"4": {"name": "keyword.declaration.jai"},
+								"5":
+								{
+									"patterns":
+									[
+										{"include": "#expression"}
+									]
+								}
+							}
+						},
+						{
+							"match": "(,)?\\s*((\\$)*[a-zA-Z_]\\w*)\\s*(:)\\s*(\\.\\.)?\\s*(\\[[^\\]*]\\])?\\s*((\\*)*($)?[a-zA-Z_]\\w*)?\\s*(=)?([^,\\)])*",
+							"captures":
+							{
+								"1":  {"name": "punctuation.separator.parameters.jai"},
+								"2":  {"name": "variable.parameter.jai"},
+								"3":  {"name": "punctuation.definition.generic.jai"},
+								"4":  {"name": "keyword.declaration.jai"},
+								"5":  {"name": "punctuation.jai"},
+								"6":  {"include": "#array"},
+								"7":  {"name": "storage.type.jai"},
+								"8":  {"name": "keyword.operator.pointer.jai"},
+								"9":  {"name": "punctuation.definition.generic.jai"},
+								"10": {"name": "keyword.declaration.jai"},
+								"11":
+								{
+									"patterns":
+									[
+										{"include": "#expression"}
+									]
+								}
+							}
+						}
+					]
+				},
+				"return-declarations":
+				{
+					"patterns":
+					[
+						{
+							"match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\*)*(\\$)*[a-zA-Z_]\\w*)",
+							"captures":
+							{
+								"1": {"name": "punctuation.separator.parameters.jai"},
+								"2": {"name": "variable.parameter.return.jai"},
+								"3": {"name": "keyword.declaration.jai"},
+								"4": {"name": "storage.type.jai"},
+								"5":
+								{
+									"patterns": [
+										{"include": "#array"}
+									]
+								},
+								"6": {"name": "keyword.operator.pointer.jai"},
+								"7": {"name": "punctuation.definition.generic"},
+								"10": {"name": "storage.type.jai"}
+							}
+						},
+						{
+							"match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\*)*(\\$)*[a-zA-Z_]\\w*)",
+							"captures":
+							{
+								"1": {"name": "punctuation.separator.parameters.jai"},
+								"2": {"name": "storage.type.jai"},
+								"3":
+								{
+									"patterns": [
+										{"include": "#array"}
+									]
+								},
+								"4": {"name": "keyword.operator.pointer.jai"},
+								"5": {"name": "punctuation.definition.generic"},
+								"8": {"name": "storage.type.jai"}
+							}
+						}
+					]
+				}
+			}
+		},
+		"more-numbers":
+		{
+			"patterns":
+			[
+				{
+					"match": "(0b[01_]+)",
+					"captures": {
+						"1": { "name": "constant.numeric.jai" }
+					}
+				},
+				{
+					"match": "(0x[a-fA-F_\\d]+)",
+					"captures": {
+						"1": { "name": "constant.numeric.jai" }
+					}
+				},
+				{
+					"match": "(\\d[\\d_]*)",
+					"captures": {
+						"1": { "name": "constant.numeric.jai" }
+					}
+				}
+			]
+		},
+		"comma-joined-variables":
+		{
+			"match": "(,)([a-zA-Z_]\\w*)",
+			"captures":
+			{
+				"1": { "name": "punctuation.separator.jai" },
+				"2": { "name": "variable.other.declaration.jai" }
+			}
+		},
+		"array":
+		{
+			"match": "(\\[)[^\\]]*(\\])",
+			"captures":
+			{
+				"1": { "name": "punctuation.section.brackets.begin.jai" },
+				"2": { "name": "punctuation.section.brackets.end.jai" }
+			}
+		},
+		"expression":
+		{
+			"patterns":
+			[
+				{ "include": "#strings" },
+				{ "include": "#keywords" },
+				{ "include": "#symbols" },
+				{ "include": "#support" },
+				{ "include": "#numbers" },
+				{ "include": "#enum-members" },
+				{ "include": "#function-calls" },
+				{ "include": "#variables" },
+				{ "include": "#deprecated" },
+				{ "include": "#more-numbers" }
+			]
+		}
+	},
+	"scopeName": "source.jai"
+}

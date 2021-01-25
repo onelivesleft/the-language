@@ -1,0 +1,23 @@
+{
+    "comments": {
+        "lineComment": "//",
+        "blockComment": [ "/*", "*/" ]
+    },
+    "brackets": [
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"]
+    ],
+    "autoClosingPairs": [
+        ["{", "}", ["string", "comment"]],
+        ["[", "]", ["string", "comment"]],
+        ["(", ")",  ["string", "comment"]],
+        ["\"", "\"",  ["string"]],
+    ],
+    "surroundingPairs": [
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"],
+        ["\"", "\""]
+    ]
+}
