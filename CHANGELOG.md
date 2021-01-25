@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.0.6] - 2021-
+* xx is a cast
+* better cast grammar
+* grammar fixes
+
 ## [0.0.5] - 2021-01-25
 * Basic provider functionality
 * Here strings, nested comments

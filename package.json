@@ -2,7 +2,7 @@
     "name": "the-language",
     "displayName": "The Language",
     "description": "Support for the Jai language.",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "repository": {
         "type": "git",
         "url": "https://github.com/onelivesleft/the-language"
@@ -19,12 +19,6 @@
     ],
     "main": "./out/extension.js",
     "contributes": {
-        "commands": [
-			{
-				"command": "the-language.test",
-				"title": "The Language Test"
-			}
-		],
         "languages": [
             {
                 "id": "jai",

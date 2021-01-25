@@ -32,7 +32,7 @@ class JaiReferenceProvider implements vscode.ReferenceProvider {
 							 options: { includeDeclaration: boolean }, token: vscode.CancellationToken):
 	Thenable<vscode.Location[]> {
 		return new Promise((resolve, reject) => {
-			jaiLocate(document.fileName, position).then(output => {
+			jaiLocate(document.fileName, position, "Reference").then(output => {
 				if (output === undefined) {
 					reject();
 				}
@@ -51,7 +51,7 @@ class JaiDefinitionProvider implements vscode.DefinitionProvider {
 							 token: vscode.CancellationToken):
 	vscode.ProviderResult<vscode.Definition | vscode.DefinitionLink[]> {
 		return new Promise<vscode.Definition>((resolve, reject) => {
-			jaiLocate(document.fileName, position).then(output => {
+			jaiLocate(document.fileName, position, "Definition").then(output => {
 				if (output === undefined) {
 					reject();
 				}
@@ -70,7 +70,7 @@ class JaiRenameProvider implements vscode.RenameProvider {
 							  token: vscode.CancellationToken):
 	Thenable<vscode.WorkspaceEdit> {
 		return new Promise<vscode.WorkspaceEdit>((resolve, reject) => {
-			jaiLocate(document.fileName, position).then(output => {
+			jaiLocate(document.fileName, position, "Rename").then(output => {
 				if (output === undefined) {
 					reject();
 				}
@@ -91,7 +91,7 @@ class JaiRenameProvider implements vscode.RenameProvider {
 }
 
 
-async function jaiLocate(filepath: string, position: vscode.Position): Promise<string | undefined> {
+async function jaiLocate(filepath: string, position: vscode.Position, operation: string): Promise<string | undefined> {
 	let config = vscode.workspace.getConfiguration('the-language');
 	let exe_path = config.get("pathToJaiExecutable");
 	if (exe_path === undefined) return;
@@ -104,7 +104,8 @@ async function jaiLocate(filepath: string, position: vscode.Position): Promise<s
 		normalized,
 		normalized,
 		(position.line + 1).toString(),
-		(position.character + 1).toString()
+		(position.character + 1).toString(),
+		operation
 	];
 
 	return execCommand(exe_path as string, args);

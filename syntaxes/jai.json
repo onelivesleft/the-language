@@ -1,4 +1,5 @@
 {
+	"scopeName": "source.jai",
 	"name": "Jai",
 	"patterns":
 	[
@@ -11,6 +12,7 @@
 		{ "include": "#structs"},
 		{ "include": "#enums"},
 		{ "include": "#keywords" },
+		{ "include": "#casts" },
 		{ "include": "#symbols" },
 		{ "include": "#support" },
 		{ "include": "#numbers" },
@@ -96,16 +98,12 @@
 					"match": "\\b(defer)\\b"
 				},
 				{
-					"name": "keyword.control.cast.jai",
-					"match": "\\b(cast|,no_check|,trunc)\\b"
-				},
-				{
 					"name": "keyword.other.directive.jai",
 					"match": "(#assert|#bake_arguments|#bake|#caller_location|#char|#compiler|#complete|#dump|#expand|#foreign|#foreign-library|#if|#insert|#intrinsic|#modify|#must|#run|#scope_export|#scope_file|#scope_module|#string|#through)\\b"
 				},
 				{
 					"name": "keyword.other.jai",
-					"match": "\\b(using|xx|operator)\\b"
+					"match": "\\b(using|operator)\\b"
 				},
 				{
 					"name": "constant.language.jai",
@@ -132,6 +130,28 @@
 					"match": "\\b(it|it_index)\\b"
 				}
 			]
+		},
+		"casts":
+		{
+			"patterns":
+			[
+				{
+					"match": "\\b(cast(,trunc)?(,no_check)?(,trunc)?)\\s*(\\()\\s*((\\**)[a-zA-Z_]\\w*)\\s*(\\))",
+					"captures":
+					{
+						"1": {"name": "keyword.control.cast.jai"},
+						"5": {"name": "punctuation.section.parens.begin.jai"},
+						"6": {"name": "storage.type"},
+						"7": {"name": "keyword.operator.pointer.jai"},
+						"8": {"name": "punctuation.section.parens.begin.jai"}
+					}
+				},
+				{
+					"name": "keyword.control.cast.jai",
+					"match": "\\b(xx)\\b"
+				}
+			]
+
 		},
 		"symbols":
 		{
@@ -412,7 +432,7 @@
 			"patterns":
 			[
 				{
-					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*((\\*)*([a-zA-Z_]\\w*))?\\s*(:)",
+					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*((\\**)([a-zA-Z_]\\w*))?\\s*(:)",
 					"captures":
 					{
 						"1": {"name": "variable.other.constant.declaration.jai"},
@@ -429,7 +449,7 @@
 					}
 				},
 				{
-					"match": "\\b([a-zA-Z_]\\w*)\\s*(:)\\s*((\\*)*([a-zA-Z_]\\w*))?\\s*(:)",
+					"match": "\\b([a-zA-Z_]\\w*)\\s*(:)\\s*((\\**)([a-zA-Z_]\\w*))?\\s*(:)",
 					"captures":
 					{
 						"1": {"name": "variable.other.constant.declaration.jai"},
@@ -440,7 +460,7 @@
 					}
 				},
 				{
-					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*((\\*)*([a-zA-Z_]\\w*))?\\s*(=)?",
+					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*((\\**)([a-zA-Z_]\\w*))?\\s*(=)?",
 					"captures":
 					{
 						"1": {"name": "variable.other.declaration.jai"},
@@ -457,7 +477,7 @@
 					}
 				},
 				{
-					"match": "\\b([a-zA-Z_]\\w*)\\s*(:)\\s*((\\*)*([a-zA-Z_]\\w*))?\\s*(=)?",
+					"match": "\\b([a-zA-Z_]\\w*)\\s*(:)\\s*((\\**)([a-zA-Z_]\\w*))?\\s*(=)?",
 					"captures":
 					{
 						"1": {"name": "variable.other.declaration.jai"},
@@ -566,7 +586,7 @@
 					"patterns":
 					[
 						{
-							"match": "(,)?\\s*((\\$)*[a-zA-Z_]\\w*)\\s*(:=)([^,\\)])*",
+							"match": "(,)?\\s*((\\$*)[a-zA-Z_]\\w*)\\s*(:=)([^,\\)])*",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -583,7 +603,7 @@
 							}
 						},
 						{
-							"match": "(,)?\\s*((\\$)*[a-zA-Z_]\\w*)\\s*(:)\\s*(\\.\\.)?\\s*(\\[[^\\]*]\\])?\\s*((\\*)*($)?[a-zA-Z_]\\w*)?\\s*(=)?([^,\\)])*",
+							"match": "(,)?\\s*((\\$*)[a-zA-Z_]\\w*)\\s*(:)\\s*(\\.\\.)?\\s*(\\[[^\\]*]\\])?\\s*((\\**)($)?[a-zA-Z_]\\w*)?\\s*(=)?([^,\\)])*",
 							"captures":
 							{
 								"1":  {"name": "punctuation.separator.parameters.jai"},
@@ -612,7 +632,7 @@
 					"patterns":
 					[
 						{
-							"match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\*)*(\\$)*[a-zA-Z_]\\w*)",
+							"match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -631,7 +651,7 @@
 							}
 						},
 						{
-							"match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\*)*(\\$)*[a-zA-Z_]\\w*)",
+							"match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -699,6 +719,7 @@
 			[
 				{ "include": "#strings" },
 				{ "include": "#keywords" },
+				{ "include": "#casts" },
 				{ "include": "#symbols" },
 				{ "include": "#support" },
 				{ "include": "#numbers" },
@@ -709,6 +730,5 @@
 				{ "include": "#more-numbers" }
 			]
 		}
-	},
-	"scopeName": "source.jai"
+	}
 }
