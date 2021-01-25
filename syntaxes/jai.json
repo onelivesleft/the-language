@@ -7,7 +7,7 @@
 		{ "include": "#imports" },
 		{ "include": "#strings" },
 		{ "include": "#proc" },
-		{ "include": "#for-with-both"},
+		{ "include": "#for-with-identifiers"},
 		{ "include": "#structs"},
 		{ "include": "#enums"},
 		{ "include": "#keywords" },
@@ -143,7 +143,7 @@
 				},
 				{
 					"name": "keyword.operator.jai",
-					"match": "(=|\\+|-|\\*|/|<|>|~|&|%|!|\\^)+"
+					"match": "(=|\\+|-|\\*|/|<|>|~|\\||&|%|!|\\^)+"
 				},
 				{
 					"name": "punctuation.jai",
@@ -219,9 +219,26 @@
 			"patterns":
 			[
 				{
+					"name": "string.quoted.double.empty.jai",
+					"match": "(\")(\")",
+					"captures":
+					{
+						"1": {"name": "punctuation.definition.string.empty.begin.jai"},
+						"2": {"name": "punctuation.definition.string.empty.end.jai"}
+					}
+				},
+				{
 					"name": "string.quoted.double.jai",
-					"begin": "\"",
-					"end": "\"",
+					"begin": "(\")",
+					"end": "(\"|$)",
+					"beginCaptures":
+					{
+						"1": {"name": "punctuation.definition.string.begin.jai"}
+					},
+					"endCaptures":
+					{
+						"1": {"name": "punctuation.definition.string.end.jai"}
+					},
 					"patterns": [
 						{
 							"name": "constant.character.escape.jai",
@@ -286,7 +303,7 @@
 				}
 			]
 		},
-		"for-with-both":
+		"for-with-identifiers":
 		{
 			"patterns":
 			[
@@ -299,6 +316,15 @@
 						"3": {"name": "punctuation.separator.jai"},
 						"4": {"name": "variable.other.declaration.jai"},
 						"5": {"name": "keyword.declaration.jai"}
+					}
+				},
+				{
+					"match": "\\b(for)\\s+([a-zA-Z_]\\w*)\\s*(:)",
+					"captures":
+					{
+						"1": {"name": "keyword.control.jai"},
+						"2": {"name": "variable.other.declaration.jai"},
+						"3": {"name": "keyword.declaration.jai"}
 					}
 				}
 			]
