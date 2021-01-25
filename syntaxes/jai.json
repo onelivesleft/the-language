@@ -27,16 +27,35 @@
 		"block-comments":
 		{
 			"name": "comment.block.jai",
-			"begin": "\\/\\*",
-			"end": "\\*\\/"
+			"begin": "(\\/\\*)",
+			"end": "(\\*\\/)",
+			"beginCaptures":
+			{
+				"1": {"name": "punctuation.definition.comment.jai"}
+			},
+			"endCaptures":
+			{
+				"1": {"name": "punctuation.definition.comment.jai"}
+			},
+			"patterns":
+			[
+				{
+					"name": "comment.block.jai",
+					"include": "#block-comments"
+				}
+			]
 		},
 		"comments":
 		{
 			"patterns":
 			[
 				{
-					"name": "comment.line.double-slash.jai",
-					"match": "(//.*)"
+					"match": "(//)(.*)",
+					"captures":
+					{
+						"1": {"name": "punctuation.definition.comment.jai"},
+						"2": {"name": "comment.line.double-slash.jai"}
+					}
 				}
 			]
 		},
@@ -48,10 +67,10 @@
 					"match": "(#import|#load)\\s*(\")([^\"]+)(\")",
 					"captures":
 					{
-						"1": {"name": "keyword.control.import"},
-						"2": {"name": "punctuation.definition.string.import.begin"},
-						"3": {"name": "string-quoted.other"},
-						"4": {"name": "punctuation.definition.string.import.end"}
+						"1": {"name": "keyword.control.import.directive.jai"},
+						"2": {"name": "punctuation.definition.string.import.begin.jai"},
+						"3": {"name": "string-quoted.other.jai"},
+						"4": {"name": "punctuation.definition.string.import.end.jai"}
 					}
 				}
 			]
@@ -81,7 +100,7 @@
 					"match": "\\b(cast|,no_check|,trunc)\\b"
 				},
 				{
-					"name": "keyword.other.jai",
+					"name": "keyword.other.directive.jai",
 					"match": "(#assert|#bake_arguments|#bake|#caller_location|#char|#compiler|#complete|#dump|#expand|#foreign|#foreign-library|#if|#insert|#intrinsic|#modify|#must|#run|#scope_export|#scope_file|#scope_module|#string|#through)\\b"
 				},
 				{
@@ -197,13 +216,31 @@
 			]
 		},
 		"strings": {
-			"name": "string.quoted.double.jai",
-			"begin": "\"",
-			"end": "\"",
-			"patterns": [
+			"patterns":
+			[
 				{
-					"name": "constant.character.escape.jai",
-					"match": "\\\\."
+					"name": "string.quoted.double.jai",
+					"begin": "\"",
+					"end": "\"",
+					"patterns": [
+						{
+							"name": "constant.character.escape.jai",
+							"match": "\\\\."
+						}
+					]
+				},
+				{
+					"name": "string.here.jai",
+					"begin": "(#string)\\s+(.*)",
+					"end": "\\s*(\\2)",
+					"beginCaptures": {
+						"1": {"name": "keyword.other.directive.jai"},
+						"2": {"name": "constant.other.stringdelimiter.here.jai"}
+					},
+					"endCaptures": {
+						"1": {"name": "constant.other.stringdelimiter.here.jai"}
+					},
+					"contentName": "string.unquoted.here.jai"
 				}
 			]
 		},
