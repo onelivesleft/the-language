@@ -11,13 +11,13 @@
 		{ "include": "#fors"},
 		{ "include": "#structs"},
 		{ "include": "#enums"},
+		{ "include": "#enum-members" },
 		{ "include": "#keywords" },
 		{ "include": "#casts" },
 		{ "include": "#symbols" },
 		{ "include": "#support" },
 		{ "include": "#numbers" },
 		{ "include": "#notes" },
-		{ "include": "#enum-members" },
 		{ "include": "#function-calls" },
 		{ "include": "#declarations" },
 		{ "include": "#variables" },
@@ -103,7 +103,7 @@
 				},
 				{
 					"name": "keyword.other.jai",
-					"match": "\\b(using|operator)\\b"
+					"match": "\\b(using)\\b"
 				},
 				{
 					"name": "constant.language.true.jai",
@@ -131,7 +131,7 @@
 				},
 				{
 					"name": "storage.type.jai",
-					"match": "\\b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void)\\b"
+					"match": "\\b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void|Type)\\b"
 				},
 				{
 					"name": "support.variable.jai",
@@ -298,7 +298,7 @@
 				},
 				{
 					"name": "support.function.jai",
-					"match": "\\b(type_of|size_of|debug_break|pause|rdtsc|rdtscp|rdseed|rdrand|prefetch|read_gs_qword|atomic_add|atomic_increment|atomic_and|atomic_or|atomic_xor|mfence|cpuid|xgetbv|byte_swap|bit_scan_forward|bit_scan_reverse|popcount|write_string|write_strings|write_number|write_nonnegative_number)\\b"
+					"match": "\\b(align_of|type_of|size_of|type_info|initializer_of|debug_break|pause|rdtsc|rdtscp|rdseed|rdrand|prefetch|read_gs_qword|atomic_add|atomic_increment|atomic_and|atomic_or|atomic_xor|mfence|cpuid|xgetbv|byte_swap|bit_scan_forward|bit_scan_reverse|popcount|push_context|write_string|write_strings|write_number|write_nonnegative_number)\\b"
 				},
 				{
 					"name": "support.class.jai",
@@ -380,8 +380,12 @@
 		},
 		"enum-members":
 		{
-			"match": "\\s(\\.[a-zA-Z_]\\w*)",
-			"name": "variable.enum.jai"
+			"match": "(\\s|[~])(\\.[a-zA-Z_]\\w*)",
+			"captures":
+			{
+				"1": {"name": "keyword.operator.jai"},
+				"2": {"name": "variable.enum.jai"}
+			}
 		},
 		"structs":
 		{
@@ -419,7 +423,7 @@
 			"patterns":
 			[
 				{
-					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(::)\\s*(enum)",
+					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(::)\\s*(enum(_flags))",
 					"captures":
 					{
 						"1": {"name": "entity.name.enum.jai"},
@@ -435,7 +439,7 @@
 					}
 				},
 				{
-					"match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(enum)",
+					"match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(enum(_flags))",
 					"captures":
 					{
 						"1": {"name": "entity.name.enum.jai"},
@@ -545,33 +549,15 @@
 			"patterns":
 			[
 				{
-					"match": "\\b([A-Za-z_]\\w*|(operator)([^ :]+))\\s*(::)\\s*(inline\\s*)?(\\()(.*)(\\))\\s*((->)([^{]+))?",
+					"match": "\\b((for_expansion|operator([^ :]+))|[A-Za-z_]\\w*)\\s*(::)\\s*(inline|no_inline)?\\s*(\\()(.*)(\\))\\s*((->)([^{]+))?",
 					"captures":
 					{
-						"1":
-						{
-							"name": "entity.name.function.jai"
-						},
-						"2":
-						{
-							"name": "keyword.other.jai"
-						},
-						"3":
-						{
-							"name": "keyword.operator.jai"
-						},
-						"4":
-						{
-							"name": "keyword.declaration.jai"
-						},
-						"5":
-						{
-							"name": "storage.modifier.jai"
-						},
-						"6":
-						{
-							"name": "punctuation.section.parens.begin.jai"
-						},
+						"1": { "name": "entity.name.function.jai"},
+						"2": { "name": "keyword.other.jai"},
+						"3": { "name": "keyword.operator.jai"},
+						"4": { "name": "keyword.declaration.jai"},
+						"5": { "name": "storage.modifier.jai"},
+						"6": { "name": "punctuation.section.parens.begin.jai"},
 						"7":
 						{
 							"name": "meta.function.parameters.jai",
@@ -579,14 +565,8 @@
 								{"include": "#parameter-declarations"}
 							]
 						},
-						"8":
-						{
-							"name": "punctuation.section.parens.end.jai"
-						},
-						"10":
-						{
-							"name": "punctuation.return.jai"
-						},
+						"8": { "name": "punctuation.section.parens.end.jai"},
+						"10": { "name": "punctuation.return.jai"},
 						"11":
 						{
 							"name": "meta.function.return-type.jai",
@@ -650,7 +630,7 @@
 					"patterns":
 					[
 						{
-							"match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)",
+							"match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -665,11 +645,11 @@
 								},
 								"6": {"name": "keyword.operator.pointer.jai"},
 								"7": {"name": "punctuation.definition.generic"},
-								"10": {"name": "storage.type.jai"}
+								"8": {"name": "keyword.other.directive.jai"}
 							}
 						},
 						{
-							"match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)",
+							"match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -682,7 +662,7 @@
 								},
 								"4": {"name": "keyword.operator.pointer.jai"},
 								"5": {"name": "punctuation.definition.generic"},
-								"8": {"name": "storage.type.jai"}
+								"6": {"name": "keyword.other.directive.jai"}
 							}
 						}
 					]
