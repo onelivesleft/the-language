@@ -18,7 +18,6 @@
 		{ "include": "#support" },
 		{ "include": "#numbers" },
 		{ "include": "#notes" },
-		{ "include": "#function-calls" },
 		{ "include": "#declarations" },
 		{ "include": "#variables" },
 		{ "include": "#deprecated" },
@@ -66,13 +65,45 @@
 			"patterns":
 			[
 				{
-					"match": "(#import|#load)\\s*(\")([^\"]+)(\")",
+					"match": "^\\s*(#import|#load)\\s+(\")([^\"]+)(\")",
 					"captures":
 					{
 						"1": {"name": "keyword.control.import.directive.jai"},
 						"2": {"name": "punctuation.definition.string.import.begin.jai"},
-						"3": {"name": "string-quoted.other.jai"},
+						"3": {"name": "string-quoted.other.import.jai"},
 						"4": {"name": "punctuation.definition.string.import.end.jai"}
+					}
+				},
+				{
+					"match": "^\\s*(#import|#load)\\s+(\"[^\"]*)?$",
+					"captures":
+					{
+						"1": {"name": "keyword.control.import.directive.jai"},
+						"2": {"name": "punctuation.definition.string.import.begin.jai"},
+						"3": {"name": "string-quoted.other.import.jai"}
+					}
+				},
+				{
+					"match": "^\\s*([A-Za-z_]\\w*)\\s*(::)\\s*(#foreign_(system_)?library)\\s+(\")([^\"]+)(\")",
+					"captures":
+					{
+						"1": {"name": "constant.other.import.jai"},
+						"2": {"name": "keyword.declaration.jai"},
+						"3": {"name": "keyword.control.import.directive.jai"},
+						"5": {"name": "punctuation.definition.string.import.begin.jai"},
+						"6": {"name": "string-quoted.other.import.jai"},
+						"7": {"name": "punctuation.definition.string.import.end.jai"}
+					}
+				},
+				{
+					"match": "^\\s*([A-Za-z_]\\w*)\\s*(::)\\s*(#foreign_(system_)?library)\\s+(\"[^\"]*)?$",
+					"captures":
+					{
+						"1": {"name": "constant.other.import.jai"},
+						"2": {"name": "keyword.declaration.jai"},
+						"3": {"name": "keyword.control.import.directive.jai"},
+						"5": {"name": "punctuation.definition.string.import.begin.jai"},
+						"6": {"name": "string-quoted.other.import.jai"}
 					}
 				}
 			]
@@ -99,7 +130,15 @@
 				},
 				{
 					"name": "keyword.other.directive.jai",
-					"match": "(#assert|#bake_arguments|#bake|#caller_location|#char|#compiler|#complete|#dump|#expand|#foreign|#foreign-library|#if|#insert|#intrinsic|#modify|#must|#run|#scope_export|#scope_file|#scope_module|#string|#through)\\b"
+					"match": "(#add_context|#align|#assert|#caller_location|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#place|#placeholder|#program_export|#run|#specified|#symmetric|#through|#type|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint)\\b"
+				},
+				{
+					"name": "keyword.other.directive.scope.jai",
+					"match": "(#scope_export|#scope_file|#scope_module)"
+				},
+				{
+					"name": "keyword.other.directive.string.jai",
+					"match": "(#char)"
 				},
 				{
 					"name": "keyword.other.jai",
@@ -279,7 +318,7 @@
 					"begin": "(#string)\\s+(.*)",
 					"end": "\\s*(\\2)",
 					"beginCaptures": {
-						"1": {"name": "keyword.other.directive.jai"},
+						"1": {"name": "keyword.other.directive.string.jai"},
 						"2": {"name": "constant.other.stringdelimiter.here.jai"}
 					},
 					"endCaptures": {
@@ -313,7 +352,7 @@
 			[
 				{
 					"name": "invalid.deprecated.jai",
-					"match": "\\b(ALL_SOURCE_CODE_THAT_CAN_CURRENTLY_BE_INFERRED_IS_INFERRED)\\b"
+					"match": "\\b(ALL_SOURCE_CODE_THAT_CAN_CURRENTLY_BE_INFERRED_IS_INFERRED|#run_and_insert)\\b"
 				}
 			]
 		},
@@ -367,87 +406,40 @@
 				}
 			]
 		},
-		"function-calls":
-		{
-			"name": "meta.function-call.jai",
-			"patterns":
-			[
-				{
-					"match": "\\b([a-zA-Z_]\\w*)\\s*(?=\\()",
-					"name": "meta.function.call.jai"
-				}
-			]
-		},
 		"enum-members":
 		{
-			"match": "(\\s|[~])(\\.[a-zA-Z_]\\w*)",
+			"match": "([^\\w])(\\.[a-zA-Z_]\\w*)",
 			"captures":
 			{
-				"1": {"name": "keyword.operator.jai"},
+				"1":
+				{
+					"patterns":
+					[
+						{"include": "#expression"}
+					]
+				},
 				"2": {"name": "variable.enum.jai"}
 			}
 		},
 		"structs":
 		{
-			"patterns":
-			[
-				{
-					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(::)\\s*(struct)",
-					"captures":
-					{
-						"1": {"name": "entity.name.struct.jai"},
-						"2":
-						{
-							"patterns":
-							[
-								{"include": "#comma-joined-variables"}
-							]
-						},
-						"3": {"name": "keyword.declaration.jai"},
-						"4": {"name": "keyword.declaration.struct.jai"}
-					}
-				},
-				{
-					"match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(struct)",
-					"captures":
-					{
-						"1": {"name": "entity.name.struct.jai"},
-						"2": {"name": "keyword.declaration.jai"},
-						"3": {"name": "keyword.declaration.struct.jai"}
-					}
-				}
-			]
+			"match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(struct)",
+			"captures":
+			{
+				"1": {"name": "entity.name.struct.jai"},
+				"2": {"name": "keyword.declaration.jai"},
+				"3": {"name": "keyword.declaration.struct.jai"}
+			}
 		},
 		"enums":
 		{
-			"patterns":
-			[
-				{
-					"match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(::)\\s*(enum(_flags))",
-					"captures":
-					{
-						"1": {"name": "entity.name.enum.jai"},
-						"2":
-						{
-							"patterns":
-							[
-								{"include": "#comma-joined-variables"}
-							]
-						},
-						"3": {"name": "keyword.declaration.jai"},
-						"4": {"name": "keyword.declaration.enum.jai"}
-					}
-				},
-				{
-					"match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(enum(_flags))",
-					"captures":
-					{
-						"1": {"name": "entity.name.enum.jai"},
-						"2": {"name": "keyword.declaration.jai"},
-						"3": {"name": "keyword.declaration.enum.jai"}
-					}
-				}
-			]
+			"match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(enum(_flags)?)",
+			"captures":
+			{
+				"1": {"name": "entity.name.enum.jai"},
+				"2": {"name": "keyword.declaration.jai"},
+				"3": {"name": "keyword.declaration.enum.jai"}
+			}
 		},
 		"declarations":
 		{
@@ -545,35 +537,87 @@
 		},
 		"proc":
 		{
-			"name": "meta.function.declaration.jai",
 			"patterns":
 			[
 				{
-					"match": "\\b((for_expansion|operator([^ :]+))|[A-Za-z_]\\w*)\\s*(::)\\s*(inline|no_inline)?\\s*(\\()(.*)(\\))\\s*((->)([^{]+))?",
+					"name": "meta.function.declaration.jai",
+					"match": "\\b((for_expansion|operator\\s*([^ :]+))|[A-Za-z_]\\w*)\\s*(::)\\s*((inline)\\s*|(no_inline)\\s*)*(\\()(.*)(\\))\\s*((->)([^{]+))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*",
 					"captures":
 					{
 						"1": { "name": "entity.name.function.jai"},
 						"2": { "name": "keyword.other.jai"},
 						"3": { "name": "keyword.operator.jai"},
 						"4": { "name": "keyword.declaration.jai"},
-						"5": { "name": "storage.modifier.jai"},
-						"6": { "name": "punctuation.section.parens.begin.jai"},
-						"7":
+						"6": { "name": "storage.modifier.jai"},
+						"7": { "name": "storage.modifier.jai"},
+						"8": { "name": "punctuation.section.parens.begin.jai"},
+						"9":
 						{
 							"name": "meta.function.parameters.jai",
 							"patterns": [
 								{"include": "#parameter-declarations"}
 							]
 						},
-						"8": { "name": "punctuation.section.parens.end.jai"},
-						"10": { "name": "punctuation.return.jai"},
-						"11":
+						"10": { "name": "punctuation.section.parens.end.jai"},
+						"12": { "name": "punctuation.return.jai"},
+						"13":
 						{
 							"name": "meta.function.return-type.jai",
 							"patterns": [
 								{"include": "#return-declarations"}
 							]
-						}
+						},
+						"14": {"name": "keyword.control.import.directive.decl.jai"},
+						"17": {"name": "constant.other.import.jai"},
+						"18": {"name": "punctuation.terminator.jai"},
+						"19": {"name": "keyword.other.directive.jai"}
+					}
+				},
+				{
+					"name": "meta.function.declaration.jai",
+					"match": "\\b([A-Za-z_]\\w*)\\s*(::)\\s*(#bake(_arguments))\\s+([A-Za-z_]\\w*)\\s*(\\()(.*)(\\))",
+					"captures":
+					{
+						"1": { "name": "entity.name.function.jai"},
+						"2": { "name": "keyword.declaration.jai"},
+						"3": { "name": "keyword.other.directive.jai"},
+						"5": { "name": "entity.name.function.jai"},
+						"6": { "name": "punctuation.section.parens.begin.jai"},
+						"7":
+						{
+							"name": "meta.function.parameters.jai",
+							"patterns": [
+								{"include": "#parameters"}
+							]
+						},
+						"8": { "name": "punctuation.section.parens.end.jai"}
+					}
+				},
+				{
+					"name": "meta.function.call.jai",
+					"match": "\\b([A-Za-z_]\\w*)\\s*(\\()(\\))",
+					"captures":
+					{
+						"1": { "name": "entity.name.function.jai"},
+						"2": { "name": "punctuation.section.parens.begin.jai"},
+						"3": { "name": "punctuation.section.parens.end.jai"}
+					}
+				},
+				{
+					"name": "meta.function.call.jai",
+					"match": "\\b([A-Za-z_]\\w*)\\s*(\\()(.*)(\\))",
+					"captures":
+					{
+						"1": { "name": "entity.name.function.jai"},
+						"2": { "name": "punctuation.section.parens.begin.jai"},
+						"3":
+						{
+							"name": "meta.function.parameters.jai",
+							"patterns": [
+								{"include": "#parameters"}
+							]
+						},
+						"4": { "name": "punctuation.section.parens.end.jai"}
 					}
 				}
 			],
@@ -625,12 +669,35 @@
 						}
 					]
 				},
+				"parameters":
+				{
+					"patterns":
+					[
+						{
+							"match": "(,)?(\\s*#code)?\\s*(([a-zA-Z_]\\w*)\\s*(=))?([^,\\)]*)",
+							"captures":
+							{
+								"1": {"name": "punctuation.separator.parameters.jai"},
+								"2": {"name": "keyword.other.directive.jai"},
+								"4": {"name": "variable.parameter.jai"},
+								"5": {"name": "keyword.operator.jai"},
+								"6":
+								{
+									"patterns":
+									[
+										{"include": "#expression"}
+									]
+								}
+							}
+						}
+					]
+				},
 				"return-declarations":
 				{
 					"patterns":
 					[
 						{
-							"match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?",
+							"match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*((//).*)?",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -645,11 +712,19 @@
 								},
 								"6": {"name": "keyword.operator.pointer.jai"},
 								"7": {"name": "punctuation.definition.generic"},
-								"8": {"name": "keyword.other.directive.jai"}
+								"8": {"name": "keyword.other.directive.jai"},
+								"10": {"name": "punctuation.definition.annotation.jai"},
+								"11": {"name": "variable.annotation.jai"},
+								"12": {"name": "keyword.control.import.directive.r1.jai"},
+								"15": {"name": "constant.other.import.jai"},
+								"16": {"name": "punctuation.terminator.jai"},
+								"17": {"name": "keyword.other.directive.jai"},
+								"18": {"name": "comment.line.double-slash.jai"},
+								"19": {"name": "punctuation.definition.comment.jai"}
 							}
 						},
 						{
-							"match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?",
+							"match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*((//).*)?",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -662,7 +737,15 @@
 								},
 								"4": {"name": "keyword.operator.pointer.jai"},
 								"5": {"name": "punctuation.definition.generic"},
-								"6": {"name": "keyword.other.directive.jai"}
+								"6": {"name": "keyword.other.directive.jai"},
+								"8": {"name": "punctuation.definition.annotation.jai"},
+								"9": {"name": "variable.annotation.jai"},
+								"10": {"name": "keyword.control.import.directive.jai"},
+								"13": {"name": "constant.other.import.jai"},
+								"14": {"name": "punctuation.terminator.jai"},
+								"15": {"name": "keyword.other.directive.jai"},
+								"16": {"name": "comment.line.double-slash.jai"},
+								"17": {"name": "punctuation.definition.comment.jai"}
 							}
 						}
 					]
@@ -723,7 +806,8 @@
 				{ "include": "#numbers" },
 				{ "include": "#enum-members" },
 				{ "include": "#deprecated" },
-				{ "include": "#more-numbers" }
+				{ "include": "#more-numbers" },
+				{ "include": "#variables" }
 			]
 		}
 	}

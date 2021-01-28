@@ -1,10 +1,26 @@
 # Change Log
 
+## [0.0.17] - 2021-01-27
+* all directives [A-F]
+* @tag in function return
+
+## [0.0.16] - 2021-01-27
+* better #load/#import
+
+## [0.0.15] - 2021-01-27
+* #placeholder
+
+## [0.0.14] - 2021-01-26
+* fixed enum member
+
+## [0.0.13] - 2021-01-26
+* fixed enum
+
 ## [0.0.12] - 2021-01-26
 * for_expansion
 * ~.ENUM
 
-* ## [0.0.11] - 2021-01-25
+## [0.0.11] - 2021-01-25
 * #must
 
 ## [0.0.10] - 2021-01-25
