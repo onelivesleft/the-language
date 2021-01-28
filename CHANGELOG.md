@@ -1,7 +1,7 @@
 # Change Log
 
 ## [0.0.17] - 2021-01-27
-* all directives [A-F]
+* all directives
 * @tag in function return
 
 ## [0.0.16] - 2021-01-27
