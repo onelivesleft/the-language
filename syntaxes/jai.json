@@ -7,7 +7,9 @@
 		{ "include": "#comments" },
 		{ "include": "#imports" },
 		{ "include": "#strings" },
+		{ "include": "#deprecated-names" },
 		{ "include": "#proc" },
+		{ "include": "#deprecated" },
 		{ "include": "#fors"},
 		{ "include": "#structs"},
 		{ "include": "#enums"},
@@ -19,8 +21,8 @@
 		{ "include": "#numbers" },
 		{ "include": "#notes" },
 		{ "include": "#declarations" },
+		{ "include": "#more-directives" },
 		{ "include": "#variables" },
-		{ "include": "#deprecated" },
 		{ "include": "#more-numbers" }
 	],
 	"repository":
@@ -347,14 +349,19 @@
 		},
 		"deprecated":
 		{
-			"name": "meta.function.declaration.jai",
-			"patterns":
-			[
-				{
-					"name": "invalid.deprecated.jai",
-					"match": "\\b(ALL_SOURCE_CODE_THAT_CAN_CURRENTLY_BE_INFERRED_IS_INFERRED|#run_and_insert)\\b"
-				}
-			]
+			"match": "(#deprecated\\s*((\")([^\"]*)(\"))?)",
+			"captures":
+			{
+				"1": {"name": "invalid.deprecated.jai"},
+				"3": {"name": "punctuation.definition.string.deprecated.begin.jai"},
+				"4": {"name": "string-quoted.other.deprecated.jai"},
+				"5": {"name": "punctuation.definition.string.deprecated.end.jai"}
+			}
+		},
+		"deprecated-names":
+		{
+			"name": "invalid.deprecated.jai",
+			"match": "\\b(Compiler_Message_Compilation_Phase|ALL_SOURCE_CODE_THAT_CAN_CURRENTLY_BE_INFERRED_IS_INFERRED|#run_and_insert|compiler_report_error|compiler_info|compiler_warning|compiler_error)\\b"
 		},
 		"notes":
 		{
@@ -547,7 +554,7 @@
 			[
 				{
 					"name": "meta.function.declaration.jai",
-					"match": "\\b((for_expansion|operator\\s*([^ :]+))|[A-Za-z_]\\w*)\\s*(::)\\s*((inline)\\s*|(no_inline)\\s*)*(\\()(.*)(\\))\\s*((->)([^{]+))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*",
+					"match": "\\b((for_expansion|operator\\s*([^ :]+))|[A-Za-z_]\\w*)\\s*(::)\\s*((inline)\\s*|(no_inline)\\s*)*(\\()(.*)(\\))\\s*((->)([^{]+))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")([^\"]*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*",
 					"captures":
 					{
 						"1": { "name": "entity.name.function.jai"},
@@ -575,8 +582,12 @@
 						},
 						"14": {"name": "keyword.control.import.directive.decl.jai"},
 						"17": {"name": "constant.other.import.jai"},
-						"18": {"name": "punctuation.terminator.jai"},
-						"19": {"name": "keyword.other.directive.jai"}
+						"18": {"name": "invalid.deprecated.jai"},
+						"20": {"name": "punctuation.definition.string.deprecated.begin.jai"},
+						"21": {"name": "string-quoted.other.deprecated.jai"},
+						"22": {"name": "punctuation.definition.string.deprecated.end.jai"},
+						"23": {"name": "punctuation.terminator.jai"},
+						"24": {"name": "keyword.other.directive.jai"}
 					}
 				},
 				{
@@ -703,7 +714,7 @@
 					"patterns":
 					[
 						{
-							"match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*((//).*)?",
+							"match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")([^\"]*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*((//).*)?",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -723,14 +734,20 @@
 								"11": {"name": "variable.annotation.jai"},
 								"12": {"name": "keyword.control.import.directive.r1.jai"},
 								"15": {"name": "constant.other.import.jai"},
-								"16": {"name": "punctuation.terminator.jai"},
-								"17": {"name": "keyword.other.directive.jai"},
-								"18": {"name": "comment.line.double-slash.jai"},
-								"19": {"name": "punctuation.definition.comment.jai"}
+
+								"16": {"name": "invalid.deprecated.jai"},
+								"18": {"name": "punctuation.definition.string.deprecated.begin.jai"},
+								"19": {"name": "string-quoted.other.deprecated.jai"},
+								"20": {"name": "punctuation.definition.string.deprecated.end.jai"},
+
+								"21": {"name": "punctuation.terminator.jai"},
+								"22": {"name": "keyword.other.directive.jai"},
+								"23": {"name": "comment.line.double-slash.jai"},
+								"24": {"name": "punctuation.definition.comment.jai"}
 							}
 						},
 						{
-							"match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*((//).*)?",
+							"match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")([^\"]*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*((//).*)?",
 							"captures":
 							{
 								"1": {"name": "punctuation.separator.parameters.jai"},
@@ -748,10 +765,16 @@
 								"9": {"name": "variable.annotation.jai"},
 								"10": {"name": "keyword.control.import.directive.jai"},
 								"13": {"name": "constant.other.import.jai"},
-								"14": {"name": "punctuation.terminator.jai"},
-								"15": {"name": "keyword.other.directive.jai"},
-								"16": {"name": "comment.line.double-slash.jai"},
-								"17": {"name": "punctuation.definition.comment.jai"}
+
+								"14": {"name": "invalid.deprecated.jai"},
+								"16": {"name": "punctuation.definition.string.deprecated.begin.jai"},
+								"17": {"name": "string-quoted.other.deprecated.jai"},
+								"18": {"name": "punctuation.definition.string.deprecated.end.jai"},
+
+								"19": {"name": "punctuation.terminator.jai"},
+								"20": {"name": "keyword.other.directive.jai"},
+								"21": {"name": "comment.line.double-slash.jai"},
+								"22": {"name": "punctuation.definition.comment.jai"}
 							}
 						}
 					]
@@ -815,6 +838,15 @@
 				{ "include": "#more-numbers" },
 				{ "include": "#variables" }
 			]
+		},
+		"more-directives":
+		{
+			"match": "(#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)",
+			"captures":
+			{
+				"1": {"name": "keyword.control.import.directive.decl.jai"},
+				"3": {"name": "constant.other.import.jai"}
+			}
 		}
 	}
 }

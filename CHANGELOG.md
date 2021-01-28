@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.18] - 2021-01-28
+* deprecations
+
 ## [0.0.17] - 2021-01-27
 * all directives
 * @tag in function return
