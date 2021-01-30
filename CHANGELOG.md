@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.19] - 2021-01-28
+* Fixed cast()
+* composite literals
+
 ## [0.0.18] - 2021-01-28
 * deprecations
 
