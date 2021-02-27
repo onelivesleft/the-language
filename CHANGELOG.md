@@ -1,5 +1,67 @@
 # Change Log
 
+## [0.0.38] - 2021-02-27
+* remove vestigial decorations
+
+## [0.0.37] - 2021-02-27
+* better config defaults
+
+## [0.0.36] - 2021-02-27
+* embed language background color decorations
+
+## [0.0.35] - 2021-02-26
+* rewrite into yaml + build script
+* lots more languages
+* `#string` wrappers
+
+## [0.0.34] - 2021-02-25
+* `main`
+
+## [0.0.33] - 2021-02-21
+* cast parameters
+
+## [0.0.32] - 2021-02-21
+* `using` parameter
+
+## [0.0.31] - 2021-02-21
+* Added `log`
+
+## [0.0.30] - 2021-02-19
+* Fix support.function calls
+
+## [0.0.29] - 2021-02-08
+* Fix arrays
+
+## [0.0.28] - 2021-02-08
+* Fix comments at end of line
+
+## [0.0.27] - 2021-02-08
+* Fix string not understanding escaped "
+
+## [0.0.26] - 2021-02-07
+* Fix here string not ignoring whitespace
+
+## [0.0.25] - 2021-02-07
+* Fix incorrect ) match in parameters
+
+## [0.0.24] - 2021-02-07
+* Added @tags in comments
+* Added @Note signature in comments
+
+## [0.0.23] - 2021-02-06
+* Added support for doc-comments (`/**`)
+* Added highlight to things quoted with backticks in comments
+
+## [0.0.22] - 2021-02-03
+* Fixed non-namespaced proc call
+
+## [0.0.21] - 2021-02-03
+* Fixed #import/#load when not at start of line
+
+## [0.0.20] - 2021-02-01
+* Fixed enum member as parameter
+* Fixed namespace.proc() call
+
 ## [0.0.19] - 2021-01-28
 * Fixed cast()
 * composite literals

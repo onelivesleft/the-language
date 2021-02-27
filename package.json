@@ -2,7 +2,7 @@
     "name": "the-language",
     "displayName": "The Language",
     "description": "Support for the Jai language.",
-    "version": "0.0.19",
+    "version": "0.0.38",
     "repository": {
         "type": "git",
         "url": "https://github.com/onelivesleft/the-language"
@@ -43,9 +43,28 @@
             "title": "Jai",
             "properties": {
                 "the-language.pathToJaiExecutable": {
-                "type": "string",
-                "default": "c:/jai/bin/jai.exe",
-                "description": "The path to the jai compiler executable."
+                    "type": "string",
+                    "default": "c:/jai/bin/jai.exe",
+                    "description": "The path to the jai compiler executable."
+                },
+                "the-language.embedColors": {
+                    "type": "array",
+                    "title": "Embedded Language Background Color",
+                    "properties": {
+                        "language": {
+                            "type": "string",
+                            "description": "Language identifier"
+                        },
+                        "color": {
+                            "type": "string",
+                            "description": "Background color of region",
+                            "format": "color"
+                        }
+                    },
+                    "default": [
+                        {"language": "default", "color": "#222222"}
+                    ],
+                    "description": "Background colors used when language is embedded in a #string or Markdown code block."
                 }
             }
         }

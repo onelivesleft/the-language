@@ -1,4 +1,2 @@
 # TODO
-
-* #type recurse proc def
-* TYPE.{} should be a type
+* #foreign et al can come after a single `:` if they're a typedef kinda thing
