@@ -165,6 +165,65 @@
                             "name": "comment.block.signature.date.jai"
                         }
                     }
+                },
+                { "match": "(\\[) (\\])(.*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.checklist.brackets.todo.begin.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.punctuation.checklist.brackets.todo.end.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.block.punctuation.checklist.item.todo.jai"
+                        }
+                    }
+                },
+                { "match": "(\\[)(\\.)(\\])(.*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.checklist.brackets.partial.begin.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.punctuation.checklist.mark.partial.begin.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.block.punctuation.checklist.brackets.partial.end.jai"
+                        },
+                        "4":
+                        {
+                            "name": "comment.block.punctuation.checklist.item.partial.jai"
+                        }
+                    }
+                },
+                { "match": "(\\[)([^ \\.])(\\])(.*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.checklist.brackets.done.begin.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.punctuation.checklist.mark.done.end.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.block.punctuation.checklist.brackets.done.end.jai"
+                        },
+                        "4":
+                        {
+                            "name": "comment.block.punctuation.checklist.item.done.jai"
+                        }
+                    }
                 }
             ]
         },
@@ -294,6 +353,65 @@
                                         "3":
                                         {
                                             "name": "comment.line.double-slash.signature.date.jai"
+                                        }
+                                    }
+                                },
+                                { "match": "(\\[) (\\])(.*)",
+                                    "captures":
+                                    {
+                                        "1":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.brackets.todo.begin.jai"
+                                        },
+                                        "2":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.brackets.todo.end.jai"
+                                        },
+                                        "3":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.item.todo.jai"
+                                        }
+                                    }
+                                },
+                                { "match": "(\\[)(\\.)(\\])(.*)",
+                                    "captures":
+                                    {
+                                        "1":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.brackets.partial.begin.jai"
+                                        },
+                                        "2":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.mark.partial.begin.jai"
+                                        },
+                                        "3":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.brackets.partial.end.jai"
+                                        },
+                                        "4":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.item.partial.jai"
+                                        }
+                                    }
+                                },
+                                { "match": "(\\[)([^ \\.])(\\])(.*)",
+                                    "captures":
+                                    {
+                                        "1":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.brackets.done.begin.jai"
+                                        },
+                                        "2":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.mark.done.end.jai"
+                                        },
+                                        "3":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.brackets.done.end.jai"
+                                        },
+                                        "4":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.item.done.jai"
                                         }
                                     }
                                 }
@@ -1754,6 +1872,27 @@
                         { "include": "source.arm"
                      }]
                 },
+                { "begin": "((?i)```bat)",
+                    "end": "(```)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.bat.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.bat.jai"
+                        }
+                    },
+                    "patterns":
+                    [
+                        { "include": "source.batchfile"
+                     }]
+                },
                 { "begin": "((?i)```c(\\+\\+|pp))",
                     "end": "(```)",
                     "beginCaptures":
@@ -2027,6 +2166,48 @@
                         { "include": "source.makefile"
                      }]
                 },
+                { "begin": "((?i)```(metal|msl))",
+                    "end": "(```)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.metal.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.metal.jai"
+                        }
+                    },
+                    "patterns":
+                    [
+                        { "include": "source.metal"
+                     }]
+                },
+                { "begin": "((?i)```(powershell|psl))",
+                    "end": "(```)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.psl.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.psl.jai"
+                        }
+                    },
+                    "patterns":
+                    [
+                        { "include": "source.powershell"
+                     }]
+                },
                 { "begin": "((?i)```py(thon)?)",
                     "end": "(```)",
                     "beginCaptures":
@@ -2046,6 +2227,27 @@
                     "patterns":
                     [
                         { "include": "source.python"
+                     }]
+                },
+                { "begin": "((?i)```sh(ell)?)",
+                    "end": "(```)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.sh.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.sh.jai"
+                        }
+                    },
+                    "patterns":
+                    [
+                        { "include": "source.shell"
                      }]
                 },
                 { "begin": "((?i)```shaderlab)",
@@ -2195,7 +2397,7 @@
                         { "include": "source.yaml"
                      }]
                 },
-                { "begin": "((?i)```x?html)",
+                { "begin": "((?i)```(xhtml|html))",
                     "end": "(```)",
                     "beginCaptures":
                     {
@@ -2380,6 +2582,41 @@
                     "patterns":
                     [
                         { "include": "source.arm"
+                     }]
+                },
+                { "name": "string.here.embed.bat.jai",
+                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(bat))\\b",
+                    "end": "\\s*(\\3)(\\4)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "keyword.other.directive.string.bat.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.bat.jai"
+                        },
+                        "4":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.bat.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.bat.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.bat.jai"
+                        }
+                    },
+                    "contentName": "string.unquoted.here.embed.bat.jai",
+                    "patterns":
+                    [
+                        { "include": "source.batchfile"
                      }]
                 },
                 { "name": "string.here.embed.cpp.jai",
@@ -2837,6 +3074,76 @@
                         { "include": "source.makefile"
                      }]
                 },
+                { "name": "string.here.embed.metal.jai",
+                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?((metal|msl)))\\b",
+                    "end": "\\s*(\\3)(\\4)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "keyword.other.directive.string.metal.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.metal.jai"
+                        },
+                        "4":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.metal.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.metal.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.metal.jai"
+                        }
+                    },
+                    "contentName": "string.unquoted.here.embed.metal.jai",
+                    "patterns":
+                    [
+                        { "include": "source.metal"
+                     }]
+                },
+                { "name": "string.here.embed.psl.jai",
+                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?((powershell|psl)))\\b",
+                    "end": "\\s*(\\3)(\\4)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "keyword.other.directive.string.psl.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.psl.jai"
+                        },
+                        "4":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.psl.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.psl.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.psl.jai"
+                        }
+                    },
+                    "contentName": "string.unquoted.here.embed.psl.jai",
+                    "patterns":
+                    [
+                        { "include": "source.powershell"
+                     }]
+                },
                 { "name": "string.here.embed.python.jai",
                     "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(py(thon)?))\\b",
                     "end": "\\s*(\\3)(\\4)",
@@ -2870,6 +3177,41 @@
                     "patterns":
                     [
                         { "include": "source.python"
+                     }]
+                },
+                { "name": "string.here.embed.sh.jai",
+                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(sh(ell)?))\\b",
+                    "end": "\\s*(\\3)(\\4)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "keyword.other.directive.string.sh.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.sh.jai"
+                        },
+                        "4":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.sh.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.sh.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.sh.jai"
+                        }
+                    },
+                    "contentName": "string.unquoted.here.embed.sh.jai",
+                    "patterns":
+                    [
+                        { "include": "source.shell"
                      }]
                 },
                 { "name": "string.here.embed.shaderlab.jai",
@@ -3118,7 +3460,7 @@
                      }]
                 },
                 { "name": "string.here.embed.html.jai",
-                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(x?html))\\b",
+                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?((xhtml|html)))\\b",
                     "end": "\\s*(\\3)(\\4)",
                     "beginCaptures":
                     {

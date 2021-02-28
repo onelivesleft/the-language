@@ -181,6 +181,7 @@ function subtract(range: vscode.Range, sorted_subtractors: vscode.Range []): [vs
 
 		if (to_remove.start.isBeforeOrEqual(remainder.start)) {
 			if (to_remove.end.isAfterOrEqual(remainder.end)) {
+				changed = true;
 				remainder = undefined;
 				break;
 			}

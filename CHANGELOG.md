@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.0.41] - 2021-02-28
+* factored languages
+* added a couple more languages
+
+## [0.0.40] - 2021-02-28
+* fixed selection interaction with decorations
+
+## [0.0.39] - 2021-02-27
+* checklist comments
+
 ## [0.0.38] - 2021-02-27
 * remove vestigial decorations
 

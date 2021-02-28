@@ -91,6 +91,34 @@ repository:
             name: comment.block.signature.name.jai
           '3':
             name: comment.block.signature.date.jai
+      - match: (\[) (\])(.*)
+        captures:
+          '1':
+            name: comment.block.punctuation.checklist.brackets.todo.begin.jai
+          '2':
+            name: comment.block.punctuation.checklist.brackets.todo.end.jai
+          '3':
+            name: comment.block.punctuation.checklist.item.todo.jai
+      - match: (\[)(\.)(\])(.*)
+        captures:
+          '1':
+            name: comment.block.punctuation.checklist.brackets.partial.begin.jai
+          '2':
+            name: comment.block.punctuation.checklist.mark.partial.begin.jai
+          '3':
+            name: comment.block.punctuation.checklist.brackets.partial.end.jai
+          '4':
+            name: comment.block.punctuation.checklist.item.partial.jai
+      - match: (\[)([^ \.])(\])(.*)
+        captures:
+          '1':
+            name: comment.block.punctuation.checklist.brackets.done.begin.jai
+          '2':
+            name: comment.block.punctuation.checklist.mark.done.end.jai
+          '3':
+            name: comment.block.punctuation.checklist.brackets.done.end.jai
+          '4':
+            name: comment.block.punctuation.checklist.item.done.jai
   comments:
     patterns:
       - match: (//)(.*)
@@ -153,6 +181,34 @@ repository:
                     name: comment.line.double-slash.signature.name.jai
                   '3':
                     name: comment.line.double-slash.signature.date.jai
+              - match: (\[) (\])(.*)
+                captures:
+                  '1':
+                    name: comment.block.punctuation.checklist.brackets.todo.begin.jai
+                  '2':
+                    name: comment.block.punctuation.checklist.brackets.todo.end.jai
+                  '3':
+                    name: comment.block.punctuation.checklist.item.todo.jai
+              - match: (\[)(\.)(\])(.*)
+                captures:
+                  '1':
+                    name: comment.block.punctuation.checklist.brackets.partial.begin.jai
+                  '2':
+                    name: comment.block.punctuation.checklist.mark.partial.begin.jai
+                  '3':
+                    name: comment.block.punctuation.checklist.brackets.partial.end.jai
+                  '4':
+                    name: comment.block.punctuation.checklist.item.partial.jai
+              - match: (\[)([^ \.])(\])(.*)
+                captures:
+                  '1':
+                    name: comment.block.punctuation.checklist.brackets.done.begin.jai
+                  '2':
+                    name: comment.block.punctuation.checklist.mark.done.end.jai
+                  '3':
+                    name: comment.block.punctuation.checklist.brackets.done.end.jai
+                  '4':
+                    name: comment.block.punctuation.checklist.item.done.jai
   imports:
     patterns:
       - match: '^\s*([A-Za-z_]\w*)\s*(::)\s*(#import)\s+(")([^"]+)(")'
