@@ -166,7 +166,7 @@
                         }
                     }
                 },
-                { "match": "(\\[) (\\])(.*)",
+                { "match": "(\\[)( )(\\])(.*)",
                     "captures":
                     {
                         "1":
@@ -175,9 +175,13 @@
                         },
                         "2":
                         {
-                            "name": "comment.block.punctuation.checklist.brackets.todo.end.jai"
+                            "name": "comment.block.punctuation.checklist.mark.todo.jai"
                         },
                         "3":
+                        {
+                            "name": "comment.block.punctuation.checklist.brackets.todo.end.jai"
+                        },
+                        "4":
                         {
                             "name": "comment.block.punctuation.checklist.item.todo.jai"
                         }
@@ -192,7 +196,7 @@
                         },
                         "2":
                         {
-                            "name": "comment.block.punctuation.checklist.mark.partial.begin.jai"
+                            "name": "comment.block.punctuation.checklist.mark.partial.jai"
                         },
                         "3":
                         {
@@ -213,7 +217,7 @@
                         },
                         "2":
                         {
-                            "name": "comment.block.punctuation.checklist.mark.done.end.jai"
+                            "name": "comment.block.punctuation.checklist.mark.done.jai"
                         },
                         "3":
                         {
@@ -356,7 +360,7 @@
                                         }
                                     }
                                 },
-                                { "match": "(\\[) (\\])(.*)",
+                                { "match": "(\\[)( )(\\])(.*)",
                                     "captures":
                                     {
                                         "1":
@@ -365,9 +369,13 @@
                                         },
                                         "2":
                                         {
-                                            "name": "comment.block.punctuation.checklist.brackets.todo.end.jai"
+                                            "name": "comment.block.punctuation.checklist.mark.todo.jai"
                                         },
                                         "3":
+                                        {
+                                            "name": "comment.block.punctuation.checklist.brackets.todo.end.jai"
+                                        },
+                                        "4":
                                         {
                                             "name": "comment.block.punctuation.checklist.item.todo.jai"
                                         }
@@ -382,7 +390,7 @@
                                         },
                                         "2":
                                         {
-                                            "name": "comment.block.punctuation.checklist.mark.partial.begin.jai"
+                                            "name": "comment.block.punctuation.checklist.mark.partial.jai"
                                         },
                                         "3":
                                         {
@@ -403,7 +411,7 @@
                                         },
                                         "2":
                                         {
-                                            "name": "comment.block.punctuation.checklist.mark.done.end.jai"
+                                            "name": "comment.block.punctuation.checklist.mark.done.jai"
                                         },
                                         "3":
                                         {

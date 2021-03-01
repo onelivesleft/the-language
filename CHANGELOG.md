@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.43] - 2021-03-01
+* Updated README
+
 ## [0.0.42] - 2021-03-01
 * fixed checklist grammar
 * Updated README
