@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.42] - 2021-03-01
+* fixed checklist grammar
+* Updated README
+
 ## [0.0.41] - 2021-02-28
 * factored languages
 * added a couple more languages
