@@ -5,7 +5,9 @@
 #load "languages.jai";
 
 
-// @TODO generate @tag comment grammar
+// @TODO
+// [ ] generate @tag comment grammar
+// [ ] parameterized notes
 
 
 in_file           :: "jai.yaml";

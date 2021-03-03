@@ -281,7 +281,7 @@ repository:
         match: \b(return|break|continue)\b
       - name: keyword.control.loop.jai
         match: \b(while|for)\b
-      - name: keyword.control.jai
+      - name: keyword.control.defer.jai
         match: \b(defer)\b
       - name: keyword.other.directive.jai
         match: (#add_context|#align|#assert|#caller_location|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#place|#placeholder|#program_export|#run|#specified|#symmetric|#through|#type|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint)\b
@@ -289,7 +289,7 @@ repository:
         match: (#scope_export|#scope_file|#scope_module)
       - name: keyword.other.directive.string.jai
         match: (#char)
-      - name: keyword.other.jai
+      - name: keyword.other.using.jai
         match: \b(using)\b
       - name: constant.language.true.jai
         match: \b(true)\b
@@ -326,7 +326,7 @@ repository:
   symbols:
     patterns:
       - name: keyword.declaration.jai
-        match: '(::|:=|:)+'
+        match: '(::|:=|:)'
       - name: keyword.operator.jai
         match: (=|\+|-|\*|/|<|>|~|\||&|%|!|\^)+
       - name: punctuation.jai
@@ -387,6 +387,18 @@ repository:
     match: \b(#run_and_insert|compiler_report_error|compiler_info|compiler_warning|compiler_error)\b
   notes:
     patterns:
+      - match: '(@)([a-zA-Z_]\w*)(\()([^)]*)(\))'
+        captures:
+          '1':
+            name: punctuation.definition.annotation.jai
+          '2':
+            name: variable.annotation.jai
+          '3':
+            name: punctuation.section.parens.annotation.begin.jai
+          '4':
+            name: variable.annotation.parameter.jai
+          '5':
+            name: punctuation.section.parens.annotation.end.jai
       - match: '(@)([a-zA-Z_]\w*)'
         captures:
           '1':
@@ -645,44 +657,52 @@ repository:
           '8':
             name: punctuation.section.parens.end.jai
       - name: meta.function.call.jai
-        match: '(([A-Za-z_]\w*)(\.))?\b([A-Za-z_]\w*)\s*(\()(\))'
+        match: '(([A-Za-z_]\w*)(\.)(([A-Za-z_]\w*)(\.))*)?\b([A-Za-z_]\w*)\s*(\()(\))'
         captures:
           '2':
             name: entity.name.namespace.jai
           '3':
             name: punctuation.accessor.jai
-          '4':
+          '5':
+            name: entity.name.namespace.member.jai
+          '6':
+            name: punctuation.accessor.jai
+          '7':
             patterns:
               - include: '#support'
               - match: (.*)
                 captures:
                   '1':
                     name: entity.name.function.jai
-          '5':
+          '8':
             name: punctuation.section.parens.begin.jai
-          '6':
+          '9':
             name: punctuation.section.parens.end.jai
       - name: meta.function.call.jai
-        match: '(([A-Za-z_]\w*)(\.))?\b([A-Za-z_]\w*)\s*(\()(.*)(\))'
+        match: '(([A-Za-z_]\w*)(\.)(([A-Za-z_]\w*)(\.))*)?\b([A-Za-z_]\w*)\s*(\()(.*)(\))'
         captures:
           '2':
             name: entity.name.namespace.jai
           '3':
             name: punctuation.accessor.jai
-          '4':
+          '5':
+            name: entity.name.namespace.member.jai
+          '6':
+            name: punctuation.accessor.jai
+          '7':
             patterns:
               - include: '#support'
               - match: (.*)
                 captures:
                   '1':
                     name: entity.name.function.jai
-          '5':
+          '8':
             name: punctuation.section.parens.begin.jai
-          '6':
+          '9':
             name: meta.function.parameters.jai
             patterns:
               - include: '#parameters'
-          '7':
+          '10':
             name: punctuation.section.parens.end.jai
     repository:
       parameter-declarations:

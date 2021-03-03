@@ -27,7 +27,7 @@ export const languages = [
     ["vdf", /.*(vdf|valve)/i],
     ["x64", /.*x(86_)?64/i],
     ["yaml", /.*yaml/i],
-    ["html", /.*(xhtml|html)/i],
+    ["html", /.*html/i],
     ["md", /.*(md|markdown)/i],
     ["xml", /.*xml/i],
     ["xsl", /.*xsl/i],

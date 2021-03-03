@@ -25,7 +25,7 @@ languages :: Language.[
     .{id = "vdf",       source = "source.vdf",           pattern = "(vdf|valve)"},
     .{id = "x64",       source = "source.asm.x86_64",    pattern = "x(86_)?64"},
     .{id = "yaml",      source = "source.yaml",          pattern = "yaml"},
-    .{id = "html",      source = "text.html.derivative", pattern = "(xhtml|html)"},
+    .{id = "html",      source = "text.html.derivative", pattern = "html"},
     .{id = "md",        source = "text.html.markdown",   pattern = "(md|markdown)"},
     .{id = "xml",       source = "text.xml",             pattern = "xml"},
     .{id = "xsl",       source = "text.xml.xsl",         pattern = "xsl"},

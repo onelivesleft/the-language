@@ -569,7 +569,7 @@
                 { "name": "keyword.control.loop.jai",
                     "match": "\\b(while|for)\\b"
                 },
-                { "name": "keyword.control.jai",
+                { "name": "keyword.control.defer.jai",
                     "match": "\\b(defer)\\b"
                 },
                 { "name": "keyword.other.directive.jai",
@@ -581,7 +581,7 @@
                 { "name": "keyword.other.directive.string.jai",
                     "match": "(#char)"
                 },
-                { "name": "keyword.other.jai",
+                { "name": "keyword.other.using.jai",
                     "match": "\\b(using)\\b"
                 },
                 { "name": "constant.language.true.jai",
@@ -649,7 +649,7 @@
             "patterns":
             [
                 { "name": "keyword.declaration.jai",
-                    "match": "(::|:=|:)+"
+                    "match": "(::|:=|:)"
                 },
                 { "name": "keyword.operator.jai",
                     "match": "(=|\\+|-|\\*|/|<|>|~|\\||&|%|!|\\^)+"
@@ -766,6 +766,31 @@
         {
             "patterns":
             [
+                { "match": "(@)([a-zA-Z_]\\w*)(\\()([^)]*)(\\))",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "punctuation.definition.annotation.jai"
+                        },
+                        "2":
+                        {
+                            "name": "variable.annotation.jai"
+                        },
+                        "3":
+                        {
+                            "name": "punctuation.section.parens.annotation.begin.jai"
+                        },
+                        "4":
+                        {
+                            "name": "variable.annotation.parameter.jai"
+                        },
+                        "5":
+                        {
+                            "name": "punctuation.section.parens.annotation.end.jai"
+                        }
+                    }
+                },
                 { "match": "(@)([a-zA-Z_]\\w*)",
                     "captures":
                     {
@@ -1320,7 +1345,7 @@
                     }
                 },
                 { "name": "meta.function.call.jai",
-                    "match": "(([A-Za-z_]\\w*)(\\.))?\\b([A-Za-z_]\\w*)\\s*(\\()(\\))",
+                    "match": "(([A-Za-z_]\\w*)(\\.)(([A-Za-z_]\\w*)(\\.))*)?\\b([A-Za-z_]\\w*)\\s*(\\()(\\))",
                     "captures":
                     {
                         "2":
@@ -1331,7 +1356,15 @@
                         {
                             "name": "punctuation.accessor.jai"
                         },
-                        "4":
+                        "5":
+                        {
+                            "name": "entity.name.namespace.member.jai"
+                        },
+                        "6":
+                        {
+                            "name": "punctuation.accessor.jai"
+                        },
+                        "7":
                         {
                             "patterns":
                             [
@@ -1347,18 +1380,18 @@
                                 }
                             ]
                         },
-                        "5":
+                        "8":
                         {
                             "name": "punctuation.section.parens.begin.jai"
                         },
-                        "6":
+                        "9":
                         {
                             "name": "punctuation.section.parens.end.jai"
                         }
                     }
                 },
                 { "name": "meta.function.call.jai",
-                    "match": "(([A-Za-z_]\\w*)(\\.))?\\b([A-Za-z_]\\w*)\\s*(\\()(.*)(\\))",
+                    "match": "(([A-Za-z_]\\w*)(\\.)(([A-Za-z_]\\w*)(\\.))*)?\\b([A-Za-z_]\\w*)\\s*(\\()(.*)(\\))",
                     "captures":
                     {
                         "2":
@@ -1369,7 +1402,15 @@
                         {
                             "name": "punctuation.accessor.jai"
                         },
-                        "4":
+                        "5":
+                        {
+                            "name": "entity.name.namespace.member.jai"
+                        },
+                        "6":
+                        {
+                            "name": "punctuation.accessor.jai"
+                        },
+                        "7":
                         {
                             "patterns":
                             [
@@ -1385,11 +1426,11 @@
                                 }
                             ]
                         },
-                        "5":
+                        "8":
                         {
                             "name": "punctuation.section.parens.begin.jai"
                         },
-                        "6":
+                        "9":
                         {
                             "name": "meta.function.parameters.jai",
                             "patterns":
@@ -1397,7 +1438,7 @@
                                 { "include": "#parameters"
                              }]
                         },
-                        "7":
+                        "10":
                         {
                             "name": "punctuation.section.parens.end.jai"
                         }
@@ -2405,7 +2446,7 @@
                         { "include": "source.yaml"
                      }]
                 },
-                { "begin": "((?i)```(xhtml|html))",
+                { "begin": "((?i)```html)",
                     "end": "(```)",
                     "beginCaptures":
                     {
@@ -3468,7 +3509,7 @@
                      }]
                 },
                 { "name": "string.here.embed.html.jai",
-                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?((xhtml|html)))\\b",
+                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(html))\\b",
                     "end": "\\s*(\\3)(\\4)",
                     "beginCaptures":
                     {

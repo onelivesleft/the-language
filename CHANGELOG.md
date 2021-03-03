@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.45] - 2021-03-02
+* Added annotation parameters
+
+## [0.0.44] - 2021-03-01
+* Namespace struct sub-members
+
 ## [0.0.43] - 2021-03-01
 * Updated README
 
