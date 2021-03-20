@@ -1,4 +1,32 @@
-# Change Log
+# Change L
+
+## [0.0.52] - 20121-03-19
+* #unshared + #procedure_of_call
+* fixed checklists
+* fixed `for` loops
+* fixed `*/` ending decorator blocks
+
+## [0.0.51] - 2021-03-09
+* Fix order
+
+## [0.0.50] - 2021-03-09
+* Added shader pseudonym for glsl
+
+## [0.0.49] - 2021-03-07
+* Added `Decorate Embedded Blocks` option.
+
+## [0.0.48] - 2021-03-07
+* Added `#foreign "..."`
+* Added `log_error`
+* Fixed `if()`
+* Fixed `cast`
+
+## [0.0.47] - 2021-03-04
+* Fixed it/it_index declarations
+
+## [0.0.46] - 2021-03-03
+* Fixed string parameters
+* Added % formatting characters
 
 ## [0.0.45] - 2021-03-02
 * Added annotation parameters

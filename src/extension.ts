@@ -91,7 +91,9 @@ function triggerUpdateDecorations() {
 	timeout = setTimeout(updateSelectionAndDecorations, 500);
 }
 
+
 let activeEditor = vscode.window.activeTextEditor;
+
 
 function updateSelectionAndDecorations() {
 	if (!activeEditor) return;
@@ -103,6 +105,7 @@ function updateSelectionAndDecorations() {
 
 	updateDecorations();
 }
+
 
 function updateDecorations() {
 	if (!activeEditor) return;
@@ -125,6 +128,7 @@ interface EmbedLanguageColor {
 }
 
 
+let decorateEmbeds : boolean | undefined = true;
 let embedColorsConfig: EmbedLanguageColor[] | undefined;
 let embedColors: { [language: string] : string};
 let defaultEmbedColor = "#222222";
@@ -133,6 +137,9 @@ let embedDecorations: { [color: string] : vscode.TextEditorDecorationType } = {}
 
 function updateConfig() {
 	let config = vscode.workspace.getConfiguration('the-language');
+	decorateEmbeds = config.get("decorateEmbeds");
+	if (decorateEmbeds === undefined) decorateEmbeds = true;
+
 	embedColorsConfig = config.get("embedColors");
 	const isColor = /#[a-fA-F0-9]{6}/;
 	if (embedColorsConfig !== undefined) {
@@ -209,9 +216,15 @@ function subtract(range: vscode.Range, sorted_subtractors: vscode.Range []): [vs
 	return [result, changed];
 }
 
-// @TODO docstrings
 
 function decorate(editor: vscode.TextEditor) {
+	if (!decorateEmbeds) {
+		for (let color in embedDecorations) {
+			editor.setDecorations(embedDecorations[color], []);
+		}
+		return;
+	}
+
 	let sourceCode = editor.document.getText();
 	let hereString = /#string\s+([a-zA-Z_]\w*)/;
 	let docComment = /^\/\*\*/;
@@ -294,7 +307,7 @@ function decorate(editor: vscode.TextEditor) {
 					startLine = line;
 					insideDocComment = true;
 					matchedLanguage = "md";
-					endToken = "^\\*\\/";
+					endToken = "\\*\\/";
 				}
 
 				decorationColor = defaultEmbedColor;

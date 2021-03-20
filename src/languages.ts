@@ -21,6 +21,7 @@ export const languages = [
     ["python", /.*py(thon)?/i],
     ["sh", /.*sh(ell)?/i],
     ["shaderlab", /.*shaderlab/i],
+    ["shader", /.*shader/i],
     ["sql", /.*sql/i],
     ["toml", /.*toml/i],
     ["ts", /.*(ts|typescript)/i],

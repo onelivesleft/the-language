@@ -6,8 +6,18 @@
 
 
 // @TODO
-// [ ] generate @tag comment grammar
-// [ ] parameterized notes
+// [ ] setup tasks.json for module
+// [ ] rework all parentheses to begin and end correctly
+// [.] generate @tag comment grammar
+// [x] ```*/ ending doc-comment
+// [x] for i: index..haystack.count - 1 // `index` shows as type
+// [x] rework todo lists (only at start, add scope instead of replace)
+// [x] #unshared
+// [x] log_error et al
+// [x] fix `cast`
+// [x] fix `if()`
+// [x] #foreign "..."
+// [x] parameterized notes
 
 
 in_file           :: "jai.yaml";
@@ -104,7 +114,8 @@ main :: () {
         spaces := 0;
         while spaces < row.count && row[spaces] == #char " "
             spaces += 1;
-        if spaces >= row.count  continue;
+        if spaces >= row.count || row[spaces] == #char "#"
+          continue;
         if spaces % 2 {
             print("Irregular tab indent on line %\n", line_number);
             exit(1);
@@ -203,6 +214,7 @@ main :: () {
     out("\n}");
 
     write_entire_file(out_file, builder_to_string(*json));
+    print("OK!\n");
 }
 
 
@@ -306,6 +318,14 @@ strings_header :: #string ___yaml
         patterns:
           - name: constant.character.escape.jai
             match: \\.
+          - name: constant.other.placeholder.jai
+            match: %[0-9]+
+          - match: (%)%
+            captures:
+              '1':
+                name: constant.character.escape.jai
+          - name: constant.other.placeholder.jai
+            match: %
 ___yaml
 
 strings_language :: #string ___yaml

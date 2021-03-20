@@ -2,7 +2,7 @@
     "name": "the-language",
     "displayName": "The Language",
     "description": "Support for the Jai language.",
-    "version": "0.0.45",
+    "version": "0.0.52",
     "repository": {
         "type": "git",
         "url": "https://github.com/onelivesleft/the-language"
@@ -46,6 +46,11 @@
                     "type": "string",
                     "default": "c:/jai/bin/jai.exe",
                     "description": "The path to the jai compiler executable."
+                },
+                "the-language.decorateEmbeds" : {
+                    "type": "boolean",
+                    "default": "true",
+                    "description": "Decorate embedded language blocks with a background color"
                 },
                 "the-language.embedColors": {
                     "type": "array",

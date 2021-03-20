@@ -10,13 +10,13 @@
         { "include": "#strings" },
         { "include": "#deprecated-names" },
         { "include": "#casts" },
+        { "include": "#keywords" },
         { "include": "#proc" },
         { "include": "#deprecated" },
         { "include": "#fors" },
         { "include": "#structs" },
         { "include": "#enums" },
         { "include": "#enum-members" },
-        { "include": "#keywords" },
         { "include": "#composite-literals" },
         { "include": "#symbols" },
         { "include": "#support" },
@@ -166,7 +166,7 @@
                         }
                     }
                 },
-                { "match": "(\\[)( )(\\])(.*)",
+                { "match": "^\\s*(\\[)( )(\\])(.*)",
                     "captures":
                     {
                         "1":
@@ -183,11 +183,15 @@
                         },
                         "4":
                         {
-                            "name": "comment.block.punctuation.checklist.item.todo.jai"
+                            "name": "comment.block.checklist.item.todo.jai",
+                            "patterns":
+                            [
+                                { "include": "#block-comments-line"
+                             }]
                         }
                     }
                 },
-                { "match": "(\\[)(\\.)(\\])(.*)",
+                { "match": "^\\s*(\\[)(\\.)(\\])(.*)",
                     "captures":
                     {
                         "1":
@@ -204,11 +208,15 @@
                         },
                         "4":
                         {
-                            "name": "comment.block.punctuation.checklist.item.partial.jai"
+                            "name": "comment.block.checklist.item.partial.jai",
+                            "patterns":
+                            [
+                                { "include": "#block-comments-line"
+                             }]
                         }
                     }
                 },
-                { "match": "(\\[)([^ \\.])(\\])(.*)",
+                { "match": "^\\s*(\\[)([^ \\.])(\\])(.*)",
                     "captures":
                     {
                         "1":
@@ -225,7 +233,130 @@
                         },
                         "4":
                         {
-                            "name": "comment.block.punctuation.checklist.item.done.jai"
+                            "name": "comment.block.checklist.item.done.jai",
+                            "patterns":
+                            [
+                                { "include": "#block-comments-line"
+                             }]
+                        }
+                    }
+                }
+            ]
+        },
+        "block-comments-line":
+        {
+            "patterns":
+            [
+                { "match": "(`)([^`]*)(`)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.comment.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.backquoted.jai"
+                        },
+                        "3":
+                        {
+                            "name": "markup.quote.comment.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)TODO)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.annotation.todo.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.annotation.todo.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)Note)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.annotation.note.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.annotation.note.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)Urgent)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.annotation.urgent.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.annotation.urgent.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)Speed)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.annotation.speed.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.annotation.speed.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)NoCheckin)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.annotation.nocheckin.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.annotation.nocheckin.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)(\\w+)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.annotation.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.annotation.jai"
+                        }
+                    }
+                },
+                { "name": "comment.block.signature.jai",
+                    "match": "(-) (\\w+) ([0-9]{4}-[0-9]{2}-[0-9]{2})",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.signature.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.signature.name.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.block.signature.date.jai"
                         }
                     }
                 }
@@ -235,6 +366,93 @@
         {
             "patterns":
             [
+                { "match": "(//)\\s*(\\[)( )(\\])(.*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "punctuation.definition.comment.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.punctuation.checklist.brackets.todo.begin.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.line.double-slash.punctuation.checklist.mark.todo.jai"
+                        },
+                        "4":
+                        {
+                            "name": "comment.line.double-slash.punctuation.checklist.brackets.todo.end.jai"
+                        },
+                        "5":
+                        {
+                            "name": "comment.line.double-slash.checklist.item.todo.jai",
+                            "patterns":
+                            [
+                                { "include": "#comments-line"
+                             }]
+                        }
+                    }
+                },
+                { "match": "(//)\\s*(\\[)(\\.)(\\])(.*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "punctuation.definition.comment.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.punctuation.checklist.brackets.partial.begin.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.line.double-slash.punctuation.checklist.mark.partial.jai"
+                        },
+                        "4":
+                        {
+                            "name": "comment.line.double-slash.punctuation.checklist.brackets.partial.end.jai"
+                        },
+                        "5":
+                        {
+                            "name": "comment.line.double-slash.checklist.item.partial.jai",
+                            "patterns":
+                            [
+                                { "include": "#comments-line"
+                             }]
+                        }
+                    }
+                },
+                { "match": "(//)\\s*(\\[)([^ \\.])(\\])(.*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "punctuation.definition.comment.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.punctuation.checklist.brackets.done.begin.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.line.double-slash.punctuation.checklist.mark.done.jai"
+                        },
+                        "4":
+                        {
+                            "name": "comment.line.double-slash.punctuation.checklist.brackets.done.end.jai"
+                        },
+                        "5":
+                        {
+                            "name": "comment.line.double-slash.checklist.item.done.jai",
+                            "patterns":
+                            [
+                                { "include": "#comments-line"
+                             }]
+                        }
+                    }
+                },
                 { "match": "(//)(.*)",
                     "captures":
                     {
@@ -247,183 +465,127 @@
                             "name": "comment.line.double-slash.jai",
                             "patterns":
                             [
-                                { "match": "(`)([^`]*)(`)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "markup.quote.comment.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.line.double-slash.backquoted.jai"
-                                        },
-                                        "3":
-                                        {
-                                            "name": "markup.quote.comment.jai"
-                                        }
-                                    }
-                                },
-                                { "match": "(\\@)((?i)TODO)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.line.double-slash.punctuation.annotation.todo.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.line.double-slash.annotation.todo.jai"
-                                        }
-                                    }
-                                },
-                                { "match": "(\\@)((?i)Note)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.line.double-slash.punctuation.annotation.note.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.line.double-slash.annotation.note.jai"
-                                        }
-                                    }
-                                },
-                                { "match": "(\\@)((?i)Urgent)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.line.double-slash.punctuation.annotation.urgent.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.line.double-slash.annotation.urgent.jai"
-                                        }
-                                    }
-                                },
-                                { "match": "(\\@)((?i)Speed)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.line.double-slash.punctuation.annotation.speed.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.line.double-slash.annotation.speed.jai"
-                                        }
-                                    }
-                                },
-                                { "match": "(\\@)((?i)NoCheckin)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.line.double-slash.punctuation.annotation.nocheckin.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.line.double-slash.annotation.nocheckin.jai"
-                                        }
-                                    }
-                                },
-                                { "match": "(\\@)(\\w+)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.line.double-slash.punctuation.annotation.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.line.double-slash.annotation.jai"
-                                        }
-                                    }
-                                },
-                                { "name": "comment.line.double-slash.signature.jai",
-                                    "match": "(-) (\\w+) ([0-9]{4}-[0-9]{2}-[0-9]{2})",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.line.double-slash.punctuation.signature.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.line.double-slash.signature.name.jai"
-                                        },
-                                        "3":
-                                        {
-                                            "name": "comment.line.double-slash.signature.date.jai"
-                                        }
-                                    }
-                                },
-                                { "match": "(\\[)( )(\\])(.*)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.brackets.todo.begin.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.mark.todo.jai"
-                                        },
-                                        "3":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.brackets.todo.end.jai"
-                                        },
-                                        "4":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.item.todo.jai"
-                                        }
-                                    }
-                                },
-                                { "match": "(\\[)(\\.)(\\])(.*)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.brackets.partial.begin.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.mark.partial.jai"
-                                        },
-                                        "3":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.brackets.partial.end.jai"
-                                        },
-                                        "4":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.item.partial.jai"
-                                        }
-                                    }
-                                },
-                                { "match": "(\\[)([^ \\.])(\\])(.*)",
-                                    "captures":
-                                    {
-                                        "1":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.brackets.done.begin.jai"
-                                        },
-                                        "2":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.mark.done.jai"
-                                        },
-                                        "3":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.brackets.done.end.jai"
-                                        },
-                                        "4":
-                                        {
-                                            "name": "comment.block.punctuation.checklist.item.done.jai"
-                                        }
-                                    }
-                                }
-                            ]
+                                { "include": "#comments-line"
+                             }]
+                        }
+                    }
+                }
+            ]
+        },
+        "comments-line":
+        {
+            "patterns":
+            [
+                { "match": "(`)([^`]*)(`)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.comment.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.backquoted.jai"
+                        },
+                        "3":
+                        {
+                            "name": "markup.quote.comment.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)TODO)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.line.double-slash.punctuation.annotation.todo.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.annotation.todo.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)Note)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.line.double-slash.punctuation.annotation.note.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.annotation.note.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)Urgent)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.line.double-slash.punctuation.annotation.urgent.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.annotation.urgent.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)Speed)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.line.double-slash.punctuation.annotation.speed.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.annotation.speed.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)NoCheckin)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.line.double-slash.punctuation.annotation.nocheckin.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.annotation.nocheckin.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)(\\w+)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.line.double-slash.punctuation.annotation.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.annotation.jai"
+                        }
+                    }
+                },
+                { "name": "comment.line.double-slash.signature.jai",
+                    "match": "(-) (\\w+) ([0-9]{4}-[0-9]{2}-[0-9]{2})",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.line.double-slash.punctuation.signature.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.signature.name.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.line.double-slash.signature.date.jai"
                         }
                     }
                 }
@@ -566,14 +728,14 @@
                 { "name": "keyword.control.jump.jai",
                     "match": "\\b(return|break|continue)\\b"
                 },
-                { "name": "keyword.control.loop.jai",
-                    "match": "\\b(while|for)\\b"
+                { "name": "keyword.control.loop.while.jai",
+                    "match": "\\b(while)\\b"
                 },
                 { "name": "keyword.control.defer.jai",
                     "match": "\\b(defer)\\b"
                 },
                 { "name": "keyword.other.directive.jai",
-                    "match": "(#add_context|#align|#assert|#caller_location|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#place|#placeholder|#program_export|#run|#specified|#symmetric|#through|#type|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint)\\b"
+                    "match": "(#add_context|#align|#assert|#caller_location|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#place|#placeholder|#procedure_of_call|#program_export|#run|#specified|#symmetric|#through|#type|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint|#unshared)\\b"
                 },
                 { "name": "keyword.other.directive.scope.jai",
                     "match": "(#scope_export|#scope_file|#scope_module)"
@@ -604,9 +766,6 @@
                 },
                 { "name": "storage.type.jai",
                     "match": "\\b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void|Type)\\b"
-                },
-                { "name": "support.variable.jai",
-                    "match": "\\b(it|it_index)\\b"
                 }
             ]
         },
@@ -640,7 +799,7 @@
                     }
                 },
                 { "name": "keyword.control.cast.jai",
-                    "match": "\\b(xx)\\b"
+                    "match": "\\b(xx|cast)\\b"
                 }
             ]
         },
@@ -652,7 +811,10 @@
                     "match": "(::|:=|:)"
                 },
                 { "name": "keyword.operator.jai",
-                    "match": "(=|\\+|-|\\*|/|<|>|~|\\||&|%|!|\\^)+"
+                    "match": "(=|\\+|-|\\*|/|<|>|~|\\||&|!|\\^)+"
+                },
+                { "name": "keyword.operator.percent.jai",
+                    "match": "%"
                 },
                 { "name": "punctuation.jai",
                     "match": "(\\.\\.)"
@@ -724,7 +886,7 @@
             "patterns":
             [
                 { "name": "support.function.jai",
-                    "match": "\\b(Construct|New|NewArray|Swap|__temporary_allocator|alloc|alloc_string|assert|atomic_swap|auto_release_temp|compare_and_swap|compare_and_swap2|clamp|decode_relative_pointer|enum_highest_value|enum_names|enum_range|enum_range_given_info|enum_values|exit|free|get_command_line_arguments|get_field|get_system_time|get_system_time_local|get_temporary_storage_mark|get_time|get_working_directory|init_time|log|max|memcpy|memcmp|memset|min|print|push_allocator|realloc|reset_temporary_storage|reset_temporary_storage|running_at_compile_time|set_temporary_storage_mark|set_working_directory|sprint|talloc|talloc_string|temporary_alloc|tprint|write_relative_pointer)\\b"
+                    "match": "\\b(Construct|New|NewArray|Swap|__temporary_allocator|alloc|alloc_string|assert|atomic_swap|auto_release_temp|compare_and_swap|compare_and_swap2|clamp|decode_relative_pointer|enum_highest_value|enum_names|enum_range|enum_range_given_info|enum_values|exit|free|get_command_line_arguments|get_field|get_system_time|get_system_time_local|get_temporary_storage_mark|get_time|get_working_directory|init_time|log|log_error|max|memcpy|memcmp|memset|min|print|push_allocator|realloc|reset_temporary_storage|reset_temporary_storage|running_at_compile_time|set_temporary_storage_mark|set_working_directory|sprint|talloc|talloc_string|temporary_alloc|tprint|write_relative_pointer)\\b"
                 },
                 { "name": "support.function.jai",
                     "match": "\\b(align_of|type_of|size_of|type_info|initializer_of|debug_break|pause|rdtsc|rdtscp|rdseed|rdrand|prefetch|read_gs_qword|atomic_add|atomic_increment|atomic_and|atomic_or|atomic_xor|mfence|cpuid|xgetbv|byte_swap|bit_scan_forward|bit_scan_reverse|popcount|push_context|write_string|write_strings|write_number|write_nonnegative_number)\\b"
@@ -815,7 +977,7 @@
                     {
                         "1":
                         {
-                            "name": "keyword.control.jai"
+                            "name": "keyword.control.for.jai"
                         },
                         "2":
                         {
@@ -844,7 +1006,7 @@
                     {
                         "1":
                         {
-                            "name": "keyword.control.jai"
+                            "name": "keyword.control.for.jai"
                         },
                         "2":
                         {
@@ -865,7 +1027,7 @@
                     {
                         "1":
                         {
-                            "name": "keyword.control.jai"
+                            "name": "keyword.control.for.jai"
                         },
                         "2":
                         {
@@ -939,7 +1101,7 @@
         {
             "patterns":
             [
-                { "match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(:)",
+                { "match": "\\b([a-zA-Z_]\\w*)(,\\s*[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(:)",
                     "captures":
                     {
                         "1":
@@ -1018,7 +1180,7 @@
                         }
                     }
                 },
-                { "match": "\\b([a-zA-Z_]\\w*)(,[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(=)?",
+                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))(,\\s*[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(=)?",
                     "captures":
                     {
                         "1":
@@ -1026,42 +1188,46 @@
                             "name": "variable.other.declaration.jai"
                         },
                         "2":
+                        {
+                            "name": "support.variable.jai"
+                        },
+                        "4":
                         {
                             "patterns":
                             [
                                 { "include": "#comma-joined-variables"
                              }]
                         },
-                        "3":
+                        "5":
                         {
                             "name": "keyword.declaration.jai"
                         },
-                        "4":
+                        "6":
                         {
                             "patterns":
                             [
                                 { "include": "#array"
                              }]
                         },
-                        "5":
+                        "7":
                         {
                             "name": "storage.type.jai"
                         },
-                        "6":
+                        "8":
                         {
                             "name": "keyword.operator.pointer.jai"
                         },
-                        "8":
+                        "10":
                         {
                             "name": "keyword.other.directive.jai"
                         },
-                        "9":
+                        "11":
                         {
                             "name": "keyword.declaration.jai"
                         }
                     }
                 },
-                { "match": "\\b([a-zA-Z_]\\w*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(=)?",
+                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(=)?",
                     "captures":
                     {
                         "1":
@@ -1070,28 +1236,32 @@
                         },
                         "2":
                         {
+                            "name": "support.variable.jai"
+                        },
+                        "4":
+                        {
                             "name": "keyword.declaration.jai"
                         },
-                        "3":
+                        "5":
                         {
                             "patterns":
                             [
                                 { "include": "#array"
                              }]
                         },
-                        "4":
+                        "6":
                         {
                             "name": "storage.type.jai"
                         },
-                        "5":
+                        "7":
                         {
                             "name": "keyword.operator.pointer.jai"
                         },
-                        "7":
+                        "9":
                         {
                             "name": "keyword.other.directive.jai"
                         },
-                        "8":
+                        "10":
                         {
                             "name": "keyword.declaration.jai"
                         }
@@ -1143,7 +1313,7 @@
         {
             "patterns":
             [
-                { "match": "\\b([a-zA-Z_]\\w*)(\\.[a-zA-Z0-9_.]+)?\\b",
+                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))(\\.[a-zA-Z0-9_.]+)?\\b",
                     "captures":
                     {
                         "1":
@@ -1151,6 +1321,10 @@
                             "name": "variable.other.jai"
                         },
                         "2":
+                        {
+                            "name": "support.variable.jai"
+                        },
+                        "4":
                         {
                             "patterns":
                             [
@@ -1184,7 +1358,7 @@
             "patterns":
             [
                 { "name": "meta.function.declaration.jai",
-                    "match": "\\b((main|for_expansion|operator\\s*([^ :]+))|[A-Za-z_]\\w*)\\s*(::)\\s*((inline)\\s*|(no_inline)\\s*)*(\\()(.*)(\\))\\s*((->)([^{]+))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*",
+                    "match": "\\b((main|for_expansion|operator\\s*([^ :]+))|[A-Za-z_]\\w*)\\s*(::)\\s*((inline)\\s*|(no_inline)\\s*)*(\\()(.*)(\\))\\s*((->)([^{]+))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*",
                     "captures":
                     {
                         "1":
@@ -1280,27 +1454,39 @@
                         {
                             "name": "constant.other.import.jai"
                         },
-                        "18":
+                        "19":
                         {
-                            "name": "invalid.deprecated.jai"
+                            "name": "punctuation.definition.string.import.begin.jai"
                         },
                         "20":
                         {
-                            "name": "punctuation.definition.string.deprecated.begin.jai"
+                            "name": "string-quoted.other.import.jai"
                         },
-                        "21":
+                        "22":
                         {
-                            "name": "string-quoted.other.deprecated.jai"
+                            "name": "punctuation.definition.string.import.end.jai"
                         },
                         "23":
                         {
+                            "name": "invalid.deprecated.jai"
+                        },
+                        "25":
+                        {
+                            "name": "punctuation.definition.string.deprecated.begin.jai"
+                        },
+                        "26":
+                        {
+                            "name": "string-quoted.other.deprecated.jai"
+                        },
+                        "28":
+                        {
                             "name": "punctuation.definition.string.deprecated.end.jai"
                         },
-                        "24":
+                        "29":
                         {
                             "name": "punctuation.terminator.jai"
                         },
-                        "25":
+                        "30":
                         {
                             "name": "keyword.other.directive.jai"
                         }
@@ -1545,7 +1731,7 @@
                 {
                     "patterns":
                     [
-                        { "match": "(,)?\\s*(\")(([^\"\\\\]|\\\\.)*)(\")\\s*",
+                        { "match": "(,)?\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))\\s*",
                             "captures":
                             {
                                 "1":
@@ -1554,15 +1740,10 @@
                                 },
                                 "2":
                                 {
-                                    "name": "punctuation.definition.string.begin.jai"
-                                },
-                                "3":
-                                {
-                                    "name": "string.quoted.double.jai"
-                                },
-                                "5":
-                                {
-                                    "name": "punctuation.definition.string.end.jai"
+                                    "patterns":
+                                    [
+                                        { "include": "#strings"
+                                     }]
                                 }
                             }
                         },
@@ -1607,7 +1788,7 @@
                 {
                     "patterns":
                     [
-                        { "match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*(//.*)?",
+                        { "match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*(//.*)?",
                             "captures":
                             {
                                 "1":
@@ -1661,31 +1842,43 @@
                                 {
                                     "name": "constant.other.import.jai"
                                 },
-                                "16":
+                                "17":
                                 {
-                                    "name": "invalid.deprecated.jai"
+                                    "name": "punctuation.definition.string.import.begin.jai"
                                 },
                                 "18":
                                 {
-                                    "name": "punctuation.definition.string.deprecated.begin.jai"
+                                    "name": "string-quoted.other.import.jai"
                                 },
-                                "19":
+                                "20":
                                 {
-                                    "name": "string-quoted.other.deprecated.jai"
+                                    "name": "punctuation.definition.string.import.end.jai"
                                 },
                                 "21":
                                 {
-                                    "name": "punctuation.definition.string.deprecated.end.jai"
-                                },
-                                "22":
-                                {
-                                    "name": "punctuation.terminator.jai"
+                                    "name": "invalid.deprecated.jai"
                                 },
                                 "23":
                                 {
-                                    "name": "keyword.other.directive.jai"
+                                    "name": "punctuation.definition.string.deprecated.begin.jai"
                                 },
                                 "24":
+                                {
+                                    "name": "string-quoted.other.deprecated.jai"
+                                },
+                                "26":
+                                {
+                                    "name": "punctuation.definition.string.deprecated.end.jai"
+                                },
+                                "27":
+                                {
+                                    "name": "punctuation.terminator.jai"
+                                },
+                                "28":
+                                {
+                                    "name": "keyword.other.directive.jai"
+                                },
+                                "29":
                                 {
                                     "patterns":
                                     [
@@ -1694,7 +1887,7 @@
                                 }
                             }
                         },
-                        { "match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*(//.*)?",
+                        { "match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*(//.*)?",
                             "captures":
                             {
                                 "1":
@@ -1740,31 +1933,43 @@
                                 {
                                     "name": "constant.other.import.jai"
                                 },
-                                "14":
+                                "15":
                                 {
-                                    "name": "invalid.deprecated.jai"
+                                    "name": "punctuation.definition.string.import.begin.jai"
                                 },
                                 "16":
                                 {
-                                    "name": "punctuation.definition.string.deprecated.begin.jai"
+                                    "name": "string-quoted.other.import.jai"
                                 },
-                                "17":
+                                "18":
                                 {
-                                    "name": "string-quoted.other.deprecated.jai"
+                                    "name": "punctuation.definition.string.import.end.jai"
                                 },
                                 "19":
                                 {
-                                    "name": "punctuation.definition.string.deprecated.end.jai"
-                                },
-                                "20":
-                                {
-                                    "name": "punctuation.terminator.jai"
+                                    "name": "invalid.deprecated.jai"
                                 },
                                 "21":
                                 {
-                                    "name": "keyword.other.directive.jai"
+                                    "name": "punctuation.definition.string.deprecated.begin.jai"
                                 },
                                 "22":
+                                {
+                                    "name": "string-quoted.other.deprecated.jai"
+                                },
+                                "24":
+                                {
+                                    "name": "punctuation.definition.string.deprecated.end.jai"
+                                },
+                                "25":
+                                {
+                                    "name": "punctuation.terminator.jai"
+                                },
+                                "26":
+                                {
+                                    "name": "keyword.other.directive.jai"
+                                },
+                                "27":
                                 {
                                     "patterns":
                                     [
@@ -1812,7 +2017,7 @@
         },
         "comma-joined-variables":
         {
-            "match": "(,)([a-zA-Z_]\\w*)",
+            "match": "(,)\\s*((it_index|it)|([a-zA-Z_]\\w*))",
             "captures":
             {
                 "1":
@@ -1822,6 +2027,10 @@
                 "2":
                 {
                     "name": "variable.other.declaration.jai"
+                },
+                "3":
+                {
+                    "name": "support.variable.jai"
                 }
             }
         },
@@ -1865,7 +2074,7 @@
         },
         "more-directives":
         {
-            "match": "(#foreign\\s+([A-Z-a-z_]\\w*)|#compiler|#intrinsic|#runtime_support)",
+            "match": "(#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)",
             "captures":
             {
                 "1":
@@ -1875,6 +2084,18 @@
                 "3":
                 {
                     "name": "constant.other.import.jai"
+                },
+                "5":
+                {
+                    "name": "punctuation.definition.string.import.begin.jai"
+                },
+                "6":
+                {
+                    "name": "string-quoted.other.import.jai"
+                },
+                "8":
+                {
+                    "name": "punctuation.definition.string.import.end.jai"
                 }
             }
         },
@@ -2320,6 +2541,27 @@
                         { "include": "source.shaderlab"
                      }]
                 },
+                { "begin": "((?i)```shader)",
+                    "end": "(```)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.shader.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.shader.jai"
+                        }
+                    },
+                    "patterns":
+                    [
+                        { "include": "source.glsl"
+                     }]
+                },
                 { "begin": "((?i)```sql)",
                     "end": "(```)",
                     "beginCaptures":
@@ -2595,6 +2837,21 @@
                     [
                         { "name": "constant.character.escape.jai",
                             "match": "\\\\."
+                        },
+                        { "name": "constant.other.placeholder.jai",
+                            "match": "%[0-9]+"
+                        },
+                        { "match": "(%)%",
+                            "captures":
+                            {
+                                "1":
+                                {
+                                    "name": "constant.character.escape.jai"
+                                }
+                            }
+                        },
+                        { "name": "constant.other.placeholder.jai",
+                            "match": "%"
                         }
                     ]
                 },
@@ -3296,6 +3553,41 @@
                     "patterns":
                     [
                         { "include": "source.shaderlab"
+                     }]
+                },
+                { "name": "string.here.embed.shader.jai",
+                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(shader))\\b",
+                    "end": "\\s*(\\3)(\\4)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "keyword.other.directive.string.shader.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.shader.jai"
+                        },
+                        "4":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.shader.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.shader.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.shader.jai"
+                        }
+                    },
+                    "contentName": "string.unquoted.here.embed.shader.jai",
+                    "patterns":
+                    [
+                        { "include": "source.glsl"
                      }]
                 },
                 { "name": "string.here.embed.sql.jai",
