@@ -9,6 +9,7 @@
 // [ ] setup tasks.json for module
 // [ ] rework all parentheses to begin and end correctly
 // [.] generate @tag comment grammar
+// [x] #code outside params
 // [x] ```*/ ending doc-comment
 // [x] for i: index..haystack.count - 1 // `index` shows as type
 // [x] rework todo lists (only at start, add scope instead of replace)

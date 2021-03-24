@@ -360,7 +360,7 @@ repository:
       - name: keyword.control.defer.jai
         match: \b(defer)\b
       - name: keyword.other.directive.jai
-        match: (#add_context|#align|#assert|#caller_location|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#place|#placeholder|#procedure_of_call|#program_export|#run|#specified|#symmetric|#through|#type|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint|#unshared)\b
+        match: (#add_context|#align|#assert|#caller_location|#code|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#place|#placeholder|#procedure_of_call|#program_export|#run|#specified|#symmetric|#through|#type|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint|#unshared)\b
       - name: keyword.other.directive.scope.jai
         match: (#scope_export|#scope_file|#scope_module)
       - name: keyword.other.directive.string.jai
