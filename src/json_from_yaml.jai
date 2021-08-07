@@ -4,13 +4,18 @@
 
 #load "languages.jai";
 
+debug :: true;
 
 // @TODO
 
 // Language Server
+// [ ] Projects, build files, etc.
+// [ ] What to do when program is not well formed?
+// [x] Finds idents in libraries as well as in project
+
+// Language Server Provider Maybes
 // [ ] CompletionItemProvider
 // [ ] SignatureHelpProvider
-// Language Server Maybes
 // [ ] TypeDefinitionProvider
 // [ ] ImplentationProvider
 // [ ] DocumentHighlightProvider
@@ -103,7 +108,7 @@ main :: () {
 
     yaml : String_Builder;
     init_string_builder(*yaml);
-    append(*yaml, replace(yaml_file_data, "\r", ""));
+    append(*yaml, yaml_file_data);
 
     append(*yaml, markdown_block_comments_header);
     for language: languages
@@ -125,8 +130,10 @@ main :: () {
 
     yaml_string := builder_to_string(*yaml);
 
-    for row, index: split(yaml_string, "\n") {
-        print("%\n", row);
+    for raw_row, index: split(yaml_string, "\n") {
+        row := raw_row;
+        if row.count > 0 && row[row.count - 1] == #char "\r"
+          row.count -= 1;
         line_number = index + 1;
         spaces := 0;
         while spaces < row.count && row[spaces] == #char " "
@@ -167,7 +174,7 @@ main :: () {
         }
         else if depth > previous_depth && previous_depth >= 0 {
             if peek_stack() != .LIST {
-                print("Error on line %\n", line_number);
+                print("Unexpected indent on line %\n", line_number);
                 exit(1);
             }
             out(",\n");

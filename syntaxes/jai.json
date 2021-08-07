@@ -922,7 +922,7 @@
         "deprecated-names":
         {
             "name": "invalid.deprecated.jai",
-            "match": "\\b(#run_and_insert|compiler_report_error|compiler_info|compiler_warning|compiler_error)\\b"
+            "match": "\\b(compiler_report_error|compiler_info|compiler_warning|compiler_error)\\b"
         },
         "notes":
         {

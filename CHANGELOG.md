@@ -1,6 +1,14 @@
 # Change Log
 
-## [0.0.56] - 2021-??-??
+## [0.0.58] - 2021-08-08
+* Locate now works on projects, not just single files.
+* Locate now reports idents in any file, including library files.
+
+## [0.0.57] - 2021-08-07
+* Test adding files to `out`
+* `Debug Mode` setting
+
+## [0.0.56] - 2021-08-07
 * Removed #run_and_insert
 * Basic LSP functions: can goto definition, find references, rename (but only in single files, and is probably buggy).
 

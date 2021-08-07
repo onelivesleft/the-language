@@ -25,6 +25,7 @@ let timeout: NodeJS.Timer | undefined = undefined;
 let selections: Array<vscode.Selection> = [];
 let decorationRanges: vscode.Range [] = [];
 let selectionsIntersectDecoration = false;
+let sentinel = "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -128,7 +129,9 @@ interface EmbedLanguageColor {
 }
 
 
+let debugMode : boolean | undefined = false;
 let decorateEmbeds : boolean | undefined = true;
+let projectPath : string | undefined = "";
 let embedColorsConfig: EmbedLanguageColor[] | undefined;
 let embedColors: { [language: string] : string};
 let defaultEmbedColor = "#222222";
@@ -139,6 +142,14 @@ function updateConfig() {
 	let config = vscode.workspace.getConfiguration('the-language');
 	decorateEmbeds = config.get("decorateEmbeds");
 	if (decorateEmbeds === undefined) decorateEmbeds = true;
+
+	debugMode = config.get("debugMode");
+	if (debugMode === undefined) debugMode = false;
+	console.log("Updating debugMode to " + debugMode);
+
+	projectPath = config.get("projectFile");
+	console.log("Updating projectPath to " + projectPath);
+	if (projectPath === undefined) projectPath = "";
 
 	embedColorsConfig = config.get("embedColors");
 	const isColor = /#[a-fA-F0-9]{6}/;
@@ -389,10 +400,10 @@ class JaiRenameProvider implements vscode.RenameProvider {
 					let result = new vscode.WorkspaceEdit();
 					for (let i = 0; i < locations.length; i++) {
 						let location = locations[i];
-						console.log(location.uri.fsPath);
+						if (debugMode) console.log(location.uri.fsPath);
 						result.replace(location.uri, location.range, newName);
 					}
-					console.log(result);
+					if (debugMode) console.log(result);
 					resolve(result);
 				}
 			});
@@ -406,9 +417,13 @@ async function jaiLocate(filepath: string, position: vscode.Position, operation:
 	let exe_path = config.get("pathToJaiExecutable");
 	if (exe_path === undefined) return;
 
+	if (debugMode) console.log("projectPath is " + projectPath);
+	let fileToCompile = projectPath !== "" ? projectPath as string : filepath;
+
 	let extension = vscode.extensions.getExtension("onelivesleft.the-language");
 	if (extension === undefined) return;
-	let modulepath = path.join(extension.extensionPath, "src", "modules").replace(/\//, '\\');
+	let modulepath = path.join(extension.extensionPath,
+		extension.extensionPath.toLowerCase().startsWith("c:\\repos") ? "src" : "out").replace(/\//, '\\');
 
 	let normalized = filepath.replace(/\\/g, '/');
 
@@ -418,7 +433,7 @@ async function jaiLocate(filepath: string, position: vscode.Position, operation:
 		modulepath,
 		"-meta",
 		"VSCodeLocate",
-		filepath,
+		fileToCompile,
 		"--",
 		normalized,
 		(position.line + 1).toString(),
@@ -426,6 +441,7 @@ async function jaiLocate(filepath: string, position: vscode.Position, operation:
 		operation
 	];
 
+	if (debugMode) console.log(exe_path, args);
 	return execCommand(exe_path as string, args);
 }
 
@@ -439,7 +455,12 @@ function execCommand(exe_path: string, args: string[]): Promise<string | undefin
 				reject(error);
 			}
 			else {
-				resolve(stdout);
+				if (debugMode) console.log(stdout);
+				let index = stdout.indexOf(sentinel);
+				if (index < 0)
+					resolve("");
+				else
+					resolve(stdout.slice(index + sentinel.length));
 			}
 		});
 	});

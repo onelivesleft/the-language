@@ -3,22 +3,17 @@
 #import "Hash_Table";
 #import "String";
 
-// @TODO When we find an ident declared outwith the main program (i.e. in a module)
-//       we just ignore it: we should do something more useful.
-
 debug :: false;
 
 help_text :: "Usage: jai -import_dir <Locate Folder> -meta Locate <project.jai> -- <file.jai> <row> <col>\n";
 
+sentinel :: "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
 
 set_options :: (using options: *Build_Options) {
     emit_debug_info = .NONE;
     output_path = "c:/temp";
     intermediate_path = "c:/temp";
 }
-
-
-test_path :: "c:/repos/jaitest/foo.jai";
 
 
 target_path : string;
@@ -77,7 +72,8 @@ finished_typechecking := false;
     build_options.emit_debug_info = .NONE;
     build_options.output_path = "c:/temp/"; // @TODO make correct
     build_options.intermediate_path = "c:/temp/";
-    //build_options.user_data_u64 = xx *check_message;
+    chk := check_message;
+    build_options.user_data_u64 = xx *chk;
     set_build_options(build_options, workspace);
 
     init(*locations);
@@ -89,7 +85,7 @@ finished_typechecking := false;
 
     while !finished_typechecking {
         message := compiler_wait_for_message();
-        valid, complete := my_check_message(message);
+        valid, complete := check_message(message);
         if complete  break;
     }
 
@@ -97,22 +93,12 @@ finished_typechecking := false;
 
     exit(0);
 
-/*
+
     check_message :: (message: *Message) -> valid: bool, complete: bool {
         if !message return false, false;
         if message.kind == .COMPLETE return false, true;
 
-        handle_message(message, true);
-
-        return true, false;
-    }
-*/
-
-    my_check_message :: (message: *Message) -> valid: bool, complete: bool {
-        if !message return false, false;
-        if message.kind == .COMPLETE return false, true;
-
-        handle_message(message);
+        check_valid_message(message);
 
         return true, false;
     }
@@ -141,7 +127,7 @@ expressions : [..] *Code_Node;
 to_revisit : [..] *Code_Ident;
 
 
-handle_message :: (message: *Message) {
+check_valid_message :: (message: *Message) {
     if message.kind == {
         case .TYPECHECKED;
         code := cast(*Message_Typechecked) message;
@@ -154,6 +140,7 @@ handle_message :: (message: *Message) {
         case .COMPILATION_PHASE;
         phase := cast (*Message_Phase) message;
         if phase.phase == .TYPECHECKED_ALL_WE_CAN && phase.num_items_waiting_to_typecheck == 0 {
+            print("YOYOYOYOYOO\n");
             finished_typechecking = true;
 
             for expr: expressions
@@ -170,8 +157,8 @@ handle_message :: (message: *Message) {
 
             // look for ident
             needle := decl_from_location(target_path, target_line, target_char);
-            //print("Looking for: %:%:% = %\n", target_path, target_line, target_char, needle);
             if needle {
+                print(sentinel);
                 needle_range := format_range(needle);
                 print("%\n", needle_range);
                 ranges, _ := table_find(locations, needle);
@@ -181,6 +168,7 @@ handle_message :: (message: *Message) {
                         print("%\n", range);
                 }
             }
+
 
             //print("Revisit count: %\n", to_revisit.count);
             ////for to_revisit  print("%\n", format_location(it));
@@ -235,22 +223,23 @@ check_add_decl :: (decl: *Code_Declaration) -> Location_List {
 
 
 is_valid_decl :: (decl: *Code_Declaration) -> bool {
-    return decl
-        && decl.enclosing_load
-        && decl.enclosing_load.enclosing_import.module_type == .MAIN_PROGRAM;
+    //return decl != null;
+    return decl && decl.name != "" && decl.enclosing_load
+        && (decl.enclosing_load.enclosing_import.module_type == .MAIN_PROGRAM
+            || decl.enclosing_load.enclosing_import.module_type == .FILE);
 }
 
 
 decl_from_location :: (filename: string, line: int, char: int) -> *Code_Declaration {
     for ranges, decl: locations {
-        decl_path := copy_string(decl.enclosing_load.fully_pathed_filename);
-        defer free(decl_path);
-
-        normalize_path(decl_path);
-        if decl_path != filename
-            continue;
 
         for range: ranges {
+            decl_path := copy_string(range.fully_pathed_filename);
+            defer free(decl_path);  // @TODO @Performance
+            normalize_path(decl_path);
+            if decl_path != filename
+                continue;
+
             if line < range.line_number_start || line > range.line_number_end
                 continue;
 
