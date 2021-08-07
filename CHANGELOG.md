@@ -1,9 +1,20 @@
-# Change L
+# Change Log
 
-## [0.0.53] - 20121-03-19
+## [0.0.56] - 2021-??-??
+* Removed #run_and_insert
+* Basic LSP functions: can goto definition, find references, rename (but only in single files, and is probably buggy).
+
+## [0.0.55] - 2021-05-01
+* Fix MD codeblock
+
+## [0.0.54] - 2021-03-28
+* #no_reset
+* MD codeblock support
+
+## [0.0.53] - 2021-03-19
 * #code outwith parameters
 
-## [0.0.52] - 20121-03-19
+## [0.0.52] - 2021-03-19
 * #unshared + #procedure_of_call
 * fixed checklists
 * fixed `for` loops

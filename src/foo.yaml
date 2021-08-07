@@ -404,7 +404,7 @@ repository:
       - name: keyword.operator.jai
         match: (=|\+|-|\*|/|<|>|~|\||&|!|\^)+
       - name: keyword.operator.percent.jai
-        match: %
+        match: 
       - name: punctuation.jai
         match: (\.\.)
       - name: punctuation.section.parens.begin.jai
@@ -1014,3 +1014,937 @@ repository:
         name: string-quoted.other.import.jai
       '8':
         name: punctuation.definition.string.import.end.jai
+  markdown-block-comments:
+    name: meta.embedded.block.markdown
+    begin: (\/\*\*)
+    end: (\*\/)
+    beginCaptures:
+      '1':
+        name: punctuation.definition.comment.jai
+    endCaptures:
+      '1':
+        name: punctuation.definition.comment.jai
+    patterns:
+      - include: '#block-comments'
+      - begin: ((?i)```arm)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.arm.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.arm.jai
+        patterns:
+          - include: source.arm
+      - begin: ((?i)```bat)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.bat.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.bat.jai
+        patterns:
+          - include: source.batchfile
+      - begin: ((?i)```c(\+\+|pp))
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.cpp.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.cpp.jai
+        patterns:
+          - include: source.cpp
+      - begin: ((?i)```css)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.css.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.css.jai
+        patterns:
+          - include: source.css
+      - begin: ((?i)```c(sharp|#|s))
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.cs.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.cs.jai
+        patterns:
+          - include: source.cs
+      - begin: ((?i)```c)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.c.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.c.jai
+        patterns:
+          - include: source.c
+      - begin: ((?i)```glsl)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.glsl.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.glsl.jai
+        patterns:
+          - include: source.glsl
+      - begin: ((?i)```hlsl)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.hlsl.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.hlsl.jai
+        patterns:
+          - include: source.hlsl
+      - begin: ((?i)```jai)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.jai.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.jai.jai
+        patterns:
+          - include: source.jai
+      - begin: ((?i)```(js|javascript))
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.js.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.js.jai
+        patterns:
+          - include: source.js
+      - begin: ((?i)```java)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.java.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.java.jai
+        patterns:
+          - include: source.java
+      - begin: ((?i)```jsonc)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.jsonc.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.jsonc.jai
+        patterns:
+          - include: source.json.comments
+      - begin: ((?i)```json)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.json.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.json.jai
+        patterns:
+          - include: source.json
+      - begin: ((?i)```lua)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.lua.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.lua.jai
+        patterns:
+          - include: source.lua
+      - begin: ((?i)```make(file)?)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.makefile.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.makefile.jai
+        patterns:
+          - include: source.makefile
+      - begin: ((?i)```(metal|msl))
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.metal.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.metal.jai
+        patterns:
+          - include: source.metal
+      - begin: ((?i)```(powershell|psl))
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.psl.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.psl.jai
+        patterns:
+          - include: source.powershell
+      - begin: ((?i)```py(thon)?)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.python.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.python.jai
+        patterns:
+          - include: source.python
+      - begin: ((?i)```sh(ell)?)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.sh.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.sh.jai
+        patterns:
+          - include: source.shell
+      - begin: ((?i)```shaderlab)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.shaderlab.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.shaderlab.jai
+        patterns:
+          - include: source.shaderlab
+      - begin: ((?i)```shader)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.shader.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.shader.jai
+        patterns:
+          - include: source.glsl
+      - begin: ((?i)```sql)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.sql.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.sql.jai
+        patterns:
+          - include: source.sql
+      - begin: ((?i)```toml)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.toml.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.toml.jai
+        patterns:
+          - include: source.toml
+      - begin: ((?i)```(ts|typescript))
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.ts.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.ts.jai
+        patterns:
+          - include: source.ts
+      - begin: ((?i)```(vdf|valve))
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.vdf.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.vdf.jai
+        patterns:
+          - include: source.vdf
+      - begin: ((?i)```x(86_)?64)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.x64.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.x64.jai
+        patterns:
+          - include: source.asm.x86_64
+      - begin: ((?i)```yaml)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.yaml.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.yaml.jai
+        patterns:
+          - include: source.yaml
+      - begin: ((?i)```html)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.html.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.html.jai
+        patterns:
+          - include: text.html.derivative
+      - begin: ((?i)```(md|markdown))
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.md.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.md.jai
+        patterns:
+          - include: text.html.markdown
+      - begin: ((?i)```xml)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.xml.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.xml.jai
+        patterns:
+          - include: text.xml
+      - begin: ((?i)```xsl)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.xsl.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.xsl.jai
+        patterns:
+          - include: text.xml.xsl
+      - begin: (```)
+        end: (```)
+        beginCaptures:
+          '1':
+            name: markup.quote.code.comment.jai
+        endCaptures:
+          '1':
+            name: markup.quote.code.comment.jai
+        patterns:
+          - include: source.jai
+      - contentName: meta.embedded.block.markdown
+        include: text.html.markdown
+  strings:
+    patterns:
+      - name: string.quoted.double.empty.jai
+        match: (")(")
+        captures:
+          '1':
+            name: punctuation.definition.string.empty.begin.jai
+          '2':
+            name: punctuation.definition.string.empty.end.jai
+      - name: string.quoted.double.jai
+        begin: (")
+        end: ("|$)
+        beginCaptures:
+          '1':
+            name: punctuation.definition.string.begin.jai
+        endCaptures:
+          '1':
+            name: punctuation.definition.string.end.jai
+        patterns:
+          - name: constant.character.escape.jai
+            match: \\.
+          - name: constant.other.placeholder.jai
+            match: [0-9]+
+          - match: ()
+            captures:
+              '1':
+                name: constant.character.escape.jai
+          - name: constant.other.placeholder.jai
+            match: 
+      - name: string.here.embed.arm.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(arm))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.arm.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.arm.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.arm.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.arm.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.arm.jai
+        contentName: string.unquoted.here.embed.arm.jai
+        patterns:
+          - include: source.arm
+      - name: string.here.embed.bat.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(bat))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.bat.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.bat.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.bat.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.bat.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.bat.jai
+        contentName: string.unquoted.here.embed.bat.jai
+        patterns:
+          - include: source.batchfile
+      - name: string.here.embed.cpp.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(c(\+\+|pp)))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.cpp.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.cpp.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.cpp.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.cpp.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.cpp.jai
+        contentName: string.unquoted.here.embed.cpp.jai
+        patterns:
+          - include: source.cpp
+      - name: string.here.embed.css.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(css))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.css.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.css.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.css.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.css.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.css.jai
+        contentName: string.unquoted.here.embed.css.jai
+        patterns:
+          - include: source.css
+      - name: string.here.embed.cs.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(c(sharp|#|s)))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.cs.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.cs.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.cs.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.cs.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.cs.jai
+        contentName: string.unquoted.here.embed.cs.jai
+        patterns:
+          - include: source.cs
+      - name: string.here.embed.c.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(c))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.c.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.c.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.c.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.c.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.c.jai
+        contentName: string.unquoted.here.embed.c.jai
+        patterns:
+          - include: source.c
+      - name: string.here.embed.glsl.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(glsl))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.glsl.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.glsl.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.glsl.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.glsl.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.glsl.jai
+        contentName: string.unquoted.here.embed.glsl.jai
+        patterns:
+          - include: source.glsl
+      - name: string.here.embed.hlsl.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(hlsl))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.hlsl.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.hlsl.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.hlsl.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.hlsl.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.hlsl.jai
+        contentName: string.unquoted.here.embed.hlsl.jai
+        patterns:
+          - include: source.hlsl
+      - name: string.here.embed.jai.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(jai))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.jai.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.jai.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.jai.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.jai.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.jai.jai
+        contentName: string.unquoted.here.embed.jai.jai
+        patterns:
+          - include: source.jai
+      - name: string.here.embed.js.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?((js|javascript)))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.js.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.js.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.js.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.js.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.js.jai
+        contentName: string.unquoted.here.embed.js.jai
+        patterns:
+          - include: source.js
+      - name: string.here.embed.java.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(java))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.java.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.java.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.java.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.java.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.java.jai
+        contentName: string.unquoted.here.embed.java.jai
+        patterns:
+          - include: source.java
+      - name: string.here.embed.jsonc.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(jsonc))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.jsonc.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.jsonc.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.jsonc.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.jsonc.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.jsonc.jai
+        contentName: string.unquoted.here.embed.jsonc.jai
+        patterns:
+          - include: source.json.comments
+      - name: string.here.embed.json.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(json))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.json.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.json.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.json.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.json.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.json.jai
+        contentName: string.unquoted.here.embed.json.jai
+        patterns:
+          - include: source.json
+      - name: string.here.embed.lua.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(lua))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.lua.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.lua.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.lua.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.lua.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.lua.jai
+        contentName: string.unquoted.here.embed.lua.jai
+        patterns:
+          - include: source.lua
+      - name: string.here.embed.makefile.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(make(file)?))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.makefile.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.makefile.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.makefile.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.makefile.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.makefile.jai
+        contentName: string.unquoted.here.embed.makefile.jai
+        patterns:
+          - include: source.makefile
+      - name: string.here.embed.metal.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?((metal|msl)))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.metal.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.metal.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.metal.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.metal.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.metal.jai
+        contentName: string.unquoted.here.embed.metal.jai
+        patterns:
+          - include: source.metal
+      - name: string.here.embed.psl.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?((powershell|psl)))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.psl.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.psl.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.psl.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.psl.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.psl.jai
+        contentName: string.unquoted.here.embed.psl.jai
+        patterns:
+          - include: source.powershell
+      - name: string.here.embed.python.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(py(thon)?))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.python.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.python.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.python.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.python.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.python.jai
+        contentName: string.unquoted.here.embed.python.jai
+        patterns:
+          - include: source.python
+      - name: string.here.embed.sh.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(sh(ell)?))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.sh.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.sh.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.sh.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.sh.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.sh.jai
+        contentName: string.unquoted.here.embed.sh.jai
+        patterns:
+          - include: source.shell
+      - name: string.here.embed.shaderlab.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(shaderlab))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.shaderlab.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.shaderlab.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.shaderlab.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.shaderlab.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.shaderlab.jai
+        contentName: string.unquoted.here.embed.shaderlab.jai
+        patterns:
+          - include: source.shaderlab
+      - name: string.here.embed.shader.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(shader))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.shader.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.shader.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.shader.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.shader.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.shader.jai
+        contentName: string.unquoted.here.embed.shader.jai
+        patterns:
+          - include: source.glsl
+      - name: string.here.embed.sql.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(sql))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.sql.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.sql.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.sql.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.sql.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.sql.jai
+        contentName: string.unquoted.here.embed.sql.jai
+        patterns:
+          - include: source.sql
+      - name: string.here.embed.toml.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(toml))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.toml.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.toml.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.toml.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.toml.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.toml.jai
+        contentName: string.unquoted.here.embed.toml.jai
+        patterns:
+          - include: source.toml
+      - name: string.here.embed.ts.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?((ts|typescript)))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.ts.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.ts.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.ts.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.ts.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.ts.jai
+        contentName: string.unquoted.here.embed.ts.jai
+        patterns:
+          - include: source.ts
+      - name: string.here.embed.vdf.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?((vdf|valve)))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.vdf.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.vdf.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.vdf.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.vdf.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.vdf.jai
+        contentName: string.unquoted.here.embed.vdf.jai
+        patterns:
+          - include: source.vdf
+      - name: string.here.embed.x64.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(x(86_)?64))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.x64.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.x64.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.x64.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.x64.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.x64.jai
+        contentName: string.unquoted.here.embed.x64.jai
+        patterns:
+          - include: source.asm.x86_64
+      - name: string.here.embed.yaml.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(yaml))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.yaml.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.yaml.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.yaml.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.yaml.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.yaml.jai
+        contentName: string.unquoted.here.embed.yaml.jai
+        patterns:
+          - include: source.yaml
+      - name: string.here.embed.html.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(html))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.html.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.html.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.html.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.html.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.html.jai
+        contentName: string.unquoted.here.embed.html.jai
+        patterns:
+          - include: text.html.derivative
+      - name: string.here.embed.md.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?((md|markdown)))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.md.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.md.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.md.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.md.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.md.jai
+        contentName: string.unquoted.here.embed.md.jai
+        patterns:
+          - include: text.html.markdown
+      - name: string.here.embed.xml.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(xml))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.xml.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.xml.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.xml.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.xml.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.xml.jai
+        contentName: string.unquoted.here.embed.xml.jai
+        patterns:
+          - include: text.xml
+      - name: string.here.embed.xsl.jai
+        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(xsl))\b'
+        end: \s*(\3)(\4)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.xsl.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.xsl.jai
+          '4':
+            name: constant.other.stringdelimiter.here.embed.language.xsl.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.embed.xsl.jai
+          '2':
+            name: constant.other.stringdelimiter.here.embed.language.xsl.jai
+        contentName: string.unquoted.here.embed.xsl.jai
+        patterns:
+          - include: text.xml.xsl
+      - name: string.here.jai
+        begin: '(#string)\s+([A-Za-z_]\w*)'
+        end: \s*(\2)
+        beginCaptures:
+          '1':
+            name: keyword.other.directive.string.jai
+          '2':
+            name: constant.other.stringdelimiter.here.jai
+        endCaptures:
+          '1':
+            name: constant.other.stringdelimiter.here.jai
+        contentName: string.unquoted.here.jai
+Error on line 1018

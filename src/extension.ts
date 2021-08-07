@@ -406,12 +406,20 @@ async function jaiLocate(filepath: string, position: vscode.Position, operation:
 	let exe_path = config.get("pathToJaiExecutable");
 	if (exe_path === undefined) return;
 
+	let extension = vscode.extensions.getExtension("onelivesleft.the-language");
+	if (extension === undefined) return;
+	let modulepath = path.join(extension.extensionPath, "src", "modules").replace(/\//, '\\');
+
 	let normalized = filepath.replace(/\\/g, '/');
 
+
 	let args : string [] = [
-		"c:/repos/jai-cookbook/tools/locate.jai",
+		"-import_dir",
+		modulepath,
+		"-meta",
+		"VSCodeLocate",
+		filepath,
 		"--",
-		normalized,
 		normalized,
 		(position.line + 1).toString(),
 		(position.character + 1).toString(),
@@ -439,6 +447,7 @@ function execCommand(exe_path: string, args: string[]): Promise<string | undefin
 
 
 function locationsFromString(locations: string, firstLineOnly: boolean = false): vscode.Location[] {
+	//console.log(locations);
 	let result : vscode.Location[] = [];
 	for (let row of locations.split("\n")) {
 		if (!row.trim()) continue;

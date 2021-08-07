@@ -2,7 +2,7 @@
     "name": "the-language",
     "displayName": "The Language",
     "description": "Support for the Jai language.",
-    "version": "0.0.53",
+    "version": "0.0.56",
     "repository": {
         "type": "git",
         "url": "https://github.com/onelivesleft/the-language"
@@ -37,6 +37,16 @@
                 "language": "jai",
                 "scopeName": "source.jai",
                 "path": "./syntaxes/jai.json"
+            },
+            {
+                "scopeName": "markdown.jai.codeblock",
+                "path": "./syntaxes/codeblock.json",
+                "injectTo": [
+                  "text.html.markdown"
+                ],
+                "embeddedLanguages": {
+                  "meta.embedded.block.jai": "jai"
+                }
             }
         ],
         "configuration": {
