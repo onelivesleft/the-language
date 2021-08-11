@@ -237,8 +237,8 @@ function decorate(editor: vscode.TextEditor) {
 	}
 
 	let sourceCode = editor.document.getText();
-	let hereString = /#string\s+([a-zA-Z_]\w*)/;
-	let docComment = /^\/\*\*/;
+	let hereString = /#string\s+([a-zA-Z_]\w*)\s*$/;
+	let docComment = /^\s*\/\*\*/;
 
 	let decorationsArrays: { [color: string] : vscode.DecorationOptions[] } = {};
 

@@ -19,7 +19,7 @@ Uses Markdown for docstrings
 
 *Note: this feature is far from polished!*
 
-The extentaion provides Rename, Definition and Reference Providers.  These work using the compiler, so you need to set the compiler location extension setting (the path to the executable).  If you want to use them in a project then you need to tell the extension what your root jai file is for the project (i.e. the file you compile to build the project).  To do so, in the project folder make a `.vscode/settings.json` file that looks like this:
+The extention provides Rename, Definition and Reference Providers.  These work using the compiler, so you need to set the compiler location extension setting (the path to the executable).  If you want to use them in a project then you need to tell the extension what your root jai file is for the project (i.e. the file you compile to build the project).  To do so, in the project folder make a `.vscode/settings.json` file that looks like this:
 
 ```json
 // Place your settings in this file to overwrite default and user settings.

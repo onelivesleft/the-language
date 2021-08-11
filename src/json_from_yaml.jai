@@ -4,13 +4,13 @@
 
 #load "languages.jai";
 
-debug :: true;
+debug :: false;
 
 // @TODO
 
 // Language Server
-// [ ] Projects, build files, etc.
 // [ ] What to do when program is not well formed?
+// [x] Projects, build files, etc.
 // [x] Finds idents in libraries as well as in project
 
 // Language Server Provider Maybes
@@ -24,19 +24,20 @@ debug :: true;
 // [ ] FoldingRangeProvider
 
 // Misc
-// [ ] `#code,null`
-// [ ] fix `number, is_number, leading_zero, c := read_int(format, c);` not marking first two vars as decl
-// [ ] whitespace before `/**` and inner backticks
-// [ ] `#c_call`
-// [ ] `context`
-// [ ] markdown codeblock
-// [ ] only start #string when the label is the last thing on the line
-// [ ] anonymous enum/enum_flags/structs
-// [ ] #expand after returns
+// [ ] Generate `support.function.jai` by scraping Preload et al
 // [ ] setup tasks.json for module
+// [ ] whitespace before MD inner backticks behaves a bit weird
+// [ ] markdown codeblock
+// [ ] #expand after returns (wtf does this mean)
 // [ ] rework all parentheses to begin and end correctly
-// [ ] label.desired_position = lerp(label.position, position, 0.9); // dt * 2);
+// [.] `#code,null`
 // [.] generate @tag comment grammar
+// [x] fix `number, is_number, leading_zero, c := read_int(format, c);` not marking first two vars as decl
+// [x] `#type`, `#c_call`
+// [x] `context`, `#no_context`
+// [x] anonymous enum/enum_flags/structs
+// [x] only start #string when the label is the last thing on the line
+// [x] whitespace before `/**`
 
 
 in_file           :: "jai.yaml";
@@ -87,8 +88,19 @@ peek_stack :: () -> Node_Type {
 
 line_number := 0;
 
+Replacement :: struct {
+  from : string;
+  to : string;
+}
+
+replacements : [..] Replacement;
+
+
 
 main :: () {
+    args :=  get_command_line_arguments();
+    noisey := args.count > 1;
+
     yaml_file_data, success := read_entire_file(in_file);
     if !success {
         print("Failed to read %", in_file);
@@ -128,23 +140,109 @@ main :: () {
     push_stack(.DICT);
     out("{");
 
-    yaml_string := builder_to_string(*yaml);
+    preprocess : String_Builder;
+    init_string_builder(*preprocess);
+    line_offsets : [..] int;
+    processed_line_count := 0;
+    array_add(*line_offsets, 0);
 
-    for raw_row, index: split(yaml_string, "\n") {
+    for raw_row, index: split(builder_to_string(*yaml), "\n") {
         row := raw_row;
         if row.count > 0 && row[row.count - 1] == #char "\r"
-          row.count -= 1;
+            row.count -= 1;
         line_number = index + 1;
+
         spaces := 0;
         while spaces < row.count && row[spaces] == #char " "
             spaces += 1;
-        if spaces >= row.count || row[spaces] == #char "#"
+        if spaces >= row.count {
+            line_offsets[processed_line_count] += 1;
             continue;
+        }
+
+        if row[spaces] == #char "#" {
+            line_offsets[processed_line_count] += 1;
+
+            row = trim_left(advance(row, spaces + 1));
+            i := index_of_char(row, #char ":");
+            if i == -1 || i >= row.count - 2 || row[i + 1] != #char ":"
+                continue;
+
+            from : string = ---;
+            from.data = row.data;
+            from.count = i;
+            from = trim_right(from);
+
+            to := trim(advance(row, i + 2), " \t\n\r");
+
+            if row != "" {
+                replacement : Replacement = ---;
+                replacement.from = from;
+                replacement.to = to;
+                i := 0;
+                while i < replacements.count && replacements[i].from.count > from.count
+                    i += 1;
+                check := i;
+                while check < replacements.count && replacements[check].from.count == from.count {
+                    if replacements[check].from == from {
+                        print("Duplicate variable label on line %\n", line_number);
+                        exit(1);
+                    }
+                    check += 1;
+                }
+                array_insert_at(*replacements, replacement, i);
+            }
+
+            continue;
+        }
+
+        digits_start := spaces;
+        digits_end := digits_start;
+        while digits_end < row.count && row[digits_end] >= #char "0" && row[digits_end] <= #char "9"
+            digits_end += 1;
+        if digits_end > digits_start && row.count > digits_end + 1 && row[digits_end] == #char ":" {
+            split_at := digits_end + 1;
+            tail := trim(slice(row, split_at + 1, row.count - (split_at + 1)), " \n\r\t");
+            if tail != "" {
+              append(*preprocess, slice(row, 0, split_at));
+              append(*preprocess, "\n");
+              for 1 .. spaces + 2  append(*preprocess, " ");
+              append(*preprocess, tail);
+              append(*preprocess, "\n");
+              array_add(*line_offsets, line_offsets[processed_line_count] - 1);
+              array_add(*line_offsets, line_offsets[processed_line_count] - 1);
+              processed_line_count += 2;
+              continue;
+            }
+        }
+
+        append(*preprocess, row);
+        append(*preprocess, "\n");
+        array_add(*line_offsets, line_offsets[processed_line_count]);
+        processed_line_count += 1;
+    }
+
+    yaml_string := builder_to_string(*preprocess);
+
+    for raw_row, index: split(yaml_string, "\n") {
+        row := raw_row;
+        line_number = index + 1 + line_offsets[index];
+        if noisey  print("% %\n", line_number, row);
+
+        spaces := 0;
+        while spaces < row.count && row[spaces] == #char " "
+            spaces += 1;
+        if spaces >= row.count  continue;
         if spaces % 2 {
             print("Irregular tab indent on line %\n", line_number);
             exit(1);
         }
         depth = spaces / 2;
+
+        if contains_upper_case(row) {
+            for replacement: replacements
+                row = replace(row, replacement.from, replacement.to);
+        }
 
         key, value, is_list_entry := parse_row(row);
 
@@ -237,10 +335,36 @@ main :: () {
     }
     out("\n}");
 
-    write_entire_file(out_file, builder_to_string(*json));
-    print("OK!\n");
+    json_string := builder_to_string(*json);
+    write_entire_file(out_file, json_string);
+
+    if noisey  for replacements  print("% -> %\n", it.from, it.to);
+
+    print("OK! (% YAML lines -> % JSON lines)\n", count(yaml_string, #char "\n"), count(json_string, #char "\n"));
 }
 
+
+count :: (s: string, c: u8) -> int {
+    total := 0;
+    for i: 0 .. s.count - 1
+        if s[i] == c  total += 1;
+    return total;
+}
+
+
+contains :: (s: string, c: u8) -> bool {
+    for i: 0 .. s.count - 1
+        if s[i] == c  return true;
+    return false;
+}
+
+
+contains_upper_case :: (s: string) -> bool {
+    for i: 0 .. s.count - 1
+        if s[i] >= #char "A" && s[i] <= #char "Z"
+            return true;
+    return false;
+}
 
 parse_row :: (row_data: string) -> key: string, value: string, is_list_entry: bool {
     row := replace(trim_left(row_data), "\\", "\\\\");
@@ -279,13 +403,13 @@ parse_row :: (row_data: string) -> key: string, value: string, is_list_entry: bo
 markdown_block_comments_header :: #string ___yaml
   markdown-block-comments:
     name: meta.embedded.block.markdown
-    begin: (\/\*\*)
-    end: (\*\/)
+    begin: (\s*\/\*\*)
+    end: (\s*\*\/)
     beginCaptures:
-      '1':
+      1:
         name: punctuation.definition.comment.jai
     endCaptures:
-      '1':
+      1:
         name: punctuation.definition.comment.jai
     patterns:
       - include: '#block-comments'
@@ -295,10 +419,10 @@ markdown_block_comments_language :: #string yaml
       - begin: ((?i)```%1)
         end: (```)
         beginCaptures:
-          '1':
+          1:
             name: markup.quote.code.comment.%2.jai
         endCaptures:
-          '1':
+          1:
             name: markup.quote.code.comment.%2.jai
         patterns:
           - include: %3
@@ -308,10 +432,10 @@ markdown_block_comments_footer :: #string yaml
       - begin: (```)
         end: (```)
         beginCaptures:
-          '1':
+          1:
             name: markup.quote.code.comment.jai
         endCaptures:
-          '1':
+          1:
             name: markup.quote.code.comment.jai
         patterns:
           - include: source.jai
@@ -326,18 +450,18 @@ strings_header :: #string ___yaml
       - name: string.quoted.double.empty.jai
         match: (")(")
         captures:
-          '1':
+          1:
             name: punctuation.definition.string.empty.begin.jai
-          '2':
+          2:
             name: punctuation.definition.string.empty.end.jai
       - name: string.quoted.double.jai
         begin: (")
         end: ("|$)
         beginCaptures:
-          '1':
+          1:
             name: punctuation.definition.string.begin.jai
         endCaptures:
-          '1':
+          1:
             name: punctuation.definition.string.end.jai
         patterns:
           - name: constant.character.escape.jai
@@ -354,19 +478,19 @@ ___yaml
 
 strings_language :: #string ___yaml
       - name: string.here.embed.%2.jai
-        begin: '(#string)\s+((?i)([A-Za-z_]\w*)?(%1))\b'
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(%1))\b
         end: \s*(\3)(\4)
         beginCaptures:
-          '1':
+          1:
             name: keyword.other.directive.string.%2.jai
-          '2':
+          2:
             name: constant.other.stringdelimiter.here.embed.%2.jai
-          '4':
+          4:
             name: constant.other.stringdelimiter.here.embed.language.%2.jai
         endCaptures:
-          '1':
+          1:
             name: constant.other.stringdelimiter.here.embed.%2.jai
-          '2':
+          2:
             name: constant.other.stringdelimiter.here.embed.language.%2.jai
         contentName: string.unquoted.here.embed.%2.jai
         patterns:
@@ -375,15 +499,15 @@ ___yaml
 
 strings_footer :: #string ___yaml
       - name: string.here.jai
-        begin: '(#string)\s+([A-Za-z_]\w*)'
+        begin: (#string)\s+([A-Za-z_]\w*)
         end: \s*(\2)
         beginCaptures:
-          '1':
+          1:
             name: keyword.other.directive.string.jai
-          '2':
+          2:
             name: constant.other.stringdelimiter.here.jai
         endCaptures:
-          '1':
+          1:
             name: constant.other.stringdelimiter.here.jai
         contentName: string.unquoted.here.jai
 ___yaml

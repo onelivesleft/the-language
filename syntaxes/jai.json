@@ -595,7 +595,7 @@
         {
             "patterns":
             [
-                { "match": "^\\s*([A-Za-z_]\\w*)\\s*(::)\\s*(#import)\\s+(\")([^\"]+)(\")",
+                { "match": "^\\s*([a-zA-Z_]\\w*)\\s*(::)\\s*(#import)\\s+(\")([^\"]+)(\")",
                     "captures":
                     {
                         "1":
@@ -662,7 +662,7 @@
                         }
                     }
                 },
-                { "match": "^\\s*([A-Za-z_]\\w*)\\s*(::)\\s*(#foreign_(system_)?library)\\s+(\")([^\"]+)(\")",
+                { "match": "^\\s*([a-zA-Z_]\\w*)\\s*(::)\\s*(#foreign_(system_)?library)\\s+(\")([^\"]+)(\")",
                     "captures":
                     {
                         "1":
@@ -691,7 +691,7 @@
                         }
                     }
                 },
-                { "match": "^\\s*([A-Za-z_]\\w*)\\s*(::)\\s*(#foreign_(system_)?library)\\s+(\"[^\"]*)?$",
+                { "match": "^\\s*([a-zA-Z_]\\w*)\\s*(::)\\s*(#foreign_(system_)?library)\\s+(\"[^\"]*)?$",
                     "captures":
                     {
                         "1":
@@ -735,13 +735,16 @@
                     "match": "\\b(defer)\\b"
                 },
                 { "name": "keyword.other.directive.jai",
-                    "match": "(#add_context|#align|#assert|#caller_location|#code|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#no_reset|#place|#placeholder|#procedure_of_call|#program_export|#run|#specified|#symmetric|#through|#type|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint|#unshared)\\b"
+                    "match": "(#add_context|#align|#assert|#caller_location|#code(,null)?|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#no_reset|#place|#placeholder|#procedure_of_call|#program_export|#run|#specified|#symmetric|#through|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint|#unshared)\\b"
                 },
                 { "name": "keyword.other.directive.scope.jai",
                     "match": "(#scope_export|#scope_file|#scope_module)"
                 },
                 { "name": "keyword.other.directive.string.jai",
                     "match": "(#char)"
+                },
+                { "name": "keyword.other.context.jai",
+                    "match": "\\b(context)\\b"
                 },
                 { "name": "keyword.other.using.jai",
                     "match": "\\b(using)\\b"
@@ -807,6 +810,27 @@
         {
             "patterns":
             [
+                { "match": "(\\})\\s*(=)\\s*(\\.)([a-zA-Z_]\\w*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "punctuation.section.braces.end.jai"
+                        },
+                        "2":
+                        {
+                            "name": "keyword.declaration.jai"
+                        },
+                        "3":
+                        {
+                            "name": "punctuation.accessor.jai"
+                        },
+                        "4":
+                        {
+                            "name": "variable.enum.jai"
+                        }
+                    }
+                },
                 { "name": "keyword.declaration.jai",
                     "match": "(::|:=|:)"
                 },
@@ -889,7 +913,7 @@
                     "match": "\\b(Construct|New|NewArray|Swap|__temporary_allocator|alloc|alloc_string|assert|atomic_swap|auto_release_temp|compare_and_swap|compare_and_swap2|clamp|decode_relative_pointer|enum_highest_value|enum_names|enum_range|enum_range_given_info|enum_values|exit|free|get_command_line_arguments|get_field|get_system_time|get_system_time_local|get_temporary_storage_mark|get_time|get_working_directory|init_time|log|log_error|max|memcpy|memcmp|memset|min|print|push_allocator|realloc|reset_temporary_storage|reset_temporary_storage|running_at_compile_time|set_temporary_storage_mark|set_working_directory|sprint|talloc|talloc_string|temporary_alloc|tprint|write_relative_pointer)\\b"
                 },
                 { "name": "support.function.jai",
-                    "match": "\\b(align_of|type_of|size_of|type_info|initializer_of|debug_break|pause|rdtsc|rdtscp|rdseed|rdrand|prefetch|read_gs_qword|atomic_add|atomic_increment|atomic_and|atomic_or|atomic_xor|mfence|cpuid|xgetbv|byte_swap|bit_scan_forward|bit_scan_reverse|popcount|push_context|write_string|write_strings|write_number|write_nonnegative_number)\\b"
+                    "match": "\\b(align_of|type_of|size_of|type_info|initializer_of|debug_break|pause|rdtsc|rdtscp|rdseed|rdrand|prefetch|atomic_add|atomic_increment|atomic_and|atomic_or|atomic_xor|mfence|cpuid|byte_swap|bit_scan_forward|bit_scan_reverse|popcount|push_context|write_string|write_strings|write_number|write_nonnegative_number)\\b"
                 },
                 { "name": "support.class.jai",
                     "match": "\\b(Any|Source_Code_Location|Source_Code_Range)\\b"
@@ -922,7 +946,7 @@
         "deprecated-names":
         {
             "name": "invalid.deprecated.jai",
-            "match": "\\b(compiler_report_error|compiler_info|compiler_warning|compiler_error)\\b"
+            "match": "\\b(compiler_report_error|compiler_info|compiler_warning|compiler_error|enum_values)\\b"
         },
         "notes":
         {
@@ -972,7 +996,7 @@
         {
             "patterns":
             [
-                { "match": "\\b(for)\\s+([*< ]*)([a-zA-Z_]\\w*)\\s*(,)\\s*([a-zA-Z_]\\w*)\\s*(:)",
+                { "match": "\\b(for)\\s+([*<\\s]*)\\s*([a-zA-Z_]\\w*)\\s*(,)\\s*([a-zA-Z_]\\w*)\\s*(:)",
                     "captures":
                     {
                         "1":
@@ -1001,7 +1025,7 @@
                         }
                     }
                 },
-                { "match": "\\b(for)\\s+([*< ]*)([a-zA-Z_]\\w*)\\s*(:)",
+                { "match": "\\b(for)\\s+([*<\\s]*)\\s*([a-zA-Z_]\\w*)\\s*(:)",
                     "captures":
                     {
                         "1":
@@ -1022,7 +1046,7 @@
                         }
                     }
                 },
-                { "match": "\\b(for)\\s+([*< ]*)",
+                { "match": "\\b(for)\\s+([*<\\s]*)",
                     "captures":
                     {
                         "1":
@@ -1101,7 +1125,7 @@
         {
             "patterns":
             [
-                { "match": "\\b([a-zA-Z_]\\w*)(,\\s*[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(:)",
+                { "match": "\\b([a-zA-Z_]\\w*)((\\s*,\\s*[a-zA-Z_]\\w*)*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(:)",
                     "captures":
                     {
                         "1":
@@ -1115,30 +1139,30 @@
                                 { "include": "#comma-joined-variables"
                              }]
                         },
-                        "3":
+                        "4":
                         {
                             "name": "keyword.declaration.jai"
                         },
-                        "4":
+                        "5":
                         {
                             "patterns":
                             [
                                 { "include": "#array"
                              }]
                         },
-                        "5":
+                        "6":
                         {
                             "name": "storage.type.jai"
                         },
-                        "6":
+                        "7":
                         {
                             "name": "keyword.operator.pointer.jai"
                         },
-                        "8":
+                        "9":
                         {
                             "name": "keyword.other.directive.jai"
                         },
-                        "9":
+                        "10":
                         {
                             "name": "keyword.declaration.jai"
                         }
@@ -1180,7 +1204,7 @@
                         }
                     }
                 },
-                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))(,\\s*[a-zA-Z_][a-zA-Z0-9_,]*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(=)?",
+                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))((\\s*,\\s*[a-zA-Z_]\\w*)*)\\s*(:)\\s*((struct)|(enum)|(enum_flags))\\b\\s*([a-zA-Z_]\\w*)?",
                     "captures":
                     {
                         "1":
@@ -1198,30 +1222,103 @@
                                 { "include": "#comma-joined-variables"
                              }]
                         },
-                        "5":
+                        "6":
+                        {
+                            "name": "keyword.declaration.jai"
+                        },
+                        "8":
+                        {
+                            "name": "keyword.declaration.struct.jai"
+                        },
+                        "9":
+                        {
+                            "name": "keyword.declaration.enum.jai"
+                        },
+                        "10":
+                        {
+                            "name": "keyword.declaration.enum.jai"
+                        },
+                        "11":
+                        {
+                            "name": "storage.type.jai"
+                        }
+                    }
+                },
+                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))\\s*(:)\\s*((struct)|(enum)|(enum_flags))\\b\\s*([a-zA-Z_]\\w*)?",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "variable.other.declaration.jai"
+                        },
+                        "2":
+                        {
+                            "name": "support.variable.jai"
+                        },
+                        "4":
                         {
                             "name": "keyword.declaration.jai"
                         },
                         "6":
+                        {
+                            "name": "keyword.declaration.struct.jai"
+                        },
+                        "7":
+                        {
+                            "name": "keyword.declaration.enum.jai"
+                        },
+                        "8":
+                        {
+                            "name": "keyword.declaration.enum.jai"
+                        },
+                        "9":
+                        {
+                            "name": "storage.type.jai"
+                        }
+                    }
+                },
+                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))((\\s*,\\s*[a-zA-Z_]\\w*)*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(=)?",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "variable.other.declaration.jai"
+                        },
+                        "2":
+                        {
+                            "name": "support.variable.jai"
+                        },
+                        "4":
+                        {
+                            "patterns":
+                            [
+                                { "include": "#comma-joined-variables"
+                             }]
+                        },
+                        "6":
+                        {
+                            "name": "keyword.declaration.jai"
+                        },
+                        "7":
                         {
                             "patterns":
                             [
                                 { "include": "#array"
                              }]
                         },
-                        "7":
+                        "8":
                         {
                             "name": "storage.type.jai"
                         },
-                        "8":
+                        "9":
                         {
                             "name": "keyword.operator.pointer.jai"
                         },
-                        "10":
+                        "11":
                         {
                             "name": "keyword.other.directive.jai"
                         },
-                        "11":
+                        "12":
                         {
                             "name": "keyword.declaration.jai"
                         }
@@ -1357,8 +1454,105 @@
         {
             "patterns":
             [
+                { "match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(#type)\\b\\s*((inline)\\s*|(no_inline)\\s*)*(\\()(.*)(\\))\\s*((->)([^{]+))?\\s*(((#foreign\\s+([a-zA-Z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#no_context|\\s*#symmetric)*",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "variable.other.constant.declaration.jai"
+                        },
+                        "2":
+                        {
+                            "name": "keyword.declaration.jai"
+                        },
+                        "3":
+                        {
+                            "name": "keyword.other.directive.jai"
+                        },
+                        "5":
+                        {
+                            "name": "storage.modifier.jai"
+                        },
+                        "6":
+                        {
+                            "name": "storage.modifier.jai"
+                        },
+                        "7":
+                        {
+                            "name": "punctuation.section.parens.begin.jai"
+                        },
+                        "8":
+                        {
+                            "name": "meta.function.parameters.jai",
+                            "patterns":
+                            [
+                                { "include": "#parameter-declarations"
+                             }]
+                        },
+                        "9":
+                        {
+                            "name": "punctuation.section.parens.end.jai"
+                        },
+                        "11":
+                        {
+                            "name": "punctuation.return.jai"
+                        },
+                        "12":
+                        {
+                            "name": "meta.function.return-type.jai",
+                            "patterns":
+                            [
+                                { "include": "#return-declarations"
+                             }]
+                        },
+                        "13":
+                        {
+                            "name": "keyword.control.import.directive.decl.jai"
+                        },
+                        "16":
+                        {
+                            "name": "constant.other.import.jai"
+                        },
+                        "18":
+                        {
+                            "name": "punctuation.definition.string.import.begin.jai"
+                        },
+                        "19":
+                        {
+                            "name": "string-quoted.other.import.jai"
+                        },
+                        "21":
+                        {
+                            "name": "punctuation.definition.string.import.end.jai"
+                        },
+                        "22":
+                        {
+                            "name": "invalid.deprecated.jai"
+                        },
+                        "24":
+                        {
+                            "name": "punctuation.definition.string.deprecated.begin.jai"
+                        },
+                        "25":
+                        {
+                            "name": "string-quoted.other.deprecated.jai"
+                        },
+                        "27":
+                        {
+                            "name": "punctuation.definition.string.deprecated.end.jai"
+                        },
+                        "28":
+                        {
+                            "name": "punctuation.terminator.jai"
+                        },
+                        "29":
+                        {
+                            "name": "keyword.other.directive.jai"
+                        }
+                    }
+                },
                 { "name": "meta.function.declaration.jai",
-                    "match": "\\b((main|for_expansion|operator\\s*([^ :]+))|[A-Za-z_]\\w*)\\s*(::)\\s*((inline)\\s*|(no_inline)\\s*)*(\\()(.*)(\\))\\s*((->)([^{]+))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*",
+                    "match": "\\b((main|for_expansion|operator\\s*([^ :]+))|[a-zA-Z_]\\w*)\\s*(::)\\s*((inline)\\s*|(no_inline)\\s*)*(\\()(.*)(\\))\\s*((->)([^{]+))?\\s*(((#foreign\\s+([a-zA-Z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#no_context|\\s*#symmetric)*",
                     "captures":
                     {
                         "1":
@@ -1493,7 +1687,7 @@
                     }
                 },
                 { "name": "meta.function.declaration.jai",
-                    "match": "\\b([A-Za-z_]\\w*)\\s*(::)\\s*(#bake(_arguments))\\s+([A-Za-z_]\\w*)\\s*(\\()(.*)(\\))",
+                    "match": "\\b([a-zA-Z_]\\w*)\\s*(::)\\s*(#bake(_arguments))\\s+([a-zA-Z_]\\w*)\\s*(\\()(.*)(\\))",
                     "captures":
                     {
                         "1":
@@ -1531,7 +1725,7 @@
                     }
                 },
                 { "name": "meta.function.call.jai",
-                    "match": "(([A-Za-z_]\\w*)(\\.)(([A-Za-z_]\\w*)(\\.))*)?\\b([A-Za-z_]\\w*)\\s*(\\()(\\))",
+                    "match": "(([a-zA-Z_]\\w*)(\\.)(([a-zA-Z_]\\w*)(\\.))*)?\\b([a-zA-Z_]\\w*)\\s*(\\()(\\))",
                     "captures":
                     {
                         "2":
@@ -1577,7 +1771,7 @@
                     }
                 },
                 { "name": "meta.function.call.jai",
-                    "match": "(([A-Za-z_]\\w*)(\\.)(([A-Za-z_]\\w*)(\\.))*)?\\b([A-Za-z_]\\w*)\\s*(\\()(.*)(\\))",
+                    "match": "(([a-zA-Z_]\\w*)(\\.)(([a-zA-Z_]\\w*)(\\.))*)?\\b([a-zA-Z_]\\w*)\\s*(\\()(.*)(\\))",
                     "captures":
                     {
                         "2":
@@ -1747,7 +1941,7 @@
                                 }
                             }
                         },
-                        { "match": "(,)?(\\s*#code)?((cast(,trunc)?(,no_check)?(,trunc)?)\\s*(\\()\\s*((\\**)[a-zA-Z_]\\w*)\\s*(\\)))?(\\s*([a-zA-Z_]\\w*)(\\s*=))?([^,]*)",
+                        { "match": "(,)?(\\s*#code(,null)?)?((cast(,trunc)?(,no_check)?(,trunc)?)\\s*(\\()\\s*((\\**)[a-zA-Z_]\\w*)\\s*(\\)))?(\\s*([a-zA-Z_]\\w*)(\\s*=))?([^,]*)",
                             "captures":
                             {
                                 "1":
@@ -1758,22 +1952,22 @@
                                 {
                                     "name": "keyword.other.directive.jai"
                                 },
-                                "3":
+                                "4":
                                 {
                                     "patterns":
                                     [
                                         { "include": "#casts"
                                      }]
                                 },
-                                "13":
+                                "14":
                                 {
                                     "name": "variable.parameter.jai"
                                 },
-                                "14":
+                                "15":
                                 {
                                     "name": "keyword.operator.jai"
                                 },
-                                "15":
+                                "16":
                                 {
                                     "patterns":
                                     [
@@ -1788,7 +1982,7 @@
                 {
                     "patterns":
                     [
-                        { "match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*(//.*)?",
+                        { "match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#no_context|\\s*#symmetric)*\\s*(//.*)?",
                             "captures":
                             {
                                 "1":
@@ -1887,7 +2081,7 @@
                                 }
                             }
                         },
-                        { "match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#symmetric)*\\s*(//.*)?",
+                        { "match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#no_context|\\s*#symmetric)*\\s*(//.*)?",
                             "captures":
                             {
                                 "1":
@@ -2102,8 +2296,8 @@
         "markdown-block-comments":
         {
             "name": "meta.embedded.block.markdown",
-            "begin": "(\\/\\*\\*)",
-            "end": "(\\*\\/)",
+            "begin": "(\\s*\\/\\*\\*)",
+            "end": "(\\s*\\*\\/)",
             "beginCaptures":
             {
                 "1":
@@ -2310,27 +2504,6 @@
                         { "include": "source.jai"
                      }]
                 },
-                { "begin": "((?i)```(js|javascript))",
-                    "end": "(```)",
-                    "beginCaptures":
-                    {
-                        "1":
-                        {
-                            "name": "markup.quote.code.comment.js.jai"
-                        }
-                    },
-                    "endCaptures":
-                    {
-                        "1":
-                        {
-                            "name": "markup.quote.code.comment.js.jai"
-                        }
-                    },
-                    "patterns":
-                    [
-                        { "include": "source.js"
-                     }]
-                },
                 { "begin": "((?i)```java)",
                     "end": "(```)",
                     "beginCaptures":
@@ -2392,6 +2565,27 @@
                     "patterns":
                     [
                         { "include": "source.json"
+                     }]
+                },
+                { "begin": "((?i)```(js|javascript))",
+                    "end": "(```)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.js.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.js.jai"
+                        }
+                    },
+                    "patterns":
+                    [
+                        { "include": "source.js"
                      }]
                 },
                 { "begin": "((?i)```lua)",
@@ -2499,27 +2693,6 @@
                         { "include": "source.python"
                      }]
                 },
-                { "begin": "((?i)```sh(ell)?)",
-                    "end": "(```)",
-                    "beginCaptures":
-                    {
-                        "1":
-                        {
-                            "name": "markup.quote.code.comment.sh.jai"
-                        }
-                    },
-                    "endCaptures":
-                    {
-                        "1":
-                        {
-                            "name": "markup.quote.code.comment.sh.jai"
-                        }
-                    },
-                    "patterns":
-                    [
-                        { "include": "source.shell"
-                     }]
-                },
                 { "begin": "((?i)```shaderlab)",
                     "end": "(```)",
                     "beginCaptures":
@@ -2560,6 +2733,27 @@
                     "patterns":
                     [
                         { "include": "source.glsl"
+                     }]
+                },
+                { "begin": "((?i)```sh(ell)?)",
+                    "end": "(```)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.sh.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "markup.quote.code.comment.sh.jai"
+                        }
+                    },
+                    "patterns":
+                    [
+                        { "include": "source.shell"
                      }]
                 },
                 { "begin": "((?i)```sql)",
@@ -3170,41 +3364,6 @@
                         { "include": "source.jai"
                      }]
                 },
-                { "name": "string.here.embed.js.jai",
-                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?((js|javascript)))\\b",
-                    "end": "\\s*(\\3)(\\4)",
-                    "beginCaptures":
-                    {
-                        "1":
-                        {
-                            "name": "keyword.other.directive.string.js.jai"
-                        },
-                        "2":
-                        {
-                            "name": "constant.other.stringdelimiter.here.embed.js.jai"
-                        },
-                        "4":
-                        {
-                            "name": "constant.other.stringdelimiter.here.embed.language.js.jai"
-                        }
-                    },
-                    "endCaptures":
-                    {
-                        "1":
-                        {
-                            "name": "constant.other.stringdelimiter.here.embed.js.jai"
-                        },
-                        "2":
-                        {
-                            "name": "constant.other.stringdelimiter.here.embed.language.js.jai"
-                        }
-                    },
-                    "contentName": "string.unquoted.here.embed.js.jai",
-                    "patterns":
-                    [
-                        { "include": "source.js"
-                     }]
-                },
                 { "name": "string.here.embed.java.jai",
                     "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(java))\\b",
                     "end": "\\s*(\\3)(\\4)",
@@ -3308,6 +3467,41 @@
                     "patterns":
                     [
                         { "include": "source.json"
+                     }]
+                },
+                { "name": "string.here.embed.js.jai",
+                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?((js|javascript)))\\b",
+                    "end": "\\s*(\\3)(\\4)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "keyword.other.directive.string.js.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.js.jai"
+                        },
+                        "4":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.js.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.js.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.js.jai"
+                        }
+                    },
+                    "contentName": "string.unquoted.here.embed.js.jai",
+                    "patterns":
+                    [
+                        { "include": "source.js"
                      }]
                 },
                 { "name": "string.here.embed.lua.jai",
@@ -3485,41 +3679,6 @@
                         { "include": "source.python"
                      }]
                 },
-                { "name": "string.here.embed.sh.jai",
-                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(sh(ell)?))\\b",
-                    "end": "\\s*(\\3)(\\4)",
-                    "beginCaptures":
-                    {
-                        "1":
-                        {
-                            "name": "keyword.other.directive.string.sh.jai"
-                        },
-                        "2":
-                        {
-                            "name": "constant.other.stringdelimiter.here.embed.sh.jai"
-                        },
-                        "4":
-                        {
-                            "name": "constant.other.stringdelimiter.here.embed.language.sh.jai"
-                        }
-                    },
-                    "endCaptures":
-                    {
-                        "1":
-                        {
-                            "name": "constant.other.stringdelimiter.here.embed.sh.jai"
-                        },
-                        "2":
-                        {
-                            "name": "constant.other.stringdelimiter.here.embed.language.sh.jai"
-                        }
-                    },
-                    "contentName": "string.unquoted.here.embed.sh.jai",
-                    "patterns":
-                    [
-                        { "include": "source.shell"
-                     }]
-                },
                 { "name": "string.here.embed.shaderlab.jai",
                     "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(shaderlab))\\b",
                     "end": "\\s*(\\3)(\\4)",
@@ -3588,6 +3747,41 @@
                     "patterns":
                     [
                         { "include": "source.glsl"
+                     }]
+                },
+                { "name": "string.here.embed.sh.jai",
+                    "begin": "(#string)\\s+((?i)([A-Za-z_]\\w*)?(sh(ell)?))\\b",
+                    "end": "\\s*(\\3)(\\4)",
+                    "beginCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "keyword.other.directive.string.sh.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.sh.jai"
+                        },
+                        "4":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.sh.jai"
+                        }
+                    },
+                    "endCaptures":
+                    {
+                        "1":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.sh.jai"
+                        },
+                        "2":
+                        {
+                            "name": "constant.other.stringdelimiter.here.embed.language.sh.jai"
+                        }
+                    },
+                    "contentName": "string.unquoted.here.embed.sh.jai",
+                    "patterns":
+                    [
+                        { "include": "source.shell"
                      }]
                 },
                 { "name": "string.here.embed.sql.jai",

@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.0.59] - 2021-?-?
+* Fixed doc comments (/**) not allowing prefix whitespace.
+* A string like "foo #string something" will no longer create a decorator block.
+* Fixed anonymous enums/structs not highlighting correctly.
+* Added `#no_context` and cleaned up some removed / deprecated calls.
+* Made `context` a keyword.
+* Fixed `#type` declarations.
+* Fixed comma-separated declarations/assignments
+
 ## [0.0.58] - 2021-08-08
 * Locate now works on projects, not just single files.
 * Locate now reports idents in any file, including library files.
