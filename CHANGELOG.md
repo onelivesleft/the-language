@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.0.59] - 2021-?-?
+## [0.0.59] - 2021-08-12
 * Fixed doc comments (/**) not allowing prefix whitespace.
 * A string like "foo #string something" will no longer create a decorator block.
 * Fixed anonymous enums/structs not highlighting correctly.
