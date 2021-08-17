@@ -296,6 +296,6 @@ make_code_range :: (node: *Code_Node) -> Source_Code_Range {
 
 
 normalize_path :: (path: string) {
-    translate_path(path);
+    path_overwrite_separators(path);
     to_lower(path);
 }

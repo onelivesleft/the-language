@@ -1,13 +1,23 @@
 # Change Log
 
+## [0.0.62] - 2021-08-17
+* Fixed `#asm`
+
+## [0.0.61] - 2021-08-17
+* Updated `asm` to `#asm`
+* Goto definition works inside `.added_strings_#.jai` files (it will take you to the code which created the string).
+
+## [0.0.60] - 2021-08-15
+* Added `asm` keyword and block syntax highlighting.
+
 ## [0.0.59] - 2021-08-12
-* Fixed doc comments (/**) not allowing prefix whitespace.
-* A string like "foo #string something" will no longer create a decorator block.
+* Fixed doc comments (`/**`) not allowing prefix whitespace.
+* A string like `"foo #string something"` will no longer create a decorator block.
 * Fixed anonymous enums/structs not highlighting correctly.
 * Added `#no_context` and cleaned up some removed / deprecated calls.
 * Made `context` a keyword.
 * Fixed `#type` declarations.
-* Fixed comma-separated declarations/assignments
+* Fixed comma-separated declarations/assignments.
 
 ## [0.0.58] - 2021-08-08
 * Locate now works on projects, not just single files.
@@ -18,21 +28,21 @@
 * `Debug Mode` setting
 
 ## [0.0.56] - 2021-08-07
-* Removed #run_and_insert
+* Removed `#run_and_insert`
 * Basic LSP functions: can goto definition, find references, rename (but only in single files, and is probably buggy).
 
 ## [0.0.55] - 2021-05-01
 * Fix MD codeblock
 
 ## [0.0.54] - 2021-03-28
-* #no_reset
+* `#no_reset`
 * MD codeblock support
 
 ## [0.0.53] - 2021-03-19
-* #code outwith parameters
+* `#code` outwith parameters
 
 ## [0.0.52] - 2021-03-19
-* #unshared + #procedure_of_call
+* `#unshared` + `#procedure_of_call`
 * fixed checklists
 * fixed `for` loops
 * fixed `*/` ending decorator blocks

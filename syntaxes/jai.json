@@ -7,6 +7,7 @@
         { "include": "#block-comments" },
         { "include": "#comments" },
         { "include": "#imports" },
+        { "include": "#asm" },
         { "include": "#strings" },
         { "include": "#deprecated-names" },
         { "include": "#casts" },
@@ -29,6 +30,43 @@
      }],
     "repository":
     {
+        "asm":
+        {
+            "begin": "(#asm)\\s*(\\{)",
+            "end": "(\\})",
+            "beginCaptures":
+            {
+                "1":
+                {
+                    "name": "keyword.other.directive.asm.jai"
+                },
+                "2":
+                {
+                    "name": "punctuation.section.braces.begin.jai"
+                }
+            },
+            "endCaptures":
+            {
+                "1":
+                {
+                    "name": "punctuation.section.braces.end.jai"
+                }
+            },
+            "contentName": "source.asm.x86_64",
+            "patterns":
+            [
+                { "include": "source.asm.x86_64" },
+                { "match": "(===)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "keyword.operator.pin.jai"
+                        }
+                    }
+                }
+            ]
+        },
         "block-comments":
         {
             "name": "comment.block.jai",

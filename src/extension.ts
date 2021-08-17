@@ -145,10 +145,8 @@ function updateConfig() {
 
 	debugMode = config.get("debugMode");
 	if (debugMode === undefined) debugMode = false;
-	console.log("Updating debugMode to " + debugMode);
 
 	projectPath = config.get("projectFile");
-	console.log("Updating projectPath to " + projectPath);
 	if (projectPath === undefined) projectPath = "";
 
 	embedColorsConfig = config.get("embedColors");
@@ -372,15 +370,51 @@ class JaiDefinitionProvider implements vscode.DefinitionProvider {
 							 token: vscode.CancellationToken):
 	vscode.ProviderResult<vscode.Definition | vscode.DefinitionLink[]> {
 		return new Promise<vscode.Definition>((resolve, reject) => {
-			jaiLocate(document.fileName, position, "Definition").then(output => {
-				if (output === undefined) {
-					reject();
+			if (path.basename(document.fileName).startsWith(".added_strings_")) {
+				// @Robustness This relies on .added_strings formatting being a block
+				// of 3 comments above the code block, with the middle row containing
+				// the location. i.e.:
+//
+// #insert text. Generated from C:/Repos/jaitest/concat.jai:7.
+//
+				let row = position.line;
+				let text = document.getText();
+				let lines = text.split("\n");
+				let encoded_location = /\/\/ .*Generated from (.*):([0-9]+)\./;
+
+				while (row < document.lineCount && lines[row].startsWith("//"))
+					row += 1;
+				while (row >= 0 && !lines[row].startsWith("//"))
+					row -= 1;
+				row -= 1;
+				if (row < 0) reject();
+
+				let m = lines[row].match(encoded_location);
+				if (m !== null && m !== undefined) {
+					let uri = vscode.Uri.file(m[1]);
+					let posRow = parseInt(m[2]) - 1;
+					let startPosition = new vscode.Position(posRow, 0);
+					let endPosition = new vscode.Position(posRow, 0);
+					let location = new vscode.Location(uri, new vscode.Range(startPosition, endPosition));
+					let result : vscode.Location[] = [];
+					result.push(location);
+					resolve(result);
 				}
 				else {
-					let locations = locationsFromString(output, true);
-					resolve(locations[0]);
+					reject();
 				}
-			});
+			}
+			else {
+				jaiLocate(document.fileName, position, "Definition").then(output => {
+					if (output === undefined) {
+						reject();
+					}
+					else {
+						let locations = locationsFromString(output, true);
+						resolve(locations[0]);
+					}
+				});
+			}
 		});
 	}
 }
