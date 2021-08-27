@@ -1,10 +1,13 @@
 # Change Log
 
+## [0.0.63] - 2021-08-26
+* Added completion suggestions in `#asm` blocks.
+
 ## [0.0.62] - 2021-08-17
-* Fixed `#asm`
+* Fixed `#asm`.
 
 ## [0.0.61] - 2021-08-17
-* Updated `asm` to `#asm`
+* Updated `asm` to `#asm`.
 * Goto definition works inside `.added_strings_#.jai` files (it will take you to the code which created the string).
 
 ## [0.0.60] - 2021-08-15

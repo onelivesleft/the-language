@@ -26,6 +26,8 @@ let selections: Array<vscode.Selection> = [];
 let decorationRanges: vscode.Range [] = [];
 let selectionsIntersectDecoration = false;
 let sentinel = "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
+let asmRanges: vscode.Range [] = [];
+let asmCompletions: vscode.CompletionItem[];
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -34,6 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.languages.registerReferenceProvider(SELECTOR, new JaiReferenceProvider()));
 	context.subscriptions.push(vscode.languages.registerDefinitionProvider(SELECTOR, new JaiDefinitionProvider()));
 	context.subscriptions.push(vscode.languages.registerRenameProvider(SELECTOR, new JaiRenameProvider()));
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(SELECTOR, new JaiCompletionItemProvider()));
 
 	if (activeEditor) {
 		triggerUpdateDecorations();
@@ -80,9 +83,39 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
+	asmCompletions = loadAsmCompletions();
 }
 
 export function deactivate() {}
+
+function loadAsmCompletions(): vscode.CompletionItem[] {
+	let items: vscode.CompletionItem[] = [];
+
+	let extension = vscode.extensions.getExtension("onelivesleft.the-language");
+	if (extension === undefined) return items;
+	let modulepath = path.join(extension.extensionPath,
+		extension.extensionPath.toLowerCase().startsWith("c:\\repos") ? "src" : "out").replace(/\//, '\\');
+
+	let asmJSON = fs.readFileSync(path.resolve(modulepath, "asmCommands.json"), "utf8");
+	let completions = JSON.parse(asmJSON);
+
+	for (const completion in completions) {
+		let info = completions[completion];
+		let item = new vscode.CompletionItem(completion, vscode.CompletionItemKind.Operator);
+
+		// A human-readable string with additional information
+		// about this item, like type or symbol information.
+		item.detail = info.detail[0];
+
+		// A human-readable string that represents a doc-comment.
+		item.documentation = info.description.join("\n");
+
+		items.push(item);
+	}
+
+	console.log(items);
+	return items;
+}
 
 function triggerUpdateDecorations() {
 	if (timeout) {
@@ -105,6 +138,7 @@ function updateSelectionAndDecorations() {
 		selections.push(s[i]);
 
 	updateDecorations();
+	updateAsm(activeEditor.document.getText());
 }
 
 
@@ -344,6 +378,94 @@ function decorate(editor: vscode.TextEditor) {
 	}
 }
 
+function updateAsm(sourceCode: string) {
+	let asmStart = /#asm\s+{/;
+	let asmEnd = "}";
+
+	const sourceCodeArr = sourceCode.split('\n');
+
+	let startLine = 0;
+	let startChar = 0;
+	let insideAsm = false;
+	asmRanges = [];
+
+	for (let line = 0; line < sourceCodeArr.length; line++) {
+		if (insideAsm) {
+			let match = sourceCodeArr[line].match(asmEnd);
+
+			if (match !== null || line === sourceCodeArr.length - 1) {
+				let eol;
+				if (match === null || match.index === undefined)
+					eol = 99999;
+				else
+					eol = match.index + 1;
+				let range = new vscode.Range(
+					new vscode.Position(startLine, startChar),
+					new vscode.Position(line, eol)
+				);
+				asmRanges.push(range);
+				insideAsm = false;
+			}
+		}
+		else {
+			let match = sourceCodeArr[line].match(asmStart);
+			if (match === null || match.index === undefined) continue;
+			let singleLineMatch = sourceCodeArr[line].slice(match.index + match[0].length).match(asmEnd);
+			if (singleLineMatch === null || singleLineMatch.index === undefined) {
+				insideAsm = true;
+				startLine = line;
+				startChar = match.index + match[0].length;
+			}
+			else {
+				let range = new vscode.Range(
+					new vscode.Position(line, match.index + match[0].length),
+					new vscode.Position(line, match.index + match[0].length + singleLineMatch.index + 1)
+				);
+
+				asmRanges.push(range);
+			}
+		}
+	}
+}
+
+
+class JaiCompletionItemProvider implements vscode.CompletionItemProvider {
+	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position,
+								  token: vscode.CancellationToken, context: vscode.CompletionContext):
+		Thenable<vscode.CompletionItem[]> {
+		return new Promise((resolve, reject) => {
+			let invalidCharacter = /[^a-z0-9]/;
+			for (let i = 0; i < asmRanges.length; i++) {
+				let range = asmRanges[i];
+				if (range.contains(position)) {
+					let line = document.getText().split("\n")[position.line];
+					let startPos, endPos;
+					const eol = 99999;
+					if (position.line === range.start.line)
+						startPos = range.start.character;
+					else
+						startPos = 0;
+					if (position.line === range.end.line)
+						endPos = range.end.character;
+					else
+						endPos = eol;
+					line = line.slice(startPos, min(position.character, endPos));
+					let semicolon = line.lastIndexOf(";");
+					if (semicolon >= 0)
+					 	line = line.slice(semicolon + 1);
+					line = line.trimLeft();
+					let match = line.match(invalidCharacter);
+					if (match === null)
+						resolve(asmCompletions);
+					else
+						reject();
+					return;
+				}
+			}
+			reject();
+		});
+    }
+}
 
 
 class JaiReferenceProvider implements vscode.ReferenceProvider {
@@ -516,4 +638,9 @@ function locationsFromString(locations: string, firstLineOnly: boolean = false):
 	}
 
 	return result;
+}
+
+
+function min(a: number, b: number): number {
+	if (a <= b) return a; else return b;
 }

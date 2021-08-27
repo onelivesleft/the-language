@@ -4,3 +4,6 @@ node_modules
 *.vsix
 .build/
 src/.build/
+*.xml
+*.pdb
+*.exe

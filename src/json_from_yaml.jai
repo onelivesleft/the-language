@@ -164,7 +164,7 @@ main :: () {
             line_offsets[processed_line_count] += 1;
 
             row = trim_left(advance(row, spaces + 1));
-            i := index_of_char(row, #char ":");
+            i := find_index_from_left(row, #char ":");
             if i == -1 || i >= row.count - 2 || row[i + 1] != #char ":"
                 continue;
 
@@ -376,7 +376,7 @@ parse_row :: (row_data: string) -> key: string, value: string, is_list_entry: bo
         row.count -= 2;
     }
 
-    colon := index_of_char(row, #char ":");
+    colon := find_index_from_left(row, #char ":");
     if colon == -1 {
         print("Missing ':' on line %\n", line_number);
         exit(1);

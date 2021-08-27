@@ -140,7 +140,6 @@ check_valid_message :: (message: *Message) {
         case .COMPILATION_PHASE;
         phase := cast (*Message_Phase) message;
         if phase.phase == .TYPECHECKED_ALL_WE_CAN && phase.num_items_waiting_to_typecheck == 0 {
-            print("YOYOYOYOYOO\n");
             finished_typechecking = true;
 
             for expr: expressions
