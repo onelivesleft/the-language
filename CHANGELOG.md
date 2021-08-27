@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.64] - 2021-08-27
+* Fix misnamed json file.
+
 ## [0.0.63] - 2021-08-26
 * Added completion suggestions in `#asm` blocks.
 
