@@ -14,6 +14,9 @@ Highlight language inside herestring (postfix `HERE` with language ID)...
 Uses Markdown for docstrings
 ![Screenshot](media/screenshot4.png)
 
+Autocomplete x64 instructions
+![Screenshot](media/asmcomplete.gif)
+
 
 # IDE-like functionality
 
