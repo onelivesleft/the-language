@@ -28,6 +28,7 @@ let selectionsIntersectDecoration = false;
 let sentinel = "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
 let asmRanges: vscode.Range [] = [];
 let asmCompletions: vscode.CompletionItem[];
+let asmURLs: { [id: string] : string; } = {};
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -101,19 +102,47 @@ function loadAsmCompletions(): vscode.CompletionItem[] {
 
 	for (const completion in completions) {
 		let info = completions[completion];
-		let item = new vscode.CompletionItem(completion, vscode.CompletionItemKind.Operator);
+		let name = completion.padEnd(20, " ");
+		let detail : string = info.detail[0];
+		let first_doc_line : string = "";
+		if (info.documentation !== undefined)
+			first_doc_line = info.documentation[0];
+
+		if (!detail) detail = first_doc_line;
+		name += detail;
+
+		let item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Keyword);
+		item.insertText = completion;
 
 		// A human-readable string with additional information
 		// about this item, like type or symbol information.
-		item.detail = info.detail[0];
+		item.detail = detail;
 
 		// A human-readable string that represents a doc-comment.
-		item.documentation = info.description.join("\n");
+		if (info.documentation !== undefined) {
+			item.documentation = "";
+			let doubleLine = true;
+			for (let i = 0; i < info.documentation.length; i++) {
+				if (info.documentation[i] === "Flags Affected:")
+					doubleLine = false;
+				item.documentation += info.documentation[i] + "\n";
+				if (doubleLine) item.documentation += "\n";
+			}
+		}
+
+		if (info.operands) {
+			if (item.documentation)
+				item.documentation = " " + info.operands.join("\n ") + "\n\n" + item.documentation;
+			else
+				item.documentation = " " + info.operands.join("\n ");
+		}
+
+		let url : string = info.url;
+		asmURLs[completion] = url;
 
 		items.push(item);
 	}
 
-	console.log(items);
 	return items;
 }
 
@@ -473,6 +502,14 @@ class JaiReferenceProvider implements vscode.ReferenceProvider {
 							 options: { includeDeclaration: boolean }, token: vscode.CancellationToken):
 	Thenable<vscode.Location[]> {
 		return new Promise((resolve, reject) => {
+			for (let i = 0; i < asmRanges.length; i++) {
+				let range = asmRanges[i];
+				if (range.contains(position)) {
+					reject();
+					return;
+				}
+			}
+
 			jaiLocate(document.fileName, position, "Reference").then(output => {
 				if (output === undefined) {
 					reject();
@@ -527,6 +564,29 @@ class JaiDefinitionProvider implements vscode.DefinitionProvider {
 				}
 			}
 			else {
+				// @TODO When the VSLocate can find idents in #asm blocks refine this
+				//       (right now if you're in an #asm block it will never attempt to id,
+				//        it will always just try to go to website)
+				for (let i = 0; i < asmRanges.length; i++) {
+					let range = asmRanges[i];
+					if (range.contains(position)) {
+						let wordRange = document.getWordRangeAtPosition(position);
+						if (wordRange !== undefined) {
+							let line = document.getText().split("\n")[position.line];
+							let word = line.slice(wordRange.start.character, wordRange.end.character);
+							let url = asmURLs[word];
+							if (url === undefined) {
+								reject();
+							}
+							else {
+								vscode.env.openExternal(vscode.Uri.parse(url));
+								reject();
+							}
+						}
+						return;
+					}
+				}
+
 				jaiLocate(document.fileName, position, "Definition").then(output => {
 					if (output === undefined) {
 						reject();

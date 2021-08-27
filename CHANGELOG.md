@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.65] - 2021-08-27
+* Fully fleshed out #asm instruction info.
+* If you hit goto definition (F12) on an instruction it will open the relevant felixcloutier.com page.
+
 ## [0.0.64] - 2021-08-27
 * Fix misnamed json file.
 

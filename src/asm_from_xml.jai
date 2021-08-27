@@ -1,6 +1,8 @@
 #import "Basic";
+#import "Curl";
 #import "File";
 #import "Hash_Table";
+#import "Time";
 
 jai_string :: #import "String";
 parse_int :: jai_string.parse_int;
@@ -9,23 +11,45 @@ parse_int :: jai_string.parse_int;
 
 // @TODO
 
-// [ ] Goto definition on asm operator goes to felix url
-// [ ] Better descriptions (e.g. flags written)
+// [x] Goto definition on asm operator goes to felix url
+// [x] Better descriptions (e.g. flags written)
+// [x] Find instruction
 
 
-in_file           :: "instructions.xml";
-//in_file           :: "sample.xml";
+instructions_file :: "instructions.xml";
+descriptions_file :: "descriptions.htmls";
 out_file          :: "asmCommands.json";
 
 json : String_Builder;
 
 main :: () {
-    xml, success := read_entire_file(in_file);
+    silent := false;
+    fetch_descriptions := false;
+    args := get_command_line_arguments();
+    for 1..args.count-1 {
+        arg := args[it];
+        if arg == "-f" {
+            fetch_descriptions = true;
+            silent = true;
+        }
+        else if arg == "-s" {
+            silent = true;
+        }
+        else {
+            print("Args:\n-f = fetch descriptions from felixcloutier.com (requires libcurl.dll)\n-s = silent");
+            exit(1);
+        }
+    }
+
+    if !silent  print("Loading xml...\n");
+    xml, success := read_entire_file(instructions_file);
     if !success {
-        print("Failed to read %", in_file);
+        print("Failed to read %", instructions_file);
+        print("Download it from https://uops.info/xml.html");
         exit(1);
     }
 
+    if !silent  print("Parsing xml...\n");
     init_string_builder(*json);
     append(*json, "{\n");
 
@@ -68,7 +92,103 @@ main :: () {
         table_set(*instructions, instruction.name, variations);
     }
 
+    descriptions : Table(string, string);
+    if fetch_descriptions {
+        print("@ECHO OFF\n");
+        for variations, instruction_name: instructions {
+            for instruction_array, hash: variations {
+                instruction := instruction_array[0];
+                _, found := table_find(descriptions, instruction.url_ref);
+                if !found {
+                    download_description_from_url(instruction.url_ref);
+                    table_set(*descriptions, instruction.url_ref, "");
+                }
+                break;
+            }
+        }
+    }
+    else {
+        if !silent  print("Loading descriptions...\n");
+        htmls, success := read_entire_file(descriptions_file);
+        if !success {
+            print("Failed to read %", descriptions_file);
+            print("Generate it by running with `-f` and >");
+            exit(1);
+        }
 
+        current_url := "";
+        state : enum {
+            SEEKING_BOUNDARY;
+            SEEKING_URL;
+            SEEKING_DESCRIPTION;
+            SEEKING_P;
+            IN_DESCRIPTION;
+            SEEKING_FLAGS;
+            IN_FLAGS;
+        } = .SEEKING_BOUNDARY;
+        desc_builder : String_Builder();
+        init_string_builder(*desc_builder);
+
+        wants_to_write := false;
+        check_for_doctype := false;
+        for line_raw: split_it(htmls, "\n") {
+            line := trim(line_raw);
+            if state == {
+                case .SEEKING_BOUNDARY;
+                if contains(line, "href=\"#flags-affected\"") {
+                    state = .SEEKING_P;
+                    append(*desc_builder, "Flags Affected:\n");
+                }
+                else if line == html_boundary {
+                    if wants_to_write {
+                        wants_to_write = false;
+                        table_set(*descriptions, current_url, builder_to_string(*desc_builder));
+                        reset(*desc_builder);
+                    }
+                    state = .SEEKING_URL;
+                }
+
+                case .SEEKING_URL;
+                if starts_with(line, "felixcloutier.com") {
+                    current_url = line;
+                    state = .SEEKING_DESCRIPTION;
+                    check_for_doctype = true;
+                }
+                else {
+                    state = .SEEKING_BOUNDARY;
+                }
+
+                case .SEEKING_DESCRIPTION;
+                if check_for_doctype {
+                    check_for_doctype = false;
+                    assert(line == "<!DOCTYPE html>");
+                }
+                else if contains(line, "href=\"#description\"")
+                    state = .SEEKING_P;
+
+                case .SEEKING_P;
+                if starts_with(line, "<p>") {
+                    state = .IN_DESCRIPTION;
+                    wants_to_write = true;
+                    append(*desc_builder, strip_tags(line));
+                }
+
+                case .IN_DESCRIPTION;
+                if !starts_with(line, "<p>") {
+                    state = .SEEKING_BOUNDARY;
+                }
+                else {
+                    append(*desc_builder, strip_tags(line));
+                }
+            }
+        }
+        if wants_to_write {
+            wants_to_write = false;
+            table_set(*descriptions, current_url, builder_to_string(*desc_builder));
+        }
+    }
+
+    if !silent  print("Generating json...\n");
     first := true;
     for variations, instruction_name: instructions {
         if !first  append(*json, ",\n");
@@ -78,11 +198,29 @@ main :: () {
         name := copy_string(instruction_name);
         to_lower(name);
         count := 0;
+        first_instruction : Instruction;
         for instruction_array, hash: variations {
             instruction := instruction_array[0];
+
             if count == 0 {
+                first_instruction = instruction;
                 print_to_builder(*json, "\"%\": {\n        \"detail\": [\n            \"%\"\n        ],\n", name, instruction.summary);
-                append(*json, "        \"description\": [");
+                description, found := table_find(descriptions, instruction.url_ref);
+                if found {
+                    append(*json, "        \"documentation\": [");
+                    comma := false;
+                    for line: split_it(description, "\n") {
+                        if trim(line) {
+                            if comma  append(*json, ",\n");
+                            else      append(*json, "\n");
+
+                            print_to_builder(*json, "            \"%\"", line);
+                            comma = true;
+                        }
+                    }
+                    append(*json, "\n        ],\n");
+                }
+                append(*json, "        \"operands\": [");
             }
             types : [..] string;
             operand_sizes : [10] u64;
@@ -93,6 +231,7 @@ main :: () {
             for i: 0 .. instruction.operand_count - 1 {
                 if instruction.operands[i].type == "flags"  continue;
                 size_builder : String_Builder;
+                defer reset(*size_builder);
                 init_string_builder(*size_builder);
                 s := operand_sizes[i];
                 if s {
@@ -116,16 +255,23 @@ main :: () {
                     array_add(*types, instruction.operands[i].type);
                 }
             }
+
             if count  append(*json, ",\n");
             else      append(*json, "\n");
             print_to_builder(*json, "            \"%\"", join(types, ", "));
             count += 1;
         }
+        append(*json, "\n        ],\n");
+
+        append(*json, "        \"url\": [\n");
+        print_to_builder(*json, "            \"https://%\"", first_instruction.url_ref);
         append(*json, "\n        ]\n    }");
+
     }
 
     append(*json, "\n}\n");
 
+    if !silent  print("Writing json...\n");
     write_entire_file(out_file, builder_to_string(*json));
 
     /*
@@ -137,6 +283,7 @@ main :: () {
         }
     }
     */
+    if !silent  print("Done.\n");
 }
 
 
@@ -322,8 +469,10 @@ instruction_from_string :: (line: string) -> result: Instruction {
         else if tag == "url-ref"  result.url_ref = value;
     }
 
-    while result.name.count > 0 && result.name[0] < #char "A" || result.name[0] > #char "Z"
-        result.name = slice(result.name, 1);
+    if result.name[0] == #char "{" {
+        result.name = split(result.name, "}", max_results=2)[1];
+        result.name = trim_start(result.name);
+    }
 
     return result;
 }
@@ -367,4 +516,45 @@ print :: (using instruction: Instruction) {
     for i: 0 .. operand_count - 1
         print ("  %: % [%] % = %\n", operands[i].idx, operands[i].name, operands[i].type, operands[i].width, operands[i].valid);
     print("\n\n");
+}
+
+
+c_buffer : [128] s8;
+copy_to_c_buffer :: (s: string) -> *s8 {
+    assert(s.count < 128);
+    for 0 .. s.count - 1  c_buffer[it] = xx s[it];
+    c_buffer[s.count] = 0;
+    return *c_buffer[0];
+}
+
+html_boundary :: "---------------------------------------";
+
+download_description_from_url :: (url: string) {
+    print("echo %\necho %\n", html_boundary, url);
+    print("curl -L %\n", url);
+}
+
+
+strip_tags :: (s: string) -> string {
+    builder : String_Builder;
+    init_string_builder(*builder);
+    in_tag := false;
+    for c: 0 .. s.count - 1 {
+        if in_tag {
+            if s[c] == #char ">"  in_tag = false;
+        }
+        else {
+            if s[c] == #char "<"
+                in_tag = true;
+            else
+                append(*builder, s[c]);
+        }
+    }
+    append(*builder, "\n");
+    line := builder_to_string(*builder);
+    line = replace(line, "&lt;", "<");
+    line = replace(line, "&gt;", ">");
+    line = replace(line, "&amp;", "&");
+    line = replace(line, "\"", "\\\"");
+    return line;
 }

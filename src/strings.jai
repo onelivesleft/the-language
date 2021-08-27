@@ -1622,3 +1622,9 @@ join :: (strings: [] string, separator: u8) -> string #must {
 join :: (strings: .. string) -> string #must {
     return join(strings, "");
 }
+
+
+contains :: (haystack: string, needle: string) -> bool {
+    _, found := first_index(haystack, needle, default_first_index, default_compare);
+    return found;
+}

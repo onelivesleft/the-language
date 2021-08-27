@@ -7,3 +7,5 @@ src/.build/
 *.xml
 *.pdb
 *.exe
+*.dll
+descriptions.htmls
