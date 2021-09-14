@@ -70,8 +70,17 @@ finished_typechecking := false;
     build_options := get_build_options(workspace);
     build_options.output_type = .NO_OUTPUT;
     build_options.emit_debug_info = .NONE;
-    build_options.output_path = "c:/temp/"; // @TODO make correct
-    build_options.intermediate_path = "c:/temp/";
+
+    // @TODO make correct when Jai has a std lib way of finding this
+    #if OS == .WINDOWS {
+        build_options.output_path = "c:/temp/";
+        build_options.intermediate_path = "c:/temp/";
+    }
+    else {
+        build_options.output_path = "/tmp/";
+        build_options.intermediate_path = "/tmp/";
+    }
+
     chk := check_message;
     build_options.user_data_u64 = xx *chk;
     set_build_options(build_options, workspace);

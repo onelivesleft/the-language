@@ -94,8 +94,9 @@ function loadAsmCompletions(): vscode.CompletionItem[] {
 
 	let extension = vscode.extensions.getExtension("onelivesleft.the-language");
 	if (extension === undefined) return items;
-	let modulepath = path.join(extension.extensionPath,
-		extension.extensionPath.toLowerCase().startsWith("c:\\repos") ? "src" : "out").replace(/\//, '\\');
+	let modulepath = path.sep === "\\"
+		? path.join(extension.extensionPath, extension.extensionPath.toLowerCase().startsWith("c:\\repos") ? "src" : "out").replace(/\//, '\\')
+		: path.join(extension.extensionPath, "out");
 
 	let asmJSON = fs.readFileSync(path.resolve(modulepath, "asmCommands.json"), "utf8");
 	let completions = JSON.parse(asmJSON);
@@ -638,8 +639,9 @@ async function jaiLocate(filepath: string, position: vscode.Position, operation:
 
 	let extension = vscode.extensions.getExtension("onelivesleft.the-language");
 	if (extension === undefined) return;
-	let modulepath = path.join(extension.extensionPath,
-		extension.extensionPath.toLowerCase().startsWith("c:\\repos") ? "src" : "out").replace(/\//, '\\');
+	let modulepath = path.sep === "\\"
+		? path.join(extension.extensionPath, extension.extensionPath.toLowerCase().startsWith("c:\\repos") ? "src" : "out").replace(/\//, '\\')
+		: path.join(extension.extensionPath, "out");
 
 	let normalized = filepath.replace(/\\/g, '/');
 

@@ -78,26 +78,36 @@ repository:
           1: name: markup.quote.comment.jai
           2: name: comment.block.backquoted.jai
           3: name: markup.quote.comment.jai
-      - match: (\@)((?i)TODO)
+      - match: (\@)((?i)TODO)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.todo.jai
           2: name: comment.block.annotation.todo.jai
-      - match: (\@)((?i)Note)
+          3: name: comment.block.todo.jai
+      - match: (\@)((?i)Release)([^@]*)
+        captures:
+          1: name: comment.block.punctuation.annotation.release.jai
+          2: name: comment.block.annotation.release.jai
+          3: name: comment.block.release.jai
+      - match: (\@)((?i)Note)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.note.jai
           2: name: comment.block.annotation.note.jai
-      - match: (\@)((?i)Urgent)
+          3: name: comment.block.note.jai
+      - match: (\@)((?i)Urgent)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.urgent.jai
           2: name: comment.block.annotation.urgent.jai
-      - match: (\@)((?i)Speed)
+          3: name: comment.block.urgent.jai
+      - match: (\@)((?i)Speed)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.speed.jai
           2: name: comment.block.annotation.speed.jai
-      - match: (\@)((?i)NoCheckin)
+          3: name: comment.block.speed.jai
+      - match: (\@)((?i)NoCheckin)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.nocheckin.jai
           2: name: comment.block.annotation.nocheckin.jai
+          3: name: comment.block.todo.jai
       - match: (\@)(\w+)
         captures:
           1: name: comment.block.punctuation.annotation.jai
@@ -142,32 +152,42 @@ repository:
           1: name: markup.quote.comment.jai
           2: name: comment.block.backquoted.jai
           3: name: markup.quote.comment.jai
-      - match: (\@)((?i)TODO)
+      - match: (\@)((?i)TODO)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.todo.jai
           2: name: comment.block.annotation.todo.jai
-      - match: (\@)((?i)Note)
+          3: name: comment.block..jai
+      - match: (\@)((?i)Release)([^@]*)
+        captures:
+          1: name: comment.block.punctuation.annotation.release.jai
+          2: name: comment.block.annotation.release.jai
+          3: name: comment.block..jai
+      - match: (\@)((?i)Note)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.note.jai
           2: name: comment.block.annotation.note.jai
-      - match: (\@)((?i)Urgent)
+          3: name: comment.block..jai
+      - match: (\@)((?i)Urgent)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.urgent.jai
           2: name: comment.block.annotation.urgent.jai
-      - match: (\@)((?i)Speed)
+          3: name: comment.block..jai
+      - match: (\@)((?i)Speed)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.speed.jai
           2: name: comment.block.annotation.speed.jai
-      - match: (\@)((?i)NoCheckin)
+          3: name: comment.block..jai
+      - match: (\@)((?i)NoCheckin)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.nocheckin.jai
           2: name: comment.block.annotation.nocheckin.jai
+          3: name: comment.block.nocheckin.jai
       - match: (\@)(\w+)
         captures:
           1: name: comment.block.punctuation.annotation.jai
           2: name: comment.block.annotation.jai
       - name: comment.block.signature.jai
-        match: '(-) (\w+) (DATE)'
+        match: (-)\s*(.*)\s*(DATE)
         captures:
           1: name: comment.block.punctuation.signature.jai
           2: name: comment.block.signature.name.jai
@@ -218,32 +238,42 @@ repository:
           1: name: markup.quote.comment.jai
           2: name: comment.line.double-slash.backquoted.jai
           3: name: markup.quote.comment.jai
-      - match: (\@)((?i)TODO)
+      - match: (\@)((?i)TODO)([^@]*)
         captures:
           1: name: comment.line.double-slash.punctuation.annotation.todo.jai
           2: name: comment.line.double-slash.annotation.todo.jai
-      - match: (\@)((?i)Note)
+          3: name: comment.line.double-slash.todo.jai
+      - match: (\@)((?i)Release)([^@]*)
+        captures:
+          1: name: comment.line.double-slash.punctuation.annotation.release.jai
+          2: name: comment.line.double-slash.annotation.release.jai
+          3: name: comment.line.double-slash.release.jai
+      - match: (\@)((?i)Note)([^@]*)
         captures:
           1: name: comment.line.double-slash.punctuation.annotation.note.jai
           2: name: comment.line.double-slash.annotation.note.jai
-      - match: (\@)((?i)Urgent)
+          3: name: comment.line.double-slash.note.jai
+      - match: (\@)((?i)Urgent)([^@]*)
         captures:
           1: name: comment.line.double-slash.punctuation.annotation.urgent.jai
           2: name: comment.line.double-slash.annotation.urgent.jai
-      - match: (\@)((?i)Speed)
+          3: name: comment.line.double-slash.urgent.jai
+      - match: (\@)((?i)Speed)([^@]*)
         captures:
           1: name: comment.line.double-slash.punctuation.annotation.speed.jai
           2: name: comment.line.double-slash.annotation.speed.jai
-      - match: (\@)((?i)NoCheckin)
+          3: name: comment.line.double-slash.speed.jai
+      - match: (\@)((?i)NoCheckin)([^@]*)
         captures:
           1: name: comment.line.double-slash.punctuation.annotation.nocheckin.jai
           2: name: comment.line.double-slash.annotation.nocheckin.jai
+          3: name: comment.line.double-slash.nocheckin.jai
       - match: (\@)(\w+)
         captures:
           1: name: comment.line.double-slash.punctuation.annotation.jai
           2: name: comment.line.double-slash.annotation.jai
       - name: comment.line.double-slash.signature.jai
-        match: '(-) (\w+) (DATE)'
+        match: (-)\s*(.*)\s*(DATE)
         captures:
           1: name: comment.line.double-slash.punctuation.signature.jai
           2: name: comment.line.double-slash.signature.name.jai
