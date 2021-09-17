@@ -103,6 +103,11 @@ repository:
           1: name: comment.block.punctuation.annotation.speed.jai
           2: name: comment.block.annotation.speed.jai
           3: name: comment.block.speed.jai
+      - match: (\@)((?i)Robustness)([^@]*)
+        captures:
+          1: name: comment.block.punctuation.annotation.robustness.jai
+          2: name: comment.block.annotation.robustness.jai
+          3: name: comment.block.robustness.jai
       - match: (\@)((?i)NoCheckin)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.nocheckin.jai
@@ -156,27 +161,32 @@ repository:
         captures:
           1: name: comment.block.punctuation.annotation.todo.jai
           2: name: comment.block.annotation.todo.jai
-          3: name: comment.block..jai
+          3: name: comment.block.todo.jai
       - match: (\@)((?i)Release)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.release.jai
           2: name: comment.block.annotation.release.jai
-          3: name: comment.block..jai
+          3: name: comment.block.release.jai
       - match: (\@)((?i)Note)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.note.jai
           2: name: comment.block.annotation.note.jai
-          3: name: comment.block..jai
+          3: name: comment.block.note.jai
       - match: (\@)((?i)Urgent)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.urgent.jai
           2: name: comment.block.annotation.urgent.jai
-          3: name: comment.block..jai
+          3: name: comment.block.urgent.jai
       - match: (\@)((?i)Speed)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.speed.jai
           2: name: comment.block.annotation.speed.jai
-          3: name: comment.block..jai
+          3: name: comment.block.speed.jai
+      - match: (\@)((?i)Robustness)([^@]*)
+        captures:
+          1: name: comment.block.punctuation.annotation.robustness.jai
+          2: name: comment.block.annotation.robustness.jai
+          3: name: comment.block.robustness.jai
       - match: (\@)((?i)NoCheckin)([^@]*)
         captures:
           1: name: comment.block.punctuation.annotation.nocheckin.jai
@@ -263,6 +273,11 @@ repository:
           1: name: comment.line.double-slash.punctuation.annotation.speed.jai
           2: name: comment.line.double-slash.annotation.speed.jai
           3: name: comment.line.double-slash.speed.jai
+      - match: (\@)((?i)Robustness)([^@]*)
+        captures:
+          1: name: comment.line.double-slash.punctuation.annotation.robustness.jai
+          2: name: comment.line.double-slash.annotation.robustness.jai
+          3: name: comment.line.double-slash.robustness.jai
       - match: (\@)((?i)NoCheckin)([^@]*)
         captures:
           1: name: comment.line.double-slash.punctuation.annotation.nocheckin.jai
@@ -322,6 +337,8 @@ repository:
         match: \b(return|break|continue)\b
       - name: keyword.control.loop.while.jai
         match: \b(while)\b
+      - name: keyword.control.loop.for.remove.jai
+        match: \b(remove)\b
       - name: keyword.control.defer.jai
         match: \b(defer)\b
       - name: keyword.other.directive.jai
@@ -331,7 +348,7 @@ repository:
       - name: keyword.other.directive.string.jai
         match: (#char)
       - name: keyword.other.context.jai
-        match: \b(context)\b
+        match: \b(context|push_context)\b
       - name: keyword.other.using.jai
         match: \b(using)\b
       - name: constant.language.true.jai
@@ -404,14 +421,6 @@ repository:
       - match: '[(\[\{:\s=.,/*+<>-](\d[\d_]*)'
         captures:
           1: name: constant.numeric.jai
-  support:
-    patterns:
-      - name: support.function.jai
-        match: \b(Construct|New|NewArray|Swap|__temporary_allocator|alloc|alloc_string|assert|atomic_swap|auto_release_temp|compare_and_swap|compare_and_swap2|clamp|decode_relative_pointer|enum_highest_value|enum_names|enum_range|enum_range_given_info|enum_values|exit|free|get_command_line_arguments|get_field|get_system_time|get_system_time_local|get_temporary_storage_mark|get_time|get_working_directory|init_time|log|log_error|max|memcpy|memcmp|memset|min|print|push_allocator|realloc|reset_temporary_storage|reset_temporary_storage|running_at_compile_time|set_temporary_storage_mark|set_working_directory|sprint|talloc|talloc_string|temporary_alloc|tprint|write_relative_pointer)\b
-      - name: support.function.jai
-        match: \b(align_of|type_of|size_of|type_info|initializer_of|debug_break|pause|rdtsc|rdtscp|rdseed|rdrand|prefetch|atomic_add|atomic_increment|atomic_and|atomic_or|atomic_xor|mfence|cpuid|byte_swap|bit_scan_forward|bit_scan_reverse|popcount|push_context|write_string|write_strings|write_number|write_nonnegative_number)\b
-      - name: support.class.jai
-        match: \b(Any|Source_Code_Location|Source_Code_Range)\b
   deprecated:
     match: '(#deprecated\s*((")((QUOTED))("))?)'
     captures:
@@ -419,9 +428,6 @@ repository:
       3: name: punctuation.definition.string.deprecated.begin.jai
       4: name: string-quoted.other.deprecated.jai
       6: name: punctuation.definition.string.deprecated.end.jai
-  deprecated-names:
-    name: invalid.deprecated.jai
-    match: \b(compiler_report_error|compiler_info|compiler_warning|compiler_error|enum_values)\b
   notes:
     patterns:
       - match: '(@)(NAME)(\()([^)]*)(\))'
@@ -439,7 +445,7 @@ repository:
     patterns:
       - match: '\b(for)\s+([*<\s]*)(SPACED-NAME)(,)(SPACED-NAME)(:)'
         captures:
-          1: name: keyword.control.for.jai
+          1: name: keyword.control.loop.for.jai
           2: name: keyword.operator.jai
           3: name: variable.other.declaration.jai
           4: name: punctuation.separator.jai
@@ -447,13 +453,13 @@ repository:
           6: name: keyword.declaration.jai
       - match: '\b(for)\s+([*<\s]*)(SPACED-NAME)(:)'
         captures:
-          1: name: keyword.control.for.jai
+          1: name: keyword.control.loop.for.jai
           2: name: keyword.operator.jai
           3: name: variable.other.declaration.jai
           4: name: keyword.declaration.jai
       - match: '\b(for)\s+([*<\s]*)'
         captures:
-          1: name: keyword.control.for.jai
+          1: name: keyword.control.loop.for.jai
           2: name: keyword.operator.jai
   enum-members:
     match: '([^\w])(\.)(NAME)'

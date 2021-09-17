@@ -7,7 +7,7 @@
 jai_string :: #import "String";
 parse_int :: jai_string.parse_int;
 
-#load "strings.jai";
+#load "babystrings.jai";
 
 // @TODO
 

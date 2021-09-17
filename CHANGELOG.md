@@ -1,5 +1,22 @@
 # Change Log
 
+## [0.0.70] - 2021-09-18
+* Fixed previous version breaking syntax highlighting.
+
+## [0.0.69] - 2021-09-18
+* Autogenerate deprecated info from jai modules folder.
+* Autogenerate support.function and support.class info from jai modules folder.
+* Added `remove` keyword.
+
+## [0.0.68] - 2021-09-17
+* Added `projectJaiArgs` setting to allow you to pass additional args to the compiler, such as an extra `-import_dir`.
+* Fixed reference update erroneously triggering for all files, instead of just `.jai` files.
+* Fixed compiler calls on uncompilable files locking the feature
+
+## [0.0.67] - 2021-09-16
+* Whenever you save a file the compiler will be called to try and compile newer reference data.
+* Reference and Definition providers now run off this cached data.
+
 ## [0.0.66] - 2021-09-14
 * Fixed bugs when running under linux
 

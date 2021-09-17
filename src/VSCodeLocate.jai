@@ -1,46 +1,62 @@
 #import "Basic";
 #import "Compiler";
 #import "Hash_Table";
+#import "Machine_X64";
 #import "String";
 
 debug :: false;
 
-help_text :: "Usage: jai -import_dir <Locate Folder> -meta Locate <project.jai> -- <file.jai> <row> <col>\n";
+help_text :: #string __sh
+    Usage: jai -import_dir <VSCodeLocate Folder> -meta VSCodeLocate <project.jai> -- <Operation>
+
+    <Operation> is one of:
+
+        Find <file.jai> <row> <col>   # Will return references for token at specified postion.
+        Dump                          # Will return references for evey token.
+__sh;
 
 sentinel :: "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
-
-set_options :: (using options: *Build_Options) {
-    emit_debug_info = .NONE;
-    output_path = "c:/temp";
-    intermediate_path = "c:/temp";
-}
 
 
 target_path : string;
 target_line : int;
 target_char : int;
 finished_typechecking := false;
+mode : enum { SINGLE_REFERENCE; ALL_REFERENCES; };
 
 
 #run {
+    #if debug  print("DEBUG ENABLED\n");
+
     args := compiler_get_command_line_arguments();
-    if args.count < 3 {
+    if !args {
         print(help_text);
         exit(1);
     }
 
-    line_ok : bool;
-    char_ok : bool;
+    line_ok, char_ok : bool;
 
-    target_path = args[0];
-    normalize_path(target_path);
-    target_line, line_ok = parse_int(*args[1]);
-    target_char, char_ok = parse_int(*args[2]);
-    //target_path = test_path;
-    //target_line = 67;
-    //target_char = 5;
+    operation := args[0];
+    if operation == "Find" {
+        if args.count < 4 {
+            print(help_text);
+            exit(1);
+        }
+        mode = .SINGLE_REFERENCE;
+        target_path = args[1];
+        normalize_path(target_path);
+        target_line, line_ok = parse_int(*args[2]);
+        target_char, char_ok = parse_int(*args[3]);
 
-    if !(line_ok && char_ok) {
+        if !(line_ok && char_ok) {
+            print(help_text);
+            exit(1);
+        }
+    }
+    else if operation == "Dump" {
+        mode = .ALL_REFERENCES;
+    }
+    else {
         print(help_text);
         exit(1);
     }
@@ -48,7 +64,7 @@ finished_typechecking := false;
     workspace := compiler_create_workspace("Target Program");
     if !workspace {
         print("Workspace creation failed.\n");
-        return;
+        exit(2);
     }
 
     files, run_strings := compiler_get_source_files();
@@ -63,6 +79,7 @@ finished_typechecking := false;
                 old_filename := <<it;
                 if is_absolute_path(old_filename) continue;
                 <<it = sprint("%/%", old_wd, old_filename);
+                #if debug  print("%\n", <<it);
             }
         }
     }
@@ -70,6 +87,9 @@ finished_typechecking := false;
     build_options := get_build_options(workspace);
     build_options.output_type = .NO_OUTPUT;
     build_options.emit_debug_info = .NONE;
+    enable_feature(*build_options.machine_options.x86_features.leaves, x86_Feature_Flag.AVX);
+    enable_feature(*build_options.machine_options.x86_features.leaves, x86_Feature_Flag.AVX2);
+
 
     // @TODO make correct when Jai has a std lib way of finding this
     #if OS == .WINDOWS {
@@ -163,24 +183,34 @@ check_valid_message :: (message: *Message) {
                 }
             }
 
-            // look for ident
-            needle := decl_from_location(target_path, target_line, target_char);
-            if needle {
+            if mode == {
+                case .SINGLE_REFERENCE;  // look for ident
+                needle := decl_from_location(target_path, target_line, target_char);
+                if needle {
+                    print(sentinel);
+                    needle_range := format_range(needle);
+                    print("%\n", needle_range);
+                    ranges, _ := table_find(locations, needle);
+                    for ranges {
+                        range := format_range(it);
+                        if range != needle_range
+                            print("%\n", range);
+                    }
+                }
+
+                case .ALL_REFERENCES; // dump everything
                 print(sentinel);
-                needle_range := format_range(needle);
-                print("%\n", needle_range);
-                ranges, _ := table_find(locations, needle);
-                for ranges {
-                    range := format_range(it);
-                    if range != needle_range
-                        print("%\n", range);
+                for ranges, needle: locations {
+                    needle_range := format_range(needle);
+                    print("%\n", needle_range);
+                    for ranges {
+                        range := format_range(it);
+                        if range != needle_range
+                            print("%\n", range);
+                    }
+                    print("\n");
                 }
             }
-
-
-            //print("Revisit count: %\n", to_revisit.count);
-            ////for to_revisit  print("%\n", format_location(it));
-            //for to_revisit  print("%\n", <<it);
         }
     }
 }
@@ -198,12 +228,6 @@ process_decl_or_ident :: (node: *Code_Node) {
         if ident.name == ""  return;
 
         decl := ident.resolved_declaration;
-        //if !decl { // @TODO if we no longer get these (which would be good!) then remove this and add
-        //           //       null check to `is_valid_decl`
-        //    array_add(*to_revisit, ident);
-        //    print("Missing declaration for: %\n%\n\n", ident.name, format_location(ident));
-        //    return;
-        //}
 
         if !is_valid_decl(decl)  return;
 
@@ -240,10 +264,9 @@ is_valid_decl :: (decl: *Code_Declaration) -> bool {
 
 decl_from_location :: (filename: string, line: int, char: int) -> *Code_Declaration {
     for ranges, decl: locations {
-
         for range: ranges {
             decl_path := copy_string(range.fully_pathed_filename);
-            defer free(decl_path);  // @TODO @Performance
+            defer free(decl_path);  // @TODO @Speed
             normalize_path(decl_path);
             if decl_path != filename
                 continue;

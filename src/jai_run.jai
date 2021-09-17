@@ -46,15 +46,12 @@ set_options :: (using options: *Build_Options) {
         executable := path_strip_extension(basename(filepath));
 
     set_working_directory(output_path);
+    set_build_options_dc(.{do_output = false});
 
     build_options := get_build_options();
     build_options.output_type = .NO_OUTPUT;
-    set_build_options(build_options);
-
-    build_options.output_type = .NO_OUTPUT;
     build_options.output_executable_name = executable;
 
-    set_options(*build_options);
     workspace := compiler_create_workspace("Main");
     set_build_options(build_options, workspace);
     add_build_file(filepath, workspace);

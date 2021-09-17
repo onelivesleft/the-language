@@ -1,6 +1,9 @@
 #import "Basic";
 #import "File";
-#import "String";
+#import "File_Utilities";
+#import "Strings";
+heap :: #import "Strings_Alloc";
+temp :: #import "Strings_Alloc"(__temporary_allocator);
 
 #load "languages.jai";
 
@@ -24,14 +27,16 @@ debug :: false;
 // [ ] FoldingRangeProvider
 
 // Misc
-// [ ] Generate `support.function.jai` by scraping Preload et al
+// [ ] When in .added_strings, give action to copy strings back into source file (and comment out generating command?)
 // [ ] setup tasks.json for module
 // [ ] whitespace before MD inner backticks behaves a bit weird
 // [ ] markdown codeblock
-// [ ] #expand after returns (wtf does this mean)
+// [ ] #expand after returns (syntax hghlight)
 // [ ] rework all parentheses to begin and end correctly
 // [.] `#code,null`
 // [.] generate @tag comment grammar
+// [x] Generate `support.function.jai` by scraping Preload et al
+// [x] Generate #deprecated pattern by searching procs in jai folder
 // [x] fix `number, is_number, leading_zero, c := read_int(format, c);` not marking first two vars as decl
 // [x] `#type`, `#c_call`
 // [x] `context`, `#no_context`
@@ -95,7 +100,9 @@ Replacement :: struct {
 
 replacements : [..] Replacement;
 
-
+deprecated_names : string = ---;
+support_function_names : string = ---;
+support_class_names : string = ---;
 
 main :: () {
     args :=  get_command_line_arguments();
@@ -106,6 +113,8 @@ main :: () {
         print("Failed to read %", in_file);
         exit(1);
     }
+
+    scrape_modules_folder();
 
     context.print_style.log_runtime_errors = false;
 
@@ -132,6 +141,9 @@ main :: () {
         print_to_builder(*yaml, strings_language, language.pattern, language.id, language.source);
     append(*yaml, strings_footer);
 
+    print_to_builder(*yaml, deprecated_names_insert, deprecated_names);
+    print_to_builder(*yaml, support_names_insert, support_function_names, support_class_names);
+
     init_string_builder(*json);
 
     depth := 0;
@@ -146,10 +158,8 @@ main :: () {
     processed_line_count := 0;
     array_add(*line_offsets, 0);
 
-    for raw_row, index: split(builder_to_string(*yaml), "\n") {
+    for raw_row, index: line_split(builder_to_string(*yaml)) {
         row := raw_row;
-        if row.count > 0 && row[row.count - 1] == #char "\r"
-            row.count -= 1;
         line_number = index + 1;
 
         spaces := 0;
@@ -163,17 +173,17 @@ main :: () {
         if row[spaces] == #char "#" {
             line_offsets[processed_line_count] += 1;
 
-            row = trim_left(advance(row, spaces + 1));
-            i := find_index_from_left(row, #char ":");
+            row = trim_start(advance(row, spaces + 1));
+            i := first_index(row, #char ":");
             if i == -1 || i >= row.count - 2 || row[i + 1] != #char ":"
                 continue;
 
             from : string = ---;
             from.data = row.data;
             from.count = i;
-            from = trim_right(from);
+            from = trim_end(from);
 
-            to := trim(advance(row, i + 2), " \t\n\r");
+            to := trim(advance(row, i + 2));
 
             if row != "" {
                 replacement : Replacement = ---;
@@ -198,11 +208,11 @@ main :: () {
 
         digits_start := spaces;
         digits_end := digits_start;
-        while digits_end < row.count && row[digits_end] >= #char "0" && row[digits_end] <= #char "9"
+        while digits_end < row.count && is_digit(row[digits_end])
             digits_end += 1;
         if digits_end > digits_start && row.count > digits_end + 1 && row[digits_end] == #char ":" {
             split_at := digits_end + 1;
-            tail := trim(slice(row, split_at + 1, row.count - (split_at + 1)), " \n\r\t");
+            tail := trim(slice(row, split_at + 1));
             if tail != "" {
               append(*preprocess, slice(row, 0, split_at));
               append(*preprocess, "\n");
@@ -224,7 +234,7 @@ main :: () {
 
     yaml_string := builder_to_string(*preprocess);
 
-    for raw_row, index: split(yaml_string, "\n") {
+    for raw_row, index: line_split(yaml_string) {
         row := raw_row;
         line_number = index + 1 + line_offsets[index];
         if noisey  print("% %\n", line_number, row);
@@ -241,7 +251,7 @@ main :: () {
 
         if contains_upper_case(row) {
             for replacement: replacements
-                row = replace(row, replacement.from, replacement.to);
+                row = heap.replace(row, replacement.from, replacement.to);
         }
 
         key, value, is_list_entry := parse_row(row);
@@ -344,30 +354,15 @@ main :: () {
 }
 
 
-count :: (s: string, c: u8) -> int {
-    total := 0;
-    for i: 0 .. s.count - 1
-        if s[i] == c  total += 1;
-    return total;
-}
-
-
-contains :: (s: string, c: u8) -> bool {
-    for i: 0 .. s.count - 1
-        if s[i] == c  return true;
-    return false;
-}
-
-
 contains_upper_case :: (s: string) -> bool {
     for i: 0 .. s.count - 1
-        if s[i] >= #char "A" && s[i] <= #char "Z"
+        if is_upper(s[i])
             return true;
     return false;
 }
 
 parse_row :: (row_data: string) -> key: string, value: string, is_list_entry: bool {
-    row := replace(trim_left(row_data), "\\", "\\\\");
+    row := heap.replace(trim_start(row_data), "\\", "\\\\");
 
     is_list_entry := false;
     if starts_with(row, "- ") {
@@ -376,14 +371,14 @@ parse_row :: (row_data: string) -> key: string, value: string, is_list_entry: bo
         row.count -= 2;
     }
 
-    colon := find_index_from_left(row, #char ":");
+    colon := first_index(row, #char ":");
     if colon == -1 {
         print("Missing ':' on line %\n", line_number);
         exit(1);
     }
 
     key := slice(row, 0, colon);
-    value := slice(row, colon + 1, row.count - (colon + 1));
+    value := slice(row, colon + 1);
     value = trim(value);
 
     key = fix_up(key);
@@ -393,9 +388,106 @@ parse_row :: (row_data: string) -> key: string, value: string, is_list_entry: bo
 
 
     fix_up :: (s: string) -> string {
-        return replace(trim(s, "'"), "\"", "\\\"");
+        return heap.replace(trim(s, "'"), "\"", "\\\"");
     }
 }
+
+
+support_module_paths :: string.[
+    "c:/jai/modules/Preload.jai",
+    "c:/jai/modules/Basic/Array.jai",
+    "c:/jai/modules/Basic/Simple_String.jai",
+    "c:/jai/modules/Basic/String_Builder.jai",
+    "c:/jai/modules/Basic/Print.jai",
+    "c:/jai/modules/Basic/tests.jai",
+    "c:/jai/modules/Basic/string_to_float.jai",
+    "c:/jai/modules/Basic/Memory_Debugger.jai",
+];
+
+
+contains :: (haystack: []$T, needle: T) -> bool {
+    for haystack  if it == needle  return true;
+    return false;
+}
+
+
+scrape_modules_folder :: () {
+    files := file_list("c:/jai/modules", recursive = true, follow_symlinks = false);
+    for * files {
+        if !ends_with(<<it, ".jai") || contains(<<it, "/example")
+            remove it;
+    }
+
+    deprecated_procs : [..] string;
+    support_functions : [..] string;
+    support_classes : [..] string;
+
+    for filepath: files {
+        mark := get_temporary_storage_mark();
+        defer set_temporary_storage_mark(mark);
+
+        data : string = ---;
+        {
+            push_allocator(__temporary_allocator);
+            data = read_entire_file(filepath);
+        }
+
+        if contains(support_module_paths, filepath) {
+            exporting := true;
+            for line: line_split(data) {
+                trimmed := trim(line);
+                if trimmed == "#scope_module" || trimmed == "#scope_file" {
+                    exporting = false;
+                    continue;
+                }
+                else if trimmed == "#scope_export" {
+                    exporting = true;
+                    continue;
+                }
+
+                if starts_with(line, " ")  continue;
+
+                index, found := first_index(trimmed, "::");
+                if !found  continue;
+
+                name := trim(slice(trimmed, 0, index));
+                if contains(name, " ")  continue;
+
+                trimmed = trim_end_from(trimmed, "//");
+                if contains(trimmed, " struct ") || contains(trimmed, " enum ") || contains(trimmed, " #type ")
+                    array_add(*support_classes, heap.copy(name));
+                else if contains(trimmed, "(")
+                    array_add(*support_functions, heap.copy(name));
+            }
+        }
+
+        prev := "";
+        for line_split(data) {
+            index, found := first_index(it, "#deprecated");
+            if !found  continue;
+
+            line := ifx index == 0 then prev else it;
+
+            index, found = first_index(line, "::");
+            if !found  continue;
+
+            name := trim(slice(line, 0, index));
+            if contains(name, " ")  continue;
+
+            array_add(*deprecated_procs, heap.copy(name));
+        }
+    }
+
+    print("% support functions.\n", support_functions.count);
+    print("% support classes.\n", support_classes.count);
+    print("% deprecated procs.\n", deprecated_procs.count);
+
+    support_function_names  = heap.join(support_functions, #char "|");
+    support_class_names  = heap.join(support_classes, #char "|");
+    deprecated_names = heap.join(deprecated_procs, #char "|");
+}
+
+
 
 
 // @Note bare-bones YAML parsing, so 2-space indents only!
@@ -511,3 +603,20 @@ strings_footer :: #string ___yaml
             name: constant.other.stringdelimiter.here.jai
         contentName: string.unquoted.here.jai
 ___yaml
+
+deprecated_names_insert :: #string __yaml
+  deprecated-names:
+    name: invalid.deprecated.jai
+    match: \b(%)\b
+__yaml
+
+support_names_insert :: #string __yaml
+  support:
+    patterns:
+      - name: support.function.jai
+        match: \b(align_of|type_of|size_of|type_info|initializer_of)\b
+      - name: support.function.jai
+        match: \b(%)\b
+      - name: support.class.jai
+        match: \b(%)\b
+__yaml

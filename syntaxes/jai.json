@@ -193,6 +193,23 @@
                         }
                     }
                 },
+                { "match": "(\\@)((?i)Robustness)([^@]*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.annotation.robustness.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.annotation.robustness.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.block.robustness.jai"
+                        }
+                    }
+                },
                 { "match": "(\\@)((?i)NoCheckin)([^@]*)",
                     "captures":
                     {
@@ -352,7 +369,7 @@
                         },
                         "3":
                         {
-                            "name": "comment.block..jai"
+                            "name": "comment.block.todo.jai"
                         }
                     }
                 },
@@ -369,7 +386,7 @@
                         },
                         "3":
                         {
-                            "name": "comment.block..jai"
+                            "name": "comment.block.release.jai"
                         }
                     }
                 },
@@ -386,7 +403,7 @@
                         },
                         "3":
                         {
-                            "name": "comment.block..jai"
+                            "name": "comment.block.note.jai"
                         }
                     }
                 },
@@ -403,7 +420,7 @@
                         },
                         "3":
                         {
-                            "name": "comment.block..jai"
+                            "name": "comment.block.urgent.jai"
                         }
                     }
                 },
@@ -420,7 +437,24 @@
                         },
                         "3":
                         {
-                            "name": "comment.block..jai"
+                            "name": "comment.block.speed.jai"
+                        }
+                    }
+                },
+                { "match": "(\\@)((?i)Robustness)([^@]*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.block.punctuation.annotation.robustness.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.block.annotation.robustness.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.block.robustness.jai"
                         }
                     }
                 },
@@ -690,6 +724,23 @@
                         }
                     }
                 },
+                { "match": "(\\@)((?i)Robustness)([^@]*)",
+                    "captures":
+                    {
+                        "1":
+                        {
+                            "name": "comment.line.double-slash.punctuation.annotation.robustness.jai"
+                        },
+                        "2":
+                        {
+                            "name": "comment.line.double-slash.annotation.robustness.jai"
+                        },
+                        "3":
+                        {
+                            "name": "comment.line.double-slash.robustness.jai"
+                        }
+                    }
+                },
                 { "match": "(\\@)((?i)NoCheckin)([^@]*)",
                     "captures":
                     {
@@ -880,6 +931,9 @@
                 { "name": "keyword.control.loop.while.jai",
                     "match": "\\b(while)\\b"
                 },
+                { "name": "keyword.control.loop.for.remove.jai",
+                    "match": "\\b(remove)\\b"
+                },
                 { "name": "keyword.control.defer.jai",
                     "match": "\\b(defer)\\b"
                 },
@@ -893,7 +947,7 @@
                     "match": "(#char)"
                 },
                 { "name": "keyword.other.context.jai",
-                    "match": "\\b(context)\\b"
+                    "match": "\\b(context|push_context)\\b"
                 },
                 { "name": "keyword.other.using.jai",
                     "match": "\\b(using)\\b"
@@ -1054,21 +1108,6 @@
                 }
             ]
         },
-        "support":
-        {
-            "patterns":
-            [
-                { "name": "support.function.jai",
-                    "match": "\\b(Construct|New|NewArray|Swap|__temporary_allocator|alloc|alloc_string|assert|atomic_swap|auto_release_temp|compare_and_swap|compare_and_swap2|clamp|decode_relative_pointer|enum_highest_value|enum_names|enum_range|enum_range_given_info|enum_values|exit|free|get_command_line_arguments|get_field|get_system_time|get_system_time_local|get_temporary_storage_mark|get_time|get_working_directory|init_time|log|log_error|max|memcpy|memcmp|memset|min|print|push_allocator|realloc|reset_temporary_storage|reset_temporary_storage|running_at_compile_time|set_temporary_storage_mark|set_working_directory|sprint|talloc|talloc_string|temporary_alloc|tprint|write_relative_pointer)\\b"
-                },
-                { "name": "support.function.jai",
-                    "match": "\\b(align_of|type_of|size_of|type_info|initializer_of|debug_break|pause|rdtsc|rdtscp|rdseed|rdrand|prefetch|atomic_add|atomic_increment|atomic_and|atomic_or|atomic_xor|mfence|cpuid|byte_swap|bit_scan_forward|bit_scan_reverse|popcount|push_context|write_string|write_strings|write_number|write_nonnegative_number)\\b"
-                },
-                { "name": "support.class.jai",
-                    "match": "\\b(Any|Source_Code_Location|Source_Code_Range)\\b"
-                }
-            ]
-        },
         "deprecated":
         {
             "match": "(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)",
@@ -1091,11 +1130,6 @@
                     "name": "punctuation.definition.string.deprecated.end.jai"
                 }
             }
-        },
-        "deprecated-names":
-        {
-            "name": "invalid.deprecated.jai",
-            "match": "\\b(compiler_report_error|compiler_info|compiler_warning|compiler_error|enum_values)\\b"
         },
         "notes":
         {
@@ -1150,7 +1184,7 @@
                     {
                         "1":
                         {
-                            "name": "keyword.control.for.jai"
+                            "name": "keyword.control.loop.for.jai"
                         },
                         "2":
                         {
@@ -1179,7 +1213,7 @@
                     {
                         "1":
                         {
-                            "name": "keyword.control.for.jai"
+                            "name": "keyword.control.loop.for.jai"
                         },
                         "2":
                         {
@@ -1200,7 +1234,7 @@
                     {
                         "1":
                         {
-                            "name": "keyword.control.for.jai"
+                            "name": "keyword.control.loop.for.jai"
                         },
                         "2":
                         {
@@ -4305,6 +4339,26 @@
                         }
                     },
                     "contentName": "string.unquoted.here.jai"
+                }
+            ]
+        },
+        "deprecated-names":
+        {
+            "name": "invalid.deprecated.jai",
+            "match": "\\b(CreateWindowExA|SetWindowTextA|GetWindowLongA|RegisterClassExA|SetWindowLongA|ExtractIconA|GetIconInfoExA|LoadIconA|LoadCursorA|DispatchMessageA|PeekMessageA|DefWindowProcA|GetMonitorInfoA|GetComputerNameA|GetSystemDirectoryA|GetUserNameA|GetVersionExA|CreateEventA|CreateSemaphoreA|GetModuleFileNameA|GetModuleHandleA|CreateDirectoryA|GetCurrentDirectoryA|RemoveDirectoryA|MessageBoxA|CreateFileA|CreateHardLinkA|DeleteFileA|FindFirstFileA|FindNextFileA|GetFileAttributesA|GetFullPathNameA|MoveFileA|FormatMessageA|SystemParametersInfoA|SHFileOperationA|enum_values|get_system_time_local|NSIsSymbolNameDefined|NSLookupAndBindSymbol|NSAddressOfSymbol|compiler_report_error|compiler_info|compiler_warning|compiler_error|SHGetFolderPathA|is_a_window_resized|has_a_window_moved|LZ4_decompress_fast|LZ4_decompress_fast_continue|LZ4_decompress_fast_usingDict|LZ4_resetStream|get_string_width_in_pixels|load_texture_from_file|load_texture_from_bitmap|AUGraphStart|NewAUGraph|AUGraphAddNode|AUGraphNodeInfo|AUGraphOpen|AUGraphConnectNodeInput|AUGraphInitialize|concatenate)\\b"
+        },
+        "support":
+        {
+            "patterns":
+            [
+                { "name": "support.function.jai",
+                    "match": "\\b(align_of|type_of|size_of|type_info|initializer_of)\\b"
+                },
+                { "name": "support.function.jai",
+                    "match": "\\b(__default_allocator|get_current_workspace|memcpy|memcmp|memset|running_at_compile_time|debug_break|write_string|write_strings|write_number|write_nonnegative_number|c_style_strlen|array_copy|array_copy|array_free|array_reset|array_add|array_add|array_add|array_add_if_unique|array_insert_at|array_unordered_remove_by_value|array_unordered_remove_by_index|array_ordered_remove_by_value|array_ordered_remove_by_index|array_find|peek|peek_pointer|pop|array_free|array_reset|array_reset_keeping_memory|array_reserve|array_resize|array_resize|maybe_grow|init_range|check_alloc|check_free|check_realloc|add_allocation_to_table|allocations_before_this_call_will_not_be_considered_leaks|this_allocation_is_not_a_leak|report_memory_leaks|make_leak_report|log_leak_report|deinit|init|get_memory_hash|report_use_of_unknown_memory|report_already_freed_memory|find_or_pack_stack_trace|report_allocation_of_already_live_memory|check_for_allocator_mismatch|my_log_stack_trace|trim_displayed_trace_based_on_options|procedures_match|get_hash_from_stack_trace|group_summaries|summary_should_be_grouped|intersect_call_stacks|nodes_match|commas|formatInt|formatFloat|formatStruct|buffer_to_string_without_copy|get_s64_from_void_pointer|get_u64_from_void_pointer|print_u64_base_n|print_float|print_integer|print_character|print|print_single_byte_character|sprint|tprint|log|log_error|append_indentation|append_struct_info|append_relative_pointer_size|print_type_to_builder|print_item_to_builder|is_digit|parse_number|print_to_builder|print_sequence_to_builder|isFormatter|print_bytes|print_array|type_to_string|get_full_sized_string|check_null_formatter|to_string|to_string|to_string|to_string|to_c_string|c_style_strlen|to_upper|to_lower|is_alpha|is_digit|is_alnum|is_space|is_print|is_any|advance|advance|temp_c_string|copy_temporary_string|copy_string|string_to_float|string_to_float64|string_to_float_type_T|to_integer|string_to_int|eat_spaces|init_string_builder|free_buffers|reset|ensure_contiguous_space|append|append|append|builder_string_length|builder_to_string|write_builder|consume_u8_and_length|get_current_buffer|expand|string_to_float|string_to_float64|multiply_and_convert_to_float|MUL_96|NORMALIZE|clz64|clz32|INRANGE|HOLE|print_int_tests|print_int_hex_tests|print_float_tests|simple_string_tests|string_builder_tests)\\b"
+                },
+                { "name": "support.class.jai",
+                    "match": "\\b(Operating_System_Tag|Type_Info_Tag|Type_Info|Type_Info_Integer|Type_Info_Float|Type_Info_String|Type_Info_Pointer|Type_Info_Procedure|Type_Info_Struct|Type_Info_Struct_Member|Type_Info_Array|Type_Info_Enum|Any|Allocator|Allocator_Mode|Logger|Log_Info|Log_Level|Stack_Trace_Procedure_Info|Stack_Trace_Node|Context_Base|Temporary_Storage|Source_Code_Location|Source_Code_Range|Newstring|Array_View_64|Array_View_32|Array_View_16|Array_View_8|Resizable_Array|Procedure_To_Elide|Leak_Report_Options|Leak_Report|Leak_Summary|Group_Info|Allocation|Packed_Stack_Trace|Formatter|FormatInt|FormatFloat|FormatStruct|FormatArray|Print_Style|String_Builder)\\b"
                 }
             ]
         }

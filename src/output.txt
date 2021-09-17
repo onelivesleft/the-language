@@ -1,0 +1,2634 @@
+scopeName: source.jai
+name: Jai
+patterns:
+  - include: '#markdown-block-comments'
+  - include: '#block-comments'
+  - include: '#comments'
+  - include: '#imports'
+  - include: '#asm'
+  - include: '#strings'
+  - include: '#deprecated-names'
+  - include: '#casts'
+  - include: '#keywords'
+  - include: '#proc'
+  - include: '#deprecated'
+  - include: '#fors'
+  - include: '#structs'
+  - include: '#enums'
+  - include: '#enum-members'
+  - include: '#composite-literals'
+  - include: '#symbols'
+  - include: '#support'
+  - include: '#numbers'
+  - include: '#notes'
+  - include: '#declarations'
+  - include: '#more-directives'
+  - include: '#variables'
+  - include: '#more-numbers'
+repository:
+  asm:
+    begin: (#asm)\s*(\{)
+    end: (\})
+    beginCaptures:
+      1:
+        name: keyword.other.directiv
+      2:
+        name: punctuation.section.braces.
+    endCaptures:
+      1:
+        name: punctuation.section.brace
+    contentName: source.asm.x86_64
+    patterns:
+      - include: source.asm.x86_64
+      - match: (===)
+        captures:
+          1:
+            name: keyword.ope
+  block-comments:
+    name: comment.block.jai
+    begin: (\/\*)
+    end: (\*\/)
+    beginCaptures:
+      1:
+        name: punctuation.definition.co
+    endCaptures:
+      1:
+        name: punctuation.definition.co
+    patterns:
+      - name: comment.block.jai
+        include: '#block-comments'
+      - match: (`)([^`]*)(`)
+        captures:
+          1:
+            name: markup.quot
+          2:
+            name: comment.block.b
+          3:
+            name: markup.quot
+      - match: (\@)((?i)TODO)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annota
+          2:
+            name: comment.block.annota
+          3:
+            name: comment.b
+      - match: (\@)((?i)Release)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotatio
+          2:
+            name: comment.block.annotatio
+          3:
+            name: comment.bloc
+      - match: (\@)((?i)Note)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annota
+          2:
+            name: comment.block.annota
+          3:
+            name: comment.b
+      - match: (\@)((?i)Urgent)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotati
+          2:
+            name: comment.block.annotati
+          3:
+            name: comment.blo
+      - match: (\@)((?i)Speed)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotat
+          2:
+            name: comment.block.annotat
+          3:
+            name: comment.bl
+      - match: (\@)((?i)Robustness)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotation.r
+          2:
+            name: comment.block.annotation.r
+          3:
+            name: comment.block.r
+      - match: (\@)((?i)NoCheckin)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotation.
+          2:
+            name: comment.block.annotation.
+          3:
+            name: comment.b
+      - match: (\@)(\w+)
+        captures:
+          1:
+            name: comment.block.punctuation.a
+          2:
+            name: comment.block.a
+      - name: comment.block.signature.jai
+        match: '(-) (\w+) (DATE)'
+        captures:
+          1:
+            name: comment.block.punctuation.
+          2:
+            name: comment.block.signa
+          3:
+            name: comment.block.signa
+      - match: ^\s*(\[)( )(\])(.*)
+        captures:
+          1:
+            name: comment.block.punctuation.checklist.brackets.t
+          2:
+            name: comment.block.punctuation.checklist.
+          3:
+            name: comment.block.punctuation.checklist.brackets
+          4:
+            name: comment.block.checklist.item.todo.jai
+            patterns:
+              - include: '#block-comments-line'
+      - match: ^\s*(\[)(\.)(\])(.*)
+        captures:
+          1:
+            name: comment.block.punctuation.checklist.brackets.part
+          2:
+            name: comment.block.punctuation.checklist.mar
+          3:
+            name: comment.block.punctuation.checklist.brackets.pa
+          4:
+            name: comment.block.checklist.item.partial.jai
+            patterns:
+              - include: '#block-comments-line'
+      - match: ^\s*(\[)([^ \.])(\])(.*)
+        captures:
+          1:
+            name: comment.block.punctuation.checklist.brackets.d
+          2:
+            name: comment.block.punctuation.checklist.
+          3:
+            name: comment.block.punctuation.checklist.brackets
+          4:
+            name: comment.block.checklist.item.done.jai
+            patterns:
+              - include: '#block-comments-line'
+  block-comments-line:
+    patterns:
+      - match: '(`)([^`]*)(`)'
+        captures:
+          1:
+            name: markup.quot
+          2:
+            name: comment.block.b
+          3:
+            name: markup.quot
+      - match: (\@)((?i)TODO)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annota
+          2:
+            name: comment.block.annota
+          3:
+            name: comment.b
+      - match: (\@)((?i)Release)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotatio
+          2:
+            name: comment.block.annotatio
+          3:
+            name: comment.bloc
+      - match: (\@)((?i)Note)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annota
+          2:
+            name: comment.block.annota
+          3:
+            name: comment.b
+      - match: (\@)((?i)Urgent)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotati
+          2:
+            name: comment.block.annotati
+          3:
+            name: comment.blo
+      - match: (\@)((?i)Speed)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotat
+          2:
+            name: comment.block.annotat
+          3:
+            name: comment.bl
+      - match: (\@)((?i)Robustness)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotation.r
+          2:
+            name: comment.block.annotation.r
+          3:
+            name: comment.block.r
+      - match: (\@)((?i)NoCheckin)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotation.
+          2:
+            name: comment.block.annotation.
+          3:
+            name: comment.block.
+      - match: (\@)(\w+)
+        captures:
+          1:
+            name: comment.block.punctuation.a
+          2:
+            name: comment.block.a
+      - name: comment.block.signature.jai
+        match: (-)\s*(.*)\s*(DATE)
+        captures:
+          1:
+            name: comment.block.punctuation.
+          2:
+            name: comment.block.signa
+          3:
+            name: comment.block.signa
+  comments:
+    patterns:
+      - match: (//)\s*(\[)( )(\])(.*)
+        captures:
+          1:
+            name: punctuation.definitio
+          2:
+            name: comment.line.double-slash.punctuation.checklist.brackets.t
+          3:
+            name: comment.line.double-slash.punctuation.checklist.
+          4:
+            name: comment.line.double-slash.punctuation.checklist.brackets
+          5:
+            name: comment.line.double-slash.checklist.item.todo.jai
+            patterns:
+              - include: '#comments-line'
+      - match: (//)\s*(\[)(\.)(\])(.*)
+        captures:
+          1:
+            name: punctuation.definitio
+          2:
+            name: comment.line.double-slash.punctuation.checklist.brackets.part
+          3:
+            name: comment.line.double-slash.punctuation.checklist.mar
+          4:
+            name: comment.line.double-slash.punctuation.checklist.brackets.pa
+          5:
+            name: comment.line.double-slash.checklist.item.partial.jai
+            patterns:
+              - include: '#comments-line'
+      - match: (//)\s*(\[)([^ \.])(\])(.*)
+        captures:
+          1:
+            name: punctuation.definitio
+          2:
+            name: comment.line.double-slash.punctuation.checklist.brackets.d
+          3:
+            name: comment.line.double-slash.punctuation.checklist.
+          4:
+            name: comment.line.double-slash.punctuation.checklist.brackets
+          5:
+            name: comment.line.double-slash.checklist.item.done.jai
+            patterns:
+              - include: '#comments-line'
+      - match: (//)(.*)
+        captures:
+          1:
+            name: punctuation.definitio
+          2:
+            name: comment.line.double-slash.jai
+            patterns:
+              - include: '#comments-line'
+  comments-line:
+    patterns:
+      - match: '(`)([^`]*)(`)'
+        captures:
+          1:
+            name: markup.quot
+          2:
+            name: comment.line.double-slash.b
+          3:
+            name: markup.quot
+      - match: (\@)((?i)TODO)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annota
+          2:
+            name: comment.line.double-slash.annota
+          3:
+            name: comment.line.double-s
+      - match: (\@)((?i)Release)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotatio
+          2:
+            name: comment.line.double-slash.annotatio
+          3:
+            name: comment.line.double-slas
+      - match: (\@)((?i)Note)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annota
+          2:
+            name: comment.line.double-slash.annota
+          3:
+            name: comment.line.double-s
+      - match: (\@)((?i)Urgent)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotati
+          2:
+            name: comment.line.double-slash.annotati
+          3:
+            name: comment.line.double-sla
+      - match: (\@)((?i)Speed)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotat
+          2:
+            name: comment.line.double-slash.annotat
+          3:
+            name: comment.line.double-sl
+      - match: (\@)((?i)Robustness)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotation.r
+          2:
+            name: comment.line.double-slash.annotation.r
+          3:
+            name: comment.line.double-slash.r
+      - match: (\@)((?i)NoCheckin)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotation.
+          2:
+            name: comment.line.double-slash.annotation.
+          3:
+            name: comment.line.double-slash.
+      - match: (\@)(\w+)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.a
+          2:
+            name: comment.line.double-slash.a
+      - name: comment.line.double-slash.signature.jai
+        match: (-)\s*(.*)\s*(DATE)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.
+          2:
+            name: comment.line.double-slash.signa
+          3:
+            name: comment.line.double-slash.signa
+  imports:
+    patterns:
+      - match: ^(SPACED-NAME)(::)\s*(#import)\s+(")(QUOTED)(")
+        captures:
+          1:
+            name: entity.name.
+          2:
+            name: keyword.de
+          3:
+            name: keyword.control.import.
+          4:
+            name: punctuation.definition.string.imp
+          5:
+            name: string-quoted.oth
+          6:
+            name: punctuation.definition.string.i
+      - match: (#import|#load)\s+(")(QUOTED)(")
+        captures:
+          1:
+            name: keyword.control.import.
+          2:
+            name: punctuation.definition.string.imp
+          3:
+            name: string-quoted.oth
+          4:
+            name: punctuation.definition.string.i
+      - match: (#import|#load)\s+("[^"]*)?$
+        captures:
+          1:
+            name: keyword.control.import.
+          2:
+            name: punctuation.definition.string.imp
+          3:
+            name: string-quoted.oth
+      - match: ^(SPACED-NAME)(::)\s*(#foreign_(system_)?library)\s+(")(QUOTED)(")
+        captures:
+          1:
+            name: constant.oth
+          2:
+            name: keyword.de
+          3:
+            name: keyword.control.import.
+          5:
+            name: punctuation.definition.string.imp
+          6:
+            name: string-quoted.oth
+          7:
+            name: punctuation.definition.string.i
+      - match: ^(SPACED-NAME)(::)\s*(#foreign_(system_)?library)\s+("[^"]*)?$
+        captures:
+          1:
+            name: constant.oth
+          2:
+            name: keyword.de
+          3:
+            name: keyword.control.import.
+          5:
+            name: punctuation.definition.string.imp
+          6:
+            name: string-quoted.oth
+  keywords:
+    patterns:
+      - name: keyword.control.conditional.jai
+        match: \b(if|ifx|then|else|case)\b
+      - name: keyword.control.jump.jai
+        match: \b(return|break|continue)\b
+      - name: keyword.control.loop.while.jai
+        match: \b(while)\b
+      - name: keyword.control.defer.jai
+        match: \b(defer)\b
+      - name: keyword.other.directive.jai
+        match: (#add_context|#align|#assert|#caller_location|#code(,null)?|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#no_reset|#place|#placeholder|#procedure_of_call|#program_export|#run|#specified|#symmetric|#through|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint|#unshared)\b
+      - name: keyword.other.directive.scope.jai
+        match: (#scope_export|#scope_file|#scope_module)
+      - name: keyword.other.directive.string.jai
+        match: (#char)
+      - name: keyword.other.context.jai
+        match: \b(context)\b
+      - name: keyword.other.using.jai
+        match: \b(using)\b
+      - name: constant.language.true.jai
+        match: \b(true)\b
+      - name: constant.language.false.jai
+        match: \b(false)\b
+      - name: constant.language.null.jai
+        match: \b(null)\b
+      - name: keyword.declaration.struct.jai
+        match: \b(struct)\b
+      - name: keyword.declaration.enum.jai
+        match: \b(enum)\b
+      - name: keyword.declaration.union.jai
+        match: \b(union)\b
+      - name: storage.type.jai
+        match: \b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void|Type)\b
+  casts:
+    patterns:
+      - match: \b(cast(,trunc)?(,no_check)?(,trunc)?)\s*(\()\s*((\**)NAME)\s*(\))
+        captures:
+          1:
+            name: keyword.con
+          5:
+            name: punctuation.section.par
+          6:
+            name:
+          7:
+            name: keyword.operato
+          8:
+            name: punctuation.section.par
+      - name: keyword.control.cast.jai
+        match: \b(xx|cast)\b
+  symbols:
+    patterns:
+      - match: (\})\s*(=)\s*(\.)(NAME)
+        captures:
+          1:
+            name: punctuation.section.b
+          2:
+            name: keyword.de
+          3:
+            name: punctuation
+          4:
+            name: vari
+      - name: keyword.declaration.jai
+        match: '(::|:=|:)'
+      - name: keyword.operator.jai
+        match: (=|\+|-|\*|/|<|>|~|\||&|!|\^)+
+      - name: keyword.operator.percent.jai
+        match: 
+      - name: punctuation.jai
+        match: (\.\.)
+      - name: punctuation.section.parens.begin.jai
+        match: \(
+      - name: punctuation.section.parens.end.jai
+        match: \)
+      - name: punctuation.section.braces.begin.jai
+        match: '\{'
+      - name: punctuation.section.braces.end.jai
+        match: '\}'
+      - name: punctuation.section.brackets.begin.jai
+        match: '\['
+      - name: punctuation.section.brackets.end.jai
+        match: '\]'
+      - name: punctuation.accessor.jai
+        match: (\.)
+      - name: punctuation.separator.jai
+        match: '(,)'
+      - name: punctuation.terminator.jai
+        match: (;)
+  numbers:
+    patterns:
+      - match: '[(\[{:\s=.,/*+<>-](0b[01_]+)'
+        captures:
+          1:
+            name: constan
+      - match: '[(\[{:\s=.,/*+<>-](0x[a-fA-F_\d]+)'
+        captures:
+          1:
+            name: constan
+      - match: '[(\[\{:\s=.,/*+<>-](\d[\d_]*)'
+        captures:
+          1:
+            name: constan
+  support:
+    patterns:
+      - name: support.function.jai
+        match: \b(Construct|New|NewArray|Swap|__temporary_allocator|alloc|alloc_string|assert|atomic_swap|auto_release_temp|compare_and_swap|compare_and_swap2|clamp|decode_relative_pointer|enum_highest_value|enum_names|enum_range|enum_range_given_info|enum_values|exit|free|get_command_line_arguments|get_field|get_system_time|get_system_time_local|get_temporary_storage_mark|get_time|get_working_directory|init_time|log|log_error|max|memcpy|memcmp|memset|min|print|push_allocator|realloc|reset_temporary_storage|reset_temporary_storage|running_at_compile_time|set_temporary_storage_mark|set_working_directory|sprint|talloc|talloc_string|temporary_alloc|tprint|write_relative_pointer)\b
+      - name: support.function.jai
+        match: \b(align_of|type_of|size_of|type_info|initializer_of|debug_break|pause|rdtsc|rdtscp|rdseed|rdrand|prefetch|atomic_add|atomic_increment|atomic_and|atomic_or|atomic_xor|mfence|cpuid|byte_swap|bit_scan_forward|bit_scan_reverse|popcount|push_context|write_string|write_strings|write_number|write_nonnegative_number)\b
+      - name: support.class.jai
+        match: \b(Any|Source_Code_Location|Source_Code_Range)\b
+  deprecated:
+    match: '(#deprecated\s*((")((QUOTED))("))?)'
+    captures:
+      1:
+        name: invalid.depre
+      3:
+        name: punctuation.definition.string.deprecated.
+      4:
+        name: string-quoted.other.depre
+      6:
+        name: punctuation.definition.string.deprecate
+  deprecated-names:
+    name: invalid.deprecated.jai
+    match: \b(compiler_report_error|compiler_info|compiler_warning|compiler_error|enum_values)\b
+  notes:
+    patterns:
+      - match: '(@)(NAME)(\()([^)]*)(\))'
+        captures:
+          1:
+            name: punctuation.definition.a
+          2:
+            name: variable.a
+          3:
+            name: punctuation.section.parens.annotat
+          4:
+            name: variable.annotation.
+          5:
+            name: punctuation.section.parens.annot
+      - match: '(@)(NAME)'
+        captures:
+          1:
+            name: punctuation.definition.a
+          2:
+            name: variable.a
+  fors:
+    patterns:
+      - match: '\b(for)\s+([*<\s]*)(SPACED-NAME)(,)(SPACED-NAME)(:)'
+        captures:
+          1:
+            name: keyword.co
+          2:
+            name: keyword
+          3:
+            name: variable.other.de
+          4:
+            name: punctuation.
+          5:
+            name: variable.other.de
+          6:
+            name: keyword.de
+      - match: '\b(for)\s+([*<\s]*)(SPACED-NAME)(:)'
+        captures:
+          1:
+            name: keyword.co
+          2:
+            name: keyword
+          3:
+            name: variable.other.de
+          4:
+            name: keyword.de
+      - match: '\b(for)\s+([*<\s]*)'
+        captures:
+          1:
+            name: keyword.co
+          2:
+            name: keyword
+  enum-members:
+    match: '([^\w])(\.)(NAME)'
+    captures:
+      1:
+        patterns:
+          - include: '#expression'
+      2:
+        name: punctuation.acc
+      3:
+        name: variable
+  structs:
+    match: '\b(NAME)\s*(::)\s*(struct)'
+    captures:
+      1:
+        name: entity.name.s
+      2:
+        name: keyword.declar
+      3:
+        name: keyword.declaration.s
+  enums:
+    match: '\b(NAME)\s*(::)\s*(enum(_flags)?)'
+    captures:
+      1:
+        name: entity.name
+      2:
+        name: keyword.declar
+      3:
+        name: keyword.declaration
+  declarations:
+    patterns:
+      - match: \b(NAME)((COMMA_NAME*))\s*(:)([SPACED-ARRAY])*((\**)((#type)|NAME))?\s*(:)
+        captures:
+          1:
+            name: variable.other.constant.de
+          2:
+            patterns:
+              - include: '#comma-joined-variables'
+          4:
+            name: keyword.de
+          5:
+            patterns:
+              - include: '#array'
+          6:
+            name: sto
+          7:
+            name: keyword.operato
+          9:
+            name: keyword.other.
+          10:
+            name: keyword.d
+      - match: \b(NAME)\s*(:)([SPACED-ARRAY])*((\**)((#type)|NAME))?\s*(:)
+        captures:
+          1:
+            name: variable.other.constant.de
+          2:
+            name: keyword.de
+          3:
+            patterns:
+              - include: '#array'
+          4:
+            name: sto
+          5:
+            name: keyword.operato
+          7:
+            name: keyword.other.
+          8:
+            name: keyword.de
+      - match: \b((it_index|it)|(NAME))((COMMA_NAME*))\s*(:)\s*((struct)|(enum)|(enum_flags))\b\s*(NAME)?
+        captures:
+          1:
+            name: variable.other.de
+          2:
+            name: support
+          4:
+            patterns:
+              - include: '#comma-joined-variables'
+          6:
+            name: keyword.de
+          8:
+            name: keyword.declarati
+          9:
+            name: keyword.declara
+          10:
+            name: keyword.declar
+          11:
+            name: st
+      - match: \b((it_index|it)|(NAME))\s*(:)\s*((struct)|(enum)|(enum_flags))\b\s*(NAME)?
+        captures:
+          1:
+            name: variable.other.de
+          2:
+            name: support
+          4:
+            name: keyword.de
+          6:
+            name: keyword.declarati
+          7:
+            name: keyword.declara
+          8:
+            name: keyword.declara
+          9:
+            name: sto
+      - match: \b((it_index|it)|(NAME))((COMMA_NAME*))\s*(:)([SPACED-ARRAY])*((\**)((#type)|NAME))?\s*(=)?
+        captures:
+          1:
+            name: variable.other.de
+          2:
+            name: support
+          4:
+            patterns:
+              - include: '#comma-joined-variables'
+          6:
+            name: keyword.de
+          7:
+            patterns:
+              - include: '#array'
+          8:
+            name: sto
+          9:
+            name: keyword.operato
+          11:
+            name: keyword.other
+          12:
+            name: keyword.d
+      - match: \b((it_index|it)|(NAME))\s*(:)([SPACED-ARRAY])*((\**)((#type)|NAME))?\s*(=)?
+        captures:
+          1:
+            name: variable.other.de
+          2:
+            name: support
+          4:
+            name: keyword.de
+          5:
+            patterns:
+              - include: '#array'
+          6:
+            name: sto
+          7:
+            name: keyword.operato
+          9:
+            name: keyword.other.
+          10:
+            name: keyword.d
+  composite-literals:
+    patterns:
+      - match: '\b(NAME)?\s*(\.)(\{)'
+        captures:
+          1:
+            name: storage.ty
+          2:
+            name: punctuation
+          3:
+            name: punctuation.section.bra
+      - match: '\b(NAME)?\s*(\.)(\[)'
+        captures:
+          1:
+            name: storage.ty
+          2:
+            name: punctuation
+          3:
+            name: punctuation.section.brac
+  variables:
+    patterns:
+      - match: '\b((it_index|it)|(NAME))(\.[a-zA-Z0-9_.]+)?\b'
+        captures:
+          1:
+            name: varia
+          2:
+            name: support
+          4:
+            patterns:
+              - include: '#members'
+    repository:
+      members:
+        match: '(\.)(NAME)'
+        captures:
+          1:
+            name: punctuation
+          2:
+            name: variable.oth
+  proc:
+    patterns:
+      - match: \b(NAME)\s*(::)\s*(#type)\b\s*((inline)\s*|(no_inline)\s*)*(((ENCLOSING_PARENS)))\s*((->)([^{]+))?\s*(((#foreign\s+(NAME(\s*(")((QUOTED))("))?)|FUNCTION_POSTFIX)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)
+        captures:
+          1:
+            name: variable.other.constant.de
+          2:
+            name: keyword.de
+          3:
+            name: keyword.other.
+          5:
+            name: storage
+          6:
+            name: storage
+          7:
+            name: punctuation.section.par
+          8:
+            name: meta.function.parameters.jai
+            patterns:
+              - include: '#parameter-declarations'
+          9:
+            name: punctuation.section.p
+          11:
+            name: punctuat
+          12:
+            name: meta.function.return-type.jai
+            patterns:
+              - include: '#return-declarations'
+          13:
+            name: keyword.control.import.dire
+          16:
+            name: constant.ot
+          18:
+            name: punctuation.definition.string.im
+          19:
+            name: string-quoted.ot
+          21:
+            name: punctuation.definition.string.
+          22:
+            name: invalid.
+          24:
+            name: punctuation.definition.string.deprec
+          25:
+            name: string-quoted.other.
+          27:
+            name: punctuation.definition.string.depr
+          28:
+            name: punctuation.
+          29:
+            name: keyword.other
+      - name: meta.function.declaration.jai
+        match: \b((main|for_expansion|operator\s*([^ :]+))|NAME)\s*(::)\s*((inline)\s*|(no_inline)\s*)*(((ENCLOSING_PARENS)))\s*((->)([^{]+))?\s*(((#foreign\s+(NAME(\s*(")((QUOTED))("))?)|FUNCTION_POSTFIX)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)
+        captures:
+          1:
+            name: entity.name
+          2:
+            patterns:
+              - match: (main)
+                captures:
+                  1:
+                    name: k
+              - match: (for_expansion)
+                captures:
+                  1:
+                    name: keyword.ot
+              - match: '(operator\s*([^ :]+))'
+                captures:
+                  1:
+                    name: keywo
+                  2:
+                    name:
+          3:
+            name: keyword
+          4:
+            name: keyword.de
+          6:
+            name: storage
+          7:
+            name: storage
+          8:
+            name: punctuation.section.par
+          9:
+            name: meta.function.parameters.jai
+            patterns:
+              - include: '#parameter-declarations'
+          10:
+            name: punctuation.section.
+          12:
+            name: punctuat
+          13:
+            name: meta.function.return-type.jai
+            patterns:
+              - include: '#return-declarations'
+          14:
+            name: keyword.control.import.dire
+          17:
+            name: constant.ot
+          19:
+            name: punctuation.definition.string.im
+          20:
+            name: string-quoted.ot
+          22:
+            name: punctuation.definition.string.
+          23:
+            name: invalid.
+          25:
+            name: punctuation.definition.string.deprec
+          26:
+            name: string-quoted.other.
+          28:
+            name: punctuation.definition.string.depr
+          29:
+            name: punctuation.
+          30:
+            name: keyword.other
+      - name: meta.function.declaration.jai
+        match: \b(NAME)\s*(::)\s*(#bake(_arguments))\s+(NAME)\s*(((ENCLOSING_PARENS)))
+        captures:
+          1:
+            name: entity.name
+          2:
+            name: keyword.de
+          3:
+            name: keyword.other.
+          5:
+            name: entity.name
+          6:
+            name: punctuation.section.par
+          7:
+            name: meta.function.parameters.jai
+            patterns:
+              - include: '#parameters'
+          8:
+            name: punctuation.section.p
+      - name: meta.function.call.jai
+        match: '((NAME)(\.)((NAME)(\.))*)?\b(NAME)\s*(\()(\))'
+        captures:
+          2:
+            name: entity.name.
+          3:
+            name: punctuation
+          5:
+            name: entity.name.namespa
+          6:
+            name: punctuation
+          7:
+            patterns:
+              - include: '#support'
+              - match: (.*)
+                captures:
+                  1:
+                    name: ent
+          8:
+            name: punctuation.section.par
+          9:
+            name: punctuation.section.p
+      - name: meta.function.call.jai
+        match: '((NAME)(\.)((NAME)(\.))*)?\b(NAME)\s*(((ENCLOSING_PARENS)))'
+        captures:
+          2:
+            name: entity.name.
+          3:
+            name: punctuation
+          5:
+            name: entity.name.namespa
+          6:
+            name: punctuation
+          7:
+            patterns:
+              - include: '#support'
+              - match: (.*)
+                captures:
+                  1:
+                    name: ent
+          8:
+            name: punctuation.section.par
+          9:
+            name: meta.function.parameters.jai
+            patterns:
+              - include: '#parameters'
+          10:
+            name: punctuation.section.
+    repository:
+      parameter-declarations:
+        patterns:
+          - match: '(,)?\s*(using\s*)?((\$*)NAME)(\s*:=)([^,]*)'
+            captures:
+              1:
+                name: punctuation.separat
+              2:
+                name:
+              3:
+                name: varia
+              4:
+                name: punctuation.defin
+              5:
+                name: keywor
+              6:
+                patterns:
+                  - include: '#expression'
+          - match: (,)?\s*(using\s*)?((\$*)NAME)\s*(:)\s*(\.\.)?([SPACED-ARRAY])*((\**)($)?NAME)?(\s*=)?([^,]*)
+            captures:
+              1:
+                name: punctuation.separat
+              2:
+                name:
+              3:
+                name: varia
+              4:
+                name: punctuation.defin
+              5:
+                name: keywor
+              6:
+                name
+              7: include: '#array'
+              8:
+                name:
+              9:
+                name: keyword.ope
+              10:
+                name: punctuation.defi
+              11:
+                name: keywo
+              12:
+                patterns:
+                  - include: '#expression'
+      parameters:
+        patterns:
+          - match: '(,)?\s*((")((QUOTED))("))\s*'
+            captures:
+              1:
+                name: punctuation.separat
+              2:
+                patterns:
+                  - include: '#strings'
+          - match: (,)?(\s*#code(,null)?)?((cast(,trunc)?(,no_check)?(,trunc)?)\s*(\()\s*((\**)NAME)\s*(\)))?(\s*(NAME)(\s*=))?([^,]*)
+            captures:
+              1:
+                name: punctuation.separat
+              2:
+                name: keyword.ot
+              4:
+                patterns:
+                  - include: '#casts'
+              14:
+                name: vari
+              15:
+                name: ke
+              16:
+                patterns:
+                  - include: '#expression'
+      return-declarations:
+        patterns:
+          - match: (,)?(SPACED-NAME)(:)\s*((\[[^\]]*\])?\s*(\**)(\$*)NAME)\s*(#must)?\s*((@)(NAME))?\s*(((#foreign\s+([A-Z-a-z_]\w*(\s*(")((QUOTED))("))?)|#compiler|#intrinsic|#runtime_support)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)\s*(EOL_COMMENT)
+            captures:
+              1:
+                name: punctuation.separat
+              2:
+                name: variable.par
+              3:
+                name: keywor
+              4:
+                name:
+              5:
+                patterns:
+                  - include: '#array'
+              6:
+                name: keyword.ope
+              7:
+                name: punctuation.d
+              8:
+                name: keyword.ot
+              10:
+                name: punctuation.definit
+              11:
+                name: varia
+              12:
+                name: keyword.control.impor
+              15:
+                name: constan
+              17:
+                name: punctuation.definition.strin
+              18:
+                name: string-quote
+              20:
+                name: punctuation.definition.str
+              21:
+                name: inva
+              23:
+                name: punctuation.definition.string.de
+              24:
+                name: string-quoted.ot
+              26:
+                name: punctuation.definition.string.
+              27:
+                name: punctuat
+              28:
+                name: keyword.o
+              29:
+                patterns:
+                  - include: '#comments'
+          - match: (,)?\s*((\[[^\]]*\])?\s*(\**)(\$*)NAME)\s*(#must)?\s*((@)(NAME))?\s*(((#foreign\s+([A-Z-a-z_]\w*(\s*(")((QUOTED))("))?)|#compiler|#intrinsic|#runtime_support)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)\s*(EOL_COMMENT)
+            captures:
+              1:
+                name: punctuation.separat
+              2:
+                name:
+              3:
+                patterns:
+                  - include: '#array'
+              4:
+                name: keyword.ope
+              5:
+                name: punctuation.d
+              6:
+                name: keyword.ot
+              8:
+                name: punctuation.definiti
+              9:
+                name: variab
+              10:
+                name: keyword.control.im
+              13:
+                name: constan
+              15:
+                name: punctuation.definition.strin
+              16:
+                name: string-quote
+              18:
+                name: punctuation.definition.str
+              19:
+                name: inva
+              21:
+                name: punctuation.definition.string.de
+              22:
+                name: string-quoted.ot
+              24:
+                name: punctuation.definition.string.
+              25:
+                name: punctuat
+              26:
+                name: keyword.o
+              27:
+                patterns:
+                  - include: '#comments'
+  more-numbers:
+    patterns:
+      - match: '(0b[01_]+)'
+        captures:
+          1:
+            name: constan
+      - match: '(0x[a-fA-F_\d]+)'
+        captures:
+          1:
+            name: constan
+      - match: '(\d[\d_]*)'
+        captures:
+          1:
+            name: constan
+  comma-joined-variables:
+    match: '(,)\s*((it_index|it)|(NAME))'
+    captures:
+      1:
+        name: punctuation.sepa
+      2:
+        name: variable.other.declar
+      3:
+        name: support.var
+  array:
+    match: '(\[)([^\]]*)(\])'
+    captures:
+      1:
+        name: punctuation.section.brackets.
+      2:
+        patterns:
+          - include: '#expression'
+      3:
+        name: punctuation.section.bracket
+  expression:
+    patterns:
+      - include: '#strings'
+      - include: '#casts'
+      - include: '#deprecated'
+      - include: '#enum-members'
+      - include: '#keywords'
+      - include: '#symbols'
+      - include: '#support'
+      - include: '#numbers'
+      - include: '#variables'
+      - include: '#more-numbers'
+  more-directives:
+    match: '(#foreign\s+([A-Z-a-z_]\w*(\s*(")((QUOTED))("))?)|#compiler|#intrinsic|#runtime_support)'
+    captures:
+      1:
+        name: keyword.control.import.directive
+      3:
+        name: constant.other.i
+      5:
+        name: punctuation.definition.string.import.
+      6:
+        name: string-quoted.other.i
+      8:
+        name: punctuation.definition.string.impor
+  markdown-block-comments:
+    name: meta.embedded.block.markdown
+    begin: (\s*\/\*\*)
+    end: (\s*\*\/)
+    beginCaptures:
+      1:
+        name: punctuation.definition.comment.jai
+    endCaptures:
+      1:
+        name: punctuation.definition.comment.jai
+    patterns:
+      - include: '#block-comments'
+      - begin: ((?i)```arm)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.arm.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.arm.jai
+        patterns:
+          - include: source.arm
+      - begin: ((?i)```bat)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.bat.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.bat.jai
+        patterns:
+          - include: source.batchfile
+      - begin: ((?i)```c(\+\+|pp))
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.cpp.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.cpp.jai
+        patterns:
+          - include: source.cpp
+      - begin: ((?i)```css)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.css.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.css.jai
+        patterns:
+          - include: source.css
+      - begin: ((?i)```c(sharp|#|s))
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.cs.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.cs.jai
+        patterns:
+          - include: source.cs
+      - begin: ((?i)```c)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.c.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.c.jai
+        patterns:
+          - include: source.c
+      - begin: ((?i)```glsl)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.glsl.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.glsl.jai
+        patterns:
+          - include: source.glsl
+      - begin: ((?i)```hlsl)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.hlsl.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.hlsl.jai
+        patterns:
+          - include: source.hlsl
+      - begin: ((?i)```jai)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.jai.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.jai.jai
+        patterns:
+          - include: source.jai
+      - begin: ((?i)```java)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.java.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.java.jai
+        patterns:
+          - include: source.java
+      - begin: ((?i)```jsonc)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.jsonc.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.jsonc.jai
+        patterns:
+          - include: source.json.comments
+      - begin: ((?i)```json)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.json.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.json.jai
+        patterns:
+          - include: source.json
+      - begin: ((?i)```(js|javascript))
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.js.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.js.jai
+        patterns:
+          - include: source.js
+      - begin: ((?i)```lua)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.lua.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.lua.jai
+        patterns:
+          - include: source.lua
+      - begin: ((?i)```make(file)?)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.makefile.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.makefile.jai
+        patterns:
+          - include: source.makefile
+      - begin: ((?i)```(metal|msl))
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.metal.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.metal.jai
+        patterns:
+          - include: source.metal
+      - begin: ((?i)```(powershell|psl))
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.psl.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.psl.jai
+        patterns:
+          - include: source.powershell
+      - begin: ((?i)```py(thon)?)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.python.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.python.jai
+        patterns:
+          - include: source.python
+      - begin: ((?i)```shaderlab)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.shaderlab.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.shaderlab.jai
+        patterns:
+          - include: source.shaderlab
+      - begin: ((?i)```shader)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.shader.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.shader.jai
+        patterns:
+          - include: source.glsl
+      - begin: ((?i)```sh(ell)?)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.sh.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.sh.jai
+        patterns:
+          - include: source.shell
+      - begin: ((?i)```sql)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.sql.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.sql.jai
+        patterns:
+          - include: source.sql
+      - begin: ((?i)```toml)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.toml.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.toml.jai
+        patterns:
+          - include: source.toml
+      - begin: ((?i)```(ts|typescript))
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.ts.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.ts.jai
+        patterns:
+          - include: source.ts
+      - begin: ((?i)```(vdf|valve))
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.vdf.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.vdf.jai
+        patterns:
+          - include: source.vdf
+      - begin: ((?i)```x(86_)?64)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.x64.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.x64.jai
+        patterns:
+          - include: source.asm.x86_64
+      - begin: ((?i)```yaml)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.yaml.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.yaml.jai
+        patterns:
+          - include: source.yaml
+      - begin: ((?i)```html)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.html.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.html.jai
+        patterns:
+          - include: text.html.derivative
+      - begin: ((?i)```(md|markdown))
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.md.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.md.jai
+        patterns:
+          - include: text.html.markdown
+      - begin: ((?i)```xml)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.xml.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.xml.jai
+        patterns:
+          - include: text.xml
+      - begin: ((?i)```xsl)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.xsl.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.xsl.jai
+        patterns:
+          - include: text.xml.xsl
+      - begin: (```)
+        end: (```)
+        beginCaptures:
+          1:
+            name: markup.quote.code.comment.jai
+        endCaptures:
+          1:
+            name: markup.quote.code.comment.jai
+        patterns:
+          - include: source.jai
+      - contentName: meta.embedded.block.markdown
+        include: text.html.markdown
+  strings:
+    patterns:
+      - name: string.quoted.double.empty.jai
+        match: (")(")
+        captures:
+          1:
+            name: punctuation.definition.string.empty.begin.jai
+          2:
+            name: punctuation.definition.string.empty.end.jai
+      - name: string.quoted.double.jai
+        begin: (")
+        end: ("|$)
+        beginCaptures:
+          1:
+            name: punctuation.definition.string.begin.jai
+        endCaptures:
+          1:
+            name: punctuation.definition.string.end.jai
+        patterns:
+          - name: constant.character.escape.jai
+            match: \\.
+          - name: constant.other.placeholder.jai
+            match: [0-9]+
+          - match: ()
+            captures:
+              '1':
+                name: constant.character.escape.jai
+          - name: constant.other.placeholder.jai
+            match: 
+      - name: string.here.embed.arm.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(arm))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.arm.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.arm.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.arm.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.arm.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.arm.jai
+        contentName: string.unquoted.here.embed.arm.jai
+        patterns:
+          - include: source.arm
+      - name: string.here.embed.bat.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(bat))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.bat.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.bat.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.bat.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.bat.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.bat.jai
+        contentName: string.unquoted.here.embed.bat.jai
+        patterns:
+          - include: source.batchfile
+      - name: string.here.embed.cpp.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(c(\+\+|pp)))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.cpp.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.cpp.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.cpp.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.cpp.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.cpp.jai
+        contentName: string.unquoted.here.embed.cpp.jai
+        patterns:
+          - include: source.cpp
+      - name: string.here.embed.css.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(css))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.css.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.css.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.css.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.css.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.css.jai
+        contentName: string.unquoted.here.embed.css.jai
+        patterns:
+          - include: source.css
+      - name: string.here.embed.cs.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(c(sharp|#|s)))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.cs.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.cs.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.cs.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.cs.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.cs.jai
+        contentName: string.unquoted.here.embed.cs.jai
+        patterns:
+          - include: source.cs
+      - name: string.here.embed.c.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(c))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.c.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.c.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.c.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.c.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.c.jai
+        contentName: string.unquoted.here.embed.c.jai
+        patterns:
+          - include: source.c
+      - name: string.here.embed.glsl.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(glsl))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.glsl.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.glsl.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.glsl.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.glsl.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.glsl.jai
+        contentName: string.unquoted.here.embed.glsl.jai
+        patterns:
+          - include: source.glsl
+      - name: string.here.embed.hlsl.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(hlsl))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.hlsl.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.hlsl.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.hlsl.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.hlsl.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.hlsl.jai
+        contentName: string.unquoted.here.embed.hlsl.jai
+        patterns:
+          - include: source.hlsl
+      - name: string.here.embed.jai.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(jai))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.jai.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.jai.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.jai.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.jai.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.jai.jai
+        contentName: string.unquoted.here.embed.jai.jai
+        patterns:
+          - include: source.jai
+      - name: string.here.embed.java.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(java))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.java.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.java.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.java.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.java.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.java.jai
+        contentName: string.unquoted.here.embed.java.jai
+        patterns:
+          - include: source.java
+      - name: string.here.embed.jsonc.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(jsonc))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.jsonc.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.jsonc.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.jsonc.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.jsonc.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.jsonc.jai
+        contentName: string.unquoted.here.embed.jsonc.jai
+        patterns:
+          - include: source.json.comments
+      - name: string.here.embed.json.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(json))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.json.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.json.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.json.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.json.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.json.jai
+        contentName: string.unquoted.here.embed.json.jai
+        patterns:
+          - include: source.json
+      - name: string.here.embed.js.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?((js|javascript)))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.js.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.js.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.js.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.js.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.js.jai
+        contentName: string.unquoted.here.embed.js.jai
+        patterns:
+          - include: source.js
+      - name: string.here.embed.lua.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(lua))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.lua.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.lua.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.lua.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.lua.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.lua.jai
+        contentName: string.unquoted.here.embed.lua.jai
+        patterns:
+          - include: source.lua
+      - name: string.here.embed.makefile.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(make(file)?))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.makefile.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.makefile.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.makefile.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.makefile.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.makefile.jai
+        contentName: string.unquoted.here.embed.makefile.jai
+        patterns:
+          - include: source.makefile
+      - name: string.here.embed.metal.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?((metal|msl)))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.metal.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.metal.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.metal.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.metal.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.metal.jai
+        contentName: string.unquoted.here.embed.metal.jai
+        patterns:
+          - include: source.metal
+      - name: string.here.embed.psl.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?((powershell|psl)))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.psl.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.psl.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.psl.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.psl.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.psl.jai
+        contentName: string.unquoted.here.embed.psl.jai
+        patterns:
+          - include: source.powershell
+      - name: string.here.embed.python.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(py(thon)?))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.python.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.python.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.python.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.python.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.python.jai
+        contentName: string.unquoted.here.embed.python.jai
+        patterns:
+          - include: source.python
+      - name: string.here.embed.shaderlab.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(shaderlab))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.shaderlab.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.shaderlab.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.shaderlab.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.shaderlab.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.shaderlab.jai
+        contentName: string.unquoted.here.embed.shaderlab.jai
+        patterns:
+          - include: source.shaderlab
+      - name: string.here.embed.shader.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(shader))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.shader.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.shader.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.shader.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.shader.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.shader.jai
+        contentName: string.unquoted.here.embed.shader.jai
+        patterns:
+          - include: source.glsl
+      - name: string.here.embed.sh.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(sh(ell)?))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.sh.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.sh.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.sh.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.sh.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.sh.jai
+        contentName: string.unquoted.here.embed.sh.jai
+        patterns:
+          - include: source.shell
+      - name: string.here.embed.sql.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(sql))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.sql.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.sql.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.sql.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.sql.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.sql.jai
+        contentName: string.unquoted.here.embed.sql.jai
+        patterns:
+          - include: source.sql
+      - name: string.here.embed.toml.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(toml))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.toml.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.toml.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.toml.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.toml.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.toml.jai
+        contentName: string.unquoted.here.embed.toml.jai
+        patterns:
+          - include: source.toml
+      - name: string.here.embed.ts.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?((ts|typescript)))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.ts.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.ts.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.ts.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.ts.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.ts.jai
+        contentName: string.unquoted.here.embed.ts.jai
+        patterns:
+          - include: source.ts
+      - name: string.here.embed.vdf.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?((vdf|valve)))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.vdf.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.vdf.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.vdf.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.vdf.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.vdf.jai
+        contentName: string.unquoted.here.embed.vdf.jai
+        patterns:
+          - include: source.vdf
+      - name: string.here.embed.x64.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(x(86_)?64))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.x64.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.x64.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.x64.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.x64.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.x64.jai
+        contentName: string.unquoted.here.embed.x64.jai
+        patterns:
+          - include: source.asm.x86_64
+      - name: string.here.embed.yaml.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(yaml))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.yaml.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.yaml.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.yaml.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.yaml.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.yaml.jai
+        contentName: string.unquoted.here.embed.yaml.jai
+        patterns:
+          - include: source.yaml
+      - name: string.here.embed.html.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(html))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.html.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.html.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.html.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.html.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.html.jai
+        contentName: string.unquoted.here.embed.html.jai
+        patterns:
+          - include: text.html.derivative
+      - name: string.here.embed.md.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?((md|markdown)))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.md.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.md.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.md.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.md.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.md.jai
+        contentName: string.unquoted.here.embed.md.jai
+        patterns:
+          - include: text.html.markdown
+      - name: string.here.embed.xml.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(xml))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.xml.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.xml.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.xml.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.xml.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.xml.jai
+        contentName: string.unquoted.here.embed.xml.jai
+        patterns:
+          - include: text.xml
+      - name: string.here.embed.xsl.jai
+        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(xsl))\b
+        end: \s*(\3)(\4)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.xsl.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.xsl.jai
+          4:
+            name: constant.other.stringdelimiter.here.embed.language.xsl.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.embed.xsl.jai
+          2:
+            name: constant.other.stringdelimiter.here.embed.language.xsl.jai
+        contentName: string.unquoted.here.embed.xsl.jai
+        patterns:
+          - include: text.xml.xsl
+      - name: string.here.jai
+        begin: (#string)\s+([A-Za-z_]\w*)
+        end: \s*(\2)
+        beginCaptures:
+          1:
+            name: keyword.other.directive.string.jai
+          2:
+            name: constant.other.stringdelimiter.here.jai
+        endCaptures:
+          1:
+            name: constant.other.stringdelimiter.here.jai
+        contentName: string.unquoted.here.jai
+scopeName: source.jai
+name: Jai
+patterns:
+  - include: '#markdown-block-comments'
+  - include: '#block-comments'
+  - include: '#comments'
+  - include: '#imports'
+  - include: '#asm'
+  - include: '#strings'
+  - include: '#deprecated-names'
+  - include: '#casts'
+  - include: '#keywords'
+  - include: '#proc'
+  - include: '#deprecated'
+  - include: '#fors'
+  - include: '#structs'
+  - include: '#enums'
+  - include: '#enum-members'
+  - include: '#composite-literals'
+  - include: '#symbols'
+  - include: '#support'
+  - include: '#numbers'
+  - include: '#notes'
+  - include: '#declarations'
+  - include: '#more-directives'
+  - include: '#variables'
+  - include: '#more-numbers'
+repository:
+  asm:
+    begin: (#asm)\s*(\{)
+    end: (\})
+    beginCaptures:
+      1:
+        name: keyword.other.directiv
+      2:
+        name: punctuation.section.braces.
+    endCaptures:
+      1:
+        name: punctuation.section.brace
+    contentName: source.asm.x86_64
+    patterns:
+      - include: source.asm.x86_64
+      - match: (===)
+        captures:
+          1:
+            name: keyword.ope
+  block-comments:
+    name: comment.block.jai
+    begin: (\/\*)
+    end: (\*\/)
+    beginCaptures:
+      1:
+        name: punctuation.definition.co
+    endCaptures:
+      1:
+        name: punctuation.definition.co
+    patterns:
+      - name: comment.block.jai
+        include: '#block-comments'
+      - match: (`)([^`]*)(`)
+        captures:
+          1:
+            name: markup.quot
+          2:
+            name: comment.block.b
+          3:
+            name: markup.quot
+      - match: (\@)((?i)TODO)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annota
+          2:
+            name: comment.block.annota
+          3:
+            name: comment.b
+      - match: (\@)((?i)Release)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotatio
+          2:
+            name: comment.block.annotatio
+          3:
+            name: comment.bloc
+      - match: (\@)((?i)Note)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annota
+          2:
+            name: comment.block.annota
+          3:
+            name: comment.b
+      - match: (\@)((?i)Urgent)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotati
+          2:
+            name: comment.block.annotati
+          3:
+            name: comment.blo
+      - match: (\@)((?i)Speed)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotat
+          2:
+            name: comment.block.annotat
+          3:
+            name: comment.bl
+      - match: (\@)((?i)Robustness)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotation.r
+          2:
+            name: comment.block.annotation.r
+          3:
+            name: comment.block.r
+      - match: (\@)((?i)NoCheckin)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotation.
+          2:
+            name: comment.block.annotation.
+          3:
+            name: comment.b
+      - match: (\@)(\w+)
+        captures:
+          1:
+            name: comment.block.punctuation.a
+          2:
+            name: comment.block.a
+      - name: comment.block.signature.jai
+        match: '(-) (\w+) (DATE)'
+        captures:
+          1:
+            name: comment.block.punctuation.
+          2:
+            name: comment.block.signa
+          3:
+            name: comment.block.signa
+      - match: ^\s*(\[)( )(\])(.*)
+        captures:
+          1:
+            name: comment.block.punctuation.checklist.brackets.t
+          2:
+            name: comment.block.punctuation.checklist.
+          3:
+            name: comment.block.punctuation.checklist.brackets
+          4:
+            name: comment.block.checklist.item.todo.jai
+            patterns:
+              - include: '#block-comments-line'
+      - match: ^\s*(\[)(\.)(\])(.*)
+        captures:
+          1:
+            name: comment.block.punctuation.checklist.brackets.part
+          2:
+            name: comment.block.punctuation.checklist.mar
+          3:
+            name: comment.block.punctuation.checklist.brackets.pa
+          4:
+            name: comment.block.checklist.item.partial.jai
+            patterns:
+              - include: '#block-comments-line'
+      - match: ^\s*(\[)([^ \.])(\])(.*)
+        captures:
+          1:
+            name: comment.block.punctuation.checklist.brackets.d
+          2:
+            name: comment.block.punctuation.checklist.
+          3:
+            name: comment.block.punctuation.checklist.brackets
+          4:
+            name: comment.block.checklist.item.done.jai
+            patterns:
+              - include: '#block-comments-line'
+  block-comments-line:
+    patterns:
+      - match: '(`)([^`]*)(`)'
+        captures:
+          1:
+            name: markup.quot
+          2:
+            name: comment.block.b
+          3:
+            name: markup.quot
+      - match: (\@)((?i)TODO)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annota
+          2:
+            name: comment.block.annota
+          3:
+            name: comment.b
+      - match: (\@)((?i)Release)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotatio
+          2:
+            name: comment.block.annotatio
+          3:
+            name: comment.bloc
+      - match: (\@)((?i)Note)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annota
+          2:
+            name: comment.block.annota
+          3:
+            name: comment.b
+      - match: (\@)((?i)Urgent)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotati
+          2:
+            name: comment.block.annotati
+          3:
+            name: comment.blo
+      - match: (\@)((?i)Speed)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotat
+          2:
+            name: comment.block.annotat
+          3:
+            name: comment.bl
+      - match: (\@)((?i)Robustness)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotation.r
+          2:
+            name: comment.block.annotation.r
+          3:
+            name: comment.block.r
+      - match: (\@)((?i)NoCheckin)([^@]*)
+        captures:
+          1:
+            name: comment.block.punctuation.annotation.
+          2:
+            name: comment.block.annotation.
+          3:
+            name: comment.block.
+      - match: (\@)(\w+)
+        captures:
+          1:
+            name: comment.block.punctuation.a
+          2:
+            name: comment.block.a
+      - name: comment.block.signature.jai
+        match: (-)\s*(.*)\s*(DATE)
+        captures:
+          1:
+            name: comment.block.punctuation.
+          2:
+            name: comment.block.signa
+          3:
+            name: comment.block.signa
+  comments:
+    patterns:
+      - match: (//)\s*(\[)( )(\])(.*)
+        captures:
+          1:
+            name: punctuation.definitio
+          2:
+            name: comment.line.double-slash.punctuation.checklist.brackets.t
+          3:
+            name: comment.line.double-slash.punctuation.checklist.
+          4:
+            name: comment.line.double-slash.punctuation.checklist.brackets
+          5:
+            name: comment.line.double-slash.checklist.item.todo.jai
+            patterns:
+              - include: '#comments-line'
+      - match: (//)\s*(\[)(\.)(\])(.*)
+        captures:
+          1:
+            name: punctuation.definitio
+          2:
+            name: comment.line.double-slash.punctuation.checklist.brackets.part
+          3:
+            name: comment.line.double-slash.punctuation.checklist.mar
+          4:
+            name: comment.line.double-slash.punctuation.checklist.brackets.pa
+          5:
+            name: comment.line.double-slash.checklist.item.partial.jai
+            patterns:
+              - include: '#comments-line'
+      - match: (//)\s*(\[)([^ \.])(\])(.*)
+        captures:
+          1:
+            name: punctuation.definitio
+          2:
+            name: comment.line.double-slash.punctuation.checklist.brackets.d
+          3:
+            name: comment.line.double-slash.punctuation.checklist.
+          4:
+            name: comment.line.double-slash.punctuation.checklist.brackets
+          5:
+            name: comment.line.double-slash.checklist.item.done.jai
+            patterns:
+              - include: '#comments-line'
+      - match: (//)(.*)
+        captures:
+          1:
+            name: punctuation.definitio
+          2:
+            name: comment.line.double-slash.jai
+            patterns:
+              - include: '#comments-line'
+  comments-line:
+    patterns:
+      - match: '(`)([^`]*)(`)'
+        captures:
+          1:
+            name: markup.quot
+          2:
+            name: comment.line.double-slash.b
+          3:
+            name: markup.quot
+      - match: (\@)((?i)TODO)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annota
+          2:
+            name: comment.line.double-slash.annota
+          3:
+            name: comment.line.double-s
+      - match: (\@)((?i)Release)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotatio
+          2:
+            name: comment.line.double-slash.annotatio
+          3:
+            name: comment.line.double-slas
+      - match: (\@)((?i)Note)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annota
+          2:
+            name: comment.line.double-slash.annota
+          3:
+            name: comment.line.double-s
+      - match: (\@)((?i)Urgent)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotati
+          2:
+            name: comment.line.double-slash.annotati
+          3:
+            name: comment.line.double-sla
+      - match: (\@)((?i)Speed)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotat
+          2:
+            name: comment.line.double-slash.annotat
+          3:
+            name: comment.line.double-sl
+      - match: (\@)((?i)Robustness)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotation.r
+          2:
+            name: comment.line.double-slash.annotation.r
+          3:
+            name: comment.line.double-slash.r
+      - match: (\@)((?i)NoCheckin)([^@]*)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.annotation.
+          2:
+            name: comment.line.double-slash.annotation.
+          3:
+            name: comment.line.double-slash.
+      - match: (\@)(\w+)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.a
+          2:
+            name: comment.line.double-slash.a
+      - name: comment.line.double-slash.signature.jai
+        match: (-)\s*(.*)\s*(DATE)
+        captures:
+          1:
+            name: comment.line.double-slash.punctuation.
+          2:
+            name: comment.line.double-slash.signa
+          3:
+            name: comment.line.double-slash.signa
+  imports:
+    patterns:
+      - match: ^(SPACED-NAME)(::)\s*(#import)\s+(")(QUOTED)(")
+        captures:
+          1:
+            name: entity.name.
+          2:
+            name: keyword.de
+          3:
+            name: keyword.control.import.
+          4:
+            name: punctuation.definition.string.imp
+          5:
+            name: string-quoted.oth
+          6:
+            name: punctuation.definition.string.i
+      - match: (#import|#load)\s+(")(QUOTED)(")
+        captures:
+          1:
+            name: keyword.control.import.
+          2:
+            name: punctuation.definition.string.imp
+          3:
+            name: string-quoted.oth
+          4:
+            name: punctuation.definition.string.i
+      - match: (#import|#load)\s+("[^"]*)?$
+        captures:
+          1:
+            name: keyword.control.import.
+          2:
+            name: punctuation.definition.string.imp
+          3:
+            name: string-quoted.oth
+      - match: ^(SPACED-NAME)(::)\s*(#foreign_(system_)?library)\s+(")(QUOTED)(")
+        captures:
+          1:
+            name: constant.oth
+          2:
+            name: keyword.de
+          3:
+            name: keyword.control.import.
+          5:
+            name: punctuation.definition.string.imp
+          6:
+            name: string-quoted.oth
+          7:
+            name: punctuation.definition.string.i
+      - match: ^(SPACED-NAME)(::)\s*(#foreign_(system_)?library)\s+("[^"]*)?$
+        captures:
+          1:
+            name: constant.oth
+          2:
+            name: keyword.de
+          3:
+            name: keyword.control.import.
+          5:
+            name: punctuation.definition.string.imp
+          6:
+            name: string-quoted.oth
+  keywords:
+    patterns:
+      - name: keyword.control.conditional.jai
+        match: \b(if|ifx|then|else|case)\b
+      - name: keyword.control.jump.jai
+        match: \b(return|break|continue)\b
+      - name: keyword.control.loop.while.jai
+        match: \b(while)\b
+      - name: keyword.control.defer.jai
+        match: \b(defer)\b
+      - name: keyword.other.directive.jai
+        match: (#add_context|#align|#assert|#caller_location|#code(,null)?|#complete|#dump|#expand|#file|#filepath|#if|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#no_reset|#place|#placeholder|#procedure_of_call|#program_export|#run|#specified|#symmetric|#through|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint|#unshared)\b
+      - name: keyword.other.directive.scope.jai
+        match: (#scope_export|#scope_file|#scope_module)
+      - name: keyword.other.directive.string.jai
+        match: (#char)
+      - name: keyword.other.context.jai
+        match: \b(context)\b
+      - name: keyword.other.using.jai
+        match: \b(using)\b
+      - name: constant.language.true.jai
+        match: \b(true)\b
+      - name: constant.language.false.jai
+        match: \b(false)\b
+      - name: constant.language.null.jai
+        match: \b(null)\b
+      - name: keyword.declaration.struct.jai
+        match: \b(struct)\b
+      - name: keyword.declaration.enum.jai
+        match: \b(enum)\b
+      - name: keyword.declaration.union.jai
+        match: \b(union)\b
+      - name: storage.type.jai
+        match: \b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void|Type)\b
+  casts:
+    patterns:
+      - match: \b(cast(,trunc)?(,no_check)?(,trunc)?)\s*(\()\s*((\**)NAME)\s*(\))
+        captures:
+          1:
+            name: keyword.con
+          5:
+            name: punctuation.section.par
+          6:
+            name:
+          7:
+Expected indent on line 373
