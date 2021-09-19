@@ -32,7 +32,7 @@
     {
         "asm":
         {
-            "begin": "(#asm)\\s*(\\{)",
+            "begin": "(#asm)\\s*(([A-Z0-9]+)\\s*(,[^}]*)?)?(\\{)",
             "end": "(\\})",
             "beginCaptures":
             {
@@ -40,7 +40,18 @@
                 {
                     "name": "keyword.other.directive.asm.jai"
                 },
-                "2":
+                "3":
+                {
+                    "name": "keyword.other.feature.asm.jai"
+                },
+                "4":
+                {
+                    "patterns":
+                    [
+                        { "include": "#comma-joined-asm-features"
+                     }]
+                },
+                "5":
                 {
                     "name": "punctuation.section.braces.begin.jai"
                 }
@@ -66,6 +77,21 @@
                     }
                 }
             ]
+        },
+        "comma-joined-asm-features":
+        {
+            "match": "(,)\\s*([A-Z0-9]+)\\s*",
+            "captures":
+            {
+                "1":
+                {
+                    "name": "punctuation.separator.jai"
+                },
+                "2":
+                {
+                    "name": "keyword.other.feature.asm.jai"
+                }
+            }
         },
         "block-comments":
         {
@@ -971,7 +997,7 @@
                     "match": "\\b(union)\\b"
                 },
                 { "name": "storage.type.jai",
-                    "match": "\\b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void|Type)\\b"
+                    "match": "\\b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void|Code|Type)\\b"
                 }
             ]
         },
@@ -2165,7 +2191,7 @@
                 {
                     "patterns":
                     [
-                        { "match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#no_context|\\s*#symmetric)*\\s*(//.*)?",
+                        { "match": "(,)?\\s*([a-zA-Z_]\\w*)\\s*(:)\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(#expand)?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#no_context|\\s*#symmetric)*\\s*(//.*)?",
                             "captures":
                             {
                                 "1":
@@ -2213,49 +2239,53 @@
                                 },
                                 "12":
                                 {
+                                    "name": "keyword.other.directive.jai"
+                                },
+                                "13":
+                                {
                                     "name": "keyword.control.import.directive.r1.jai"
                                 },
-                                "15":
+                                "16":
                                 {
                                     "name": "constant.other.import.jai"
                                 },
-                                "17":
+                                "18":
                                 {
                                     "name": "punctuation.definition.string.import.begin.jai"
                                 },
-                                "18":
+                                "19":
                                 {
                                     "name": "string-quoted.other.import.jai"
                                 },
-                                "20":
+                                "21":
                                 {
                                     "name": "punctuation.definition.string.import.end.jai"
                                 },
-                                "21":
+                                "22":
                                 {
                                     "name": "invalid.deprecated.jai"
                                 },
-                                "23":
+                                "24":
                                 {
                                     "name": "punctuation.definition.string.deprecated.begin.jai"
                                 },
-                                "24":
+                                "25":
                                 {
                                     "name": "string-quoted.other.deprecated.jai"
                                 },
-                                "26":
+                                "27":
                                 {
                                     "name": "punctuation.definition.string.deprecated.end.jai"
                                 },
-                                "27":
+                                "28":
                                 {
                                     "name": "punctuation.terminator.jai"
                                 },
-                                "28":
+                                "29":
                                 {
                                     "name": "keyword.other.directive.jai"
                                 },
-                                "29":
+                                "30":
                                 {
                                     "patterns":
                                     [
@@ -2264,7 +2294,7 @@
                                 }
                             }
                         },
-                        { "match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#no_context|\\s*#symmetric)*\\s*(//.*)?",
+                        { "match": "(,)?\\s*((\\[[^\\]]*\\])?\\s*(\\**)(\\$*)[a-zA-Z_]\\w*)\\s*(#must)?\\s*((@)([a-zA-Z_]\\w*))?\\s*(#expand)?\\s*(((#foreign\\s+([A-Z-a-z_]\\w*(\\s*(\")(([^\"\\\\]|\\\\.)*)(\"))?)|#compiler|#intrinsic|#runtime_support)\\s*)+\\s*(#deprecated\\s*((\")(([^\"\\\\]|\\\\.)*)(\"))?)?\\s*(;)?)?(\\s*#c_call|\\s*#no_context|\\s*#symmetric)*\\s*(//.*)?",
                             "captures":
                             {
                                 "1":
@@ -2304,49 +2334,53 @@
                                 },
                                 "10":
                                 {
+                                    "name": "keyword.other.directive.jai"
+                                },
+                                "11":
+                                {
                                     "name": "keyword.control.import.directive.jai"
                                 },
-                                "13":
+                                "14":
                                 {
                                     "name": "constant.other.import.jai"
                                 },
-                                "15":
+                                "16":
                                 {
                                     "name": "punctuation.definition.string.import.begin.jai"
                                 },
-                                "16":
+                                "17":
                                 {
                                     "name": "string-quoted.other.import.jai"
                                 },
-                                "18":
+                                "19":
                                 {
                                     "name": "punctuation.definition.string.import.end.jai"
                                 },
-                                "19":
+                                "20":
                                 {
                                     "name": "invalid.deprecated.jai"
                                 },
-                                "21":
+                                "22":
                                 {
                                     "name": "punctuation.definition.string.deprecated.begin.jai"
                                 },
-                                "22":
+                                "23":
                                 {
                                     "name": "string-quoted.other.deprecated.jai"
                                 },
-                                "24":
+                                "25":
                                 {
                                     "name": "punctuation.definition.string.deprecated.end.jai"
                                 },
-                                "25":
+                                "26":
                                 {
                                     "name": "punctuation.terminator.jai"
                                 },
-                                "26":
+                                "27":
                                 {
                                     "name": "keyword.other.directive.jai"
                                 },
-                                "27":
+                                "28":
                                 {
                                     "patterns":
                                     [

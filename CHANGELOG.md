@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.0.71] - 2021-09-19
+* Lazily load asm completions once user is in an asm block.
+* Added #asm feature-set syntax
+* Fixed #expand after return type(s)
+
 ## [0.0.70] - 2021-09-18
 * Fixed previous version breaking syntax highlighting.
 

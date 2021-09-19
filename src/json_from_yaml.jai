@@ -28,6 +28,7 @@ debug :: false;
 // [ ] FoldingRangeProvider
 
 // Misc
+// [ ] Maybe refine asm completions based on features specified
 // [ ] Show current proc in status bar
 // [ ] Show status in status bar (error state / has reference cache)
 // [ ] Show #dump of current proc

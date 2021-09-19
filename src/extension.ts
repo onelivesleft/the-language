@@ -22,7 +22,7 @@ let decorationRanges: vscode.Range [] = [];
 let selectionsIntersectDecoration = false;
 let sentinel = "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
 let asmRanges: vscode.Range [] = [];
-let asmCompletions: vscode.CompletionItem[];
+let asmCompletions: vscode.CompletionItem[] = [];
 let asmURLs: { [id: string] : string; } = {};
 let locationByFilepath : { [id: string] : vscode.Location [] []} = {};
 let foundSomeLocations = false;
@@ -89,8 +89,6 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 	});
-
-	asmCompletions = loadAsmCompletions();
 }
 
 export function deactivate() {}
@@ -558,7 +556,7 @@ function decorate(editor: vscode.TextEditor) {
 }
 
 function updateAsm(sourceCode: string) {
-	let asmStart = /#asm\s+{/;
+	let asmStart = /#asm\b.*{/;
 	let asmEnd = "}";
 
 	const sourceCodeArr = sourceCode.split('\n');
@@ -634,8 +632,11 @@ class JaiCompletionItemProvider implements vscode.CompletionItemProvider {
 					 	line = line.slice(semicolon + 1);
 					line = line.trimLeft();
 					let match = line.match(invalidCharacter);
-					if (match === null)
+					if (match === null) {
+						if (asmCompletions.length === 0)
+							asmCompletions = loadAsmCompletions();
 						resolve(asmCompletions);
+					}
 					else
 						reject();
 					return;

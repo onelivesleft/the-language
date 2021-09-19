@@ -49,11 +49,15 @@ patterns:
   - include: '#more-numbers'
 repository:
   asm:
-    begin: (#asm)\s*(\{)
+    begin: (#asm)\s*(([A-Z0-9]+)\s*(,[^}]*)?)?(\{)
     end: (\})
     beginCaptures:
       1: name: keyword.other.directive.asm.jai
-      2: name: punctuation.section.braces.begin.jai
+      3: name: keyword.other.feature.asm.jai
+      4:
+        patterns:
+          - include: '#comma-joined-asm-features'
+      5: name: punctuation.section.braces.begin.jai
     endCaptures:
       1: name: punctuation.section.braces.end.jai
     contentName: source.asm.x86_64
@@ -62,6 +66,11 @@ repository:
       - match: (===)
         captures:
           1: name: keyword.operator.pin.jai
+  comma-joined-asm-features:
+    match: (,)\s*([A-Z0-9]+)\s*
+    captures:
+      1: name: punctuation.separator.jai
+      2: name: keyword.other.feature.asm.jai
   block-comments:
     name: comment.block.jai
     begin: (\/\*)
@@ -364,7 +373,7 @@ repository:
       - name: keyword.declaration.union.jai
         match: \b(union)\b
       - name: storage.type.jai
-        match: \b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void|Type)\b
+        match: \b(int|u8|u16|u32|u64|s8|s16|s32|s64|float|float32|float64|bool|string|void|Code|Type)\b
   casts:
     patterns:
       - match: \b(cast(,trunc)?(,no_check)?(,trunc)?)\s*(\()\s*((\**)NAME)\s*(\))
@@ -754,7 +763,7 @@ repository:
                   - include: '#expression'
       return-declarations:
         patterns:
-          - match: (,)?(SPACED-NAME)(:)\s*((\[[^\]]*\])?\s*(\**)(\$*)NAME)\s*(#must)?\s*((@)(NAME))?\s*(((#foreign\s+([A-Z-a-z_]\w*(\s*(")((QUOTED))("))?)|#compiler|#intrinsic|#runtime_support)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)\s*(EOL_COMMENT)
+          - match: (,)?(SPACED-NAME)(:)\s*((\[[^\]]*\])?\s*(\**)(\$*)NAME)\s*(#must)?\s*((@)(NAME))?\s*(#expand)?\s*(((#foreign\s+([A-Z-a-z_]\w*(\s*(")((QUOTED))("))?)|#compiler|#intrinsic|#runtime_support)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)\s*(EOL_COMMENT)
             captures:
               1: name: punctuation.separator.parameters.jai
               2: name: variable.parameter.return.jai
@@ -768,21 +777,22 @@ repository:
               8: name: keyword.other.directive.jai
               10: name: punctuation.definition.annotation.jai
               11: name: variable.annotation.jai
-              12: name: keyword.control.import.directive.r1.jai
-              15: name: constant.other.import.jai
-              17: name: punctuation.definition.string.import.begin.jai
-              18: name: string-quoted.other.import.jai
-              20: name: punctuation.definition.string.import.end.jai
-              21: name: invalid.deprecated.jai
-              23: name: punctuation.definition.string.deprecated.begin.jai
-              24: name: string-quoted.other.deprecated.jai
-              26: name: punctuation.definition.string.deprecated.end.jai
-              27: name: punctuation.terminator.jai
-              28: name: keyword.other.directive.jai
-              29:
+              12: name: keyword.other.directive.jai
+              13: name: keyword.control.import.directive.r1.jai
+              16: name: constant.other.import.jai
+              18: name: punctuation.definition.string.import.begin.jai
+              19: name: string-quoted.other.import.jai
+              21: name: punctuation.definition.string.import.end.jai
+              22: name: invalid.deprecated.jai
+              24: name: punctuation.definition.string.deprecated.begin.jai
+              25: name: string-quoted.other.deprecated.jai
+              27: name: punctuation.definition.string.deprecated.end.jai
+              28: name: punctuation.terminator.jai
+              29: name: keyword.other.directive.jai
+              30:
                 patterns:
                   - include: '#comments'
-          - match: (,)?\s*((\[[^\]]*\])?\s*(\**)(\$*)NAME)\s*(#must)?\s*((@)(NAME))?\s*(((#foreign\s+([A-Z-a-z_]\w*(\s*(")((QUOTED))("))?)|#compiler|#intrinsic|#runtime_support)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)\s*(EOL_COMMENT)
+          - match: (,)?\s*((\[[^\]]*\])?\s*(\**)(\$*)NAME)\s*(#must)?\s*((@)(NAME))?\s*(#expand)?\s*(((#foreign\s+([A-Z-a-z_]\w*(\s*(")((QUOTED))("))?)|#compiler|#intrinsic|#runtime_support)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)\s*(EOL_COMMENT)
             captures:
               1: name: punctuation.separator.parameters.jai
               2: name: storage.type.jai
@@ -794,18 +804,19 @@ repository:
               6: name: keyword.other.directive.jai
               8: name: punctuation.definition.annotation.jai
               9: name: variable.annotation.jai
-              10: name: keyword.control.import.directive.jai
-              13: name: constant.other.import.jai
-              15: name: punctuation.definition.string.import.begin.jai
-              16: name: string-quoted.other.import.jai
-              18: name: punctuation.definition.string.import.end.jai
-              19: name: invalid.deprecated.jai
-              21: name: punctuation.definition.string.deprecated.begin.jai
-              22: name: string-quoted.other.deprecated.jai
-              24: name: punctuation.definition.string.deprecated.end.jai
-              25: name: punctuation.terminator.jai
-              26: name: keyword.other.directive.jai
-              27:
+              10: name: keyword.other.directive.jai
+              11: name: keyword.control.import.directive.jai
+              14: name: constant.other.import.jai
+              16: name: punctuation.definition.string.import.begin.jai
+              17: name: string-quoted.other.import.jai
+              19: name: punctuation.definition.string.import.end.jai
+              20: name: invalid.deprecated.jai
+              22: name: punctuation.definition.string.deprecated.begin.jai
+              23: name: string-quoted.other.deprecated.jai
+              25: name: punctuation.definition.string.deprecated.end.jai
+              26: name: punctuation.terminator.jai
+              27: name: keyword.other.directive.jai
+              28:
                 patterns:
                   - include: '#comments'
   more-numbers:
