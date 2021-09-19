@@ -3,11 +3,13 @@
 #import "File";
 #import "Hash_Table";
 #import "Time";
-
+#import "Strings";
+heap :: #import "Strings_Alloc";
+scratch :: #import "Strings_Alloc"(scratch_allocator, add_convenience_functions=true);
+#import "Scratch";
 jai_string :: #import "String";
 parse_int :: jai_string.parse_int;
 
-#load "babystrings.jai";
 
 // @TODO
 
@@ -56,7 +58,7 @@ main :: () {
     instruction_list : [..] Instruction;
     current_instruction : *Instruction;
 
-    for line_raw: split_it(xml, "\n") {
+    for line_raw: line_split(xml) {
         line := trim(line_raw);
         if starts_with(line, "<instruction") {
             current_instruction = array_add(*instruction_list);
@@ -77,7 +79,7 @@ main :: () {
         if found_variations  variations = variations_table;
 
         hash := instruction_hash(instruction);
-        hash_string := copy_string(to_string(*hash[0]));
+        hash_string := heap.copy(to_string(*hash[0]));
         list, found := table_find(variations, hash_string);
         if found {
             array_add(*list, instruction);
@@ -131,7 +133,7 @@ main :: () {
 
         wants_to_write := false;
         check_for_doctype := false;
-        for line_raw: split_it(htmls, "\n") {
+        for line_raw: line_split(htmls) {
             line := trim(line_raw);
             if state == {
                 case .SEEKING_BOUNDARY;
@@ -195,8 +197,7 @@ main :: () {
         else       append(*json, "\n");
         first = false;
         append(*json, "    ");
-        name := copy_string(instruction_name);
-        to_lower(name);
+        name := heap.lower(instruction_name);
         count := 0;
         first_instruction : Instruction;
         for instruction_array, hash: variations {
@@ -209,7 +210,7 @@ main :: () {
                 if found {
                     append(*json, "        \"documentation\": [");
                     comma := false;
-                    for line: split_it(description, "\n") {
+                    for line: line_split(description) {
                         if trim(line) {
                             if comma  append(*json, ",\n");
                             else      append(*json, "\n");
@@ -249,7 +250,7 @@ main :: () {
                     if s & 2048  append(*size_builder, "[2048]");
                     if s & 4096  append(*size_builder, "[4096]");
 
-                    array_add(*types, join(instruction.operands[i].type, ".", builder_to_string(*size_builder)));
+                    array_add(*types, heap.join(instruction.operands[i].type, ".", builder_to_string(*size_builder)));
                 }
                 else {
                     array_add(*types, instruction.operands[i].type);
@@ -258,7 +259,7 @@ main :: () {
 
             if count  append(*json, ",\n");
             else      append(*json, "\n");
-            print_to_builder(*json, "            \"%\"", join(types, ", "));
+            print_to_builder(*json, "            \"%\"", heap.join(types, ", "));
             count += 1;
         }
         append(*json, "\n        ],\n");
@@ -382,7 +383,7 @@ operand_from_string :: (line: string) -> result: Operand {
 
     result : Operand;
 
-    tags_and_valid := split(line, ">");
+    tags_and_valid := heap.split(line, ">");
 
     tag_line := tags_and_valid[0];
     tags_only := ends_with(tag_line, "/");
@@ -408,7 +409,7 @@ operand_from_string :: (line: string) -> result: Operand {
             init_string_builder(*builder);
             append(*builder, "                ");
             for member: info.members {
-                string_tag := replace(member.name, "__", "-");
+                string_tag := heap.replace(member.name, "__", "-");
                 if member.type.type == {
                     case .STRING;
                     print_to_builder(*builder, "if tag == \"%\"  result.% = value;", string_tag, member.name);
@@ -470,7 +471,7 @@ instruction_from_string :: (line: string) -> result: Instruction {
     }
 
     if result.name[0] == #char "{" {
-        result.name = split(result.name, "}", max_results=2)[1];
+        result.name = trim_start_past(result.name, "}");
         result.name = trim_start(result.name);
     }
 
@@ -479,11 +480,8 @@ instruction_from_string :: (line: string) -> result: Instruction {
 
 
 param :: (s: string) -> tag: string, value: string, ok: bool {
-    parts := split(s, "=");
-    assert(parts.count == 2);
-
-    tag := parts[0];
-    value := parts[1];
+    tag, value := split_into_two(s, #char "=");
+    assert(value.count >= 2);
     value = slice(value, 1, -1);
     return tag, value, true;
 }
@@ -551,10 +549,10 @@ strip_tags :: (s: string) -> string {
         }
     }
     append(*builder, "\n");
-    line := builder_to_string(*builder);
-    line = replace(line, "&lt;", "<");
-    line = replace(line, "&gt;", ">");
-    line = replace(line, "&amp;", "&");
-    line = replace(line, "\"", "\\\"");
+    line := scratch.builder_to_string(*builder);
+    line = scratch.replace(line, "&lt;", "<");
+    line = scratch.replace(line, "&gt;", ">");
+    line = scratch.replace(line, "&amp;", "&");
+    line = heap.replace(line, "\"", "\\\"");
     return line;
 }
