@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.74] - 2021-09-29
+* Actually added `#type,isa`, `#type,distinct`
+
 ## [0.0.73] - 2021-09-29
 * Added `#type,isa`, `#type,distinct`
 * Fixed asm goto-definition help not working until after lazy-load of asm definitions
