@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.76] - 2021-09-29
+* Added `#bake_constants`
+
 ## [0.0.75] - 2021-09-29
 * Added `#this`
 
