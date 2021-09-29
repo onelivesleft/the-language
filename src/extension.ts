@@ -24,8 +24,14 @@ let sentinel = "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
 let asmRanges: vscode.Range [] = [];
 let asmCompletions: vscode.CompletionItem[] = [];
 let asmURLs: { [id: string] : string; } = {};
-let locationByFilepath : { [id: string] : vscode.Location [] []} = {};
-let foundSomeLocations = false;
+
+interface Reference {
+	name: string;
+	locations: vscode.Location [];
+}
+let referenceByFilepath : { [id: string] : Reference []} = {};
+let foundSomeReferences = false;
+
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -193,62 +199,62 @@ function updateReferences(filepath: string) {
 			return;
 		}
 
-		locationByFilepath = {};
-		foundSomeLocations = false;
-		let result : vscode.Location[] = [];
+		referenceByFilepath = {};
+		foundSomeReferences = false;
+		let result : Reference = { name: "", locations: []};
 		for (let row of output.split("\n")) {
 			if (!row.trim()) {
-				if (result.length) {
-					foundSomeLocations = true;
+				if (result.locations.length) {
+					foundSomeReferences = true;
 					let done : { [id: string] : boolean } = {};
-					for (let i = 0; i < result.length; i++) {
-						let fp = result[i].uri.fsPath.toLowerCase();
+					for (let i = 0; i < result.locations.length; i++) {
+						let fp = result.locations[i].uri.fsPath.toLowerCase();
 						let alreadyPresent = done[fp];
 						if (!alreadyPresent) {
 							done[fp] = true;
-							let fileLocations = locationByFilepath[fp];
-							if (fileLocations)
-								fileLocations.push(result);
+							let fileReferences = referenceByFilepath[fp];
+							if (fileReferences)
+								fileReferences.push(result);
 							else
-								locationByFilepath[fp] = [result];
+								referenceByFilepath[fp] = [result];
 						}
 					}
-					result = [];
+					result = { name: "", locations: []};
 				}
 				continue;
 			}
 			let items = row.split("|");
-			let uri = vscode.Uri.file(items[0]);
-			let startPosition = new vscode.Position(parseInt(items[1]) - 1, parseInt(items[2]) - 1);
-			let endRow = parseInt(items[3]) - 1;
-			let endCol = parseInt(items[4]) - 1;
+			if (items[0]) result.name = items[0];
+			let uri = vscode.Uri.file(items[1]);
+			let startPosition = new vscode.Position(parseInt(items[2]) - 1, parseInt(items[3]) - 1);
+			let endRow = parseInt(items[4]) - 1;
+			let endCol = parseInt(items[5]) - 1;
 			if (endRow < 0) endRow = startPosition.line;
 			if (endCol < 0) endCol = startPosition.character + 1;
 			let endPosition = new vscode.Position(endRow, endCol);
 			let location = new vscode.Location(uri, new vscode.Range(startPosition, endPosition));
-			result.push(location);
+			result.locations.push(location);
 		}
 
-		if (result.length) {
-			foundSomeLocations = true;
+		if (result.locations.length) {
+			foundSomeReferences = true;
 			let done : { [id: string] : boolean } = {};
-			for (let i = 0; i < result.length; i++) {
-				let fp = result[i].uri.fsPath.toLowerCase();
+			for (let i = 0; i < result.locations.length; i++) {
+				let fp = result.locations[i].uri.fsPath.toLowerCase();
 				let alreadyPresent = done[fp];
 				if (!alreadyPresent) {
 					done[fp] = true;
-					let fileLocations = locationByFilepath[fp];
-					if (fileLocations)
-						fileLocations.push(result);
+					let fileReferences = referenceByFilepath[fp];
+					if (fileReferences)
+						fileReferences.push(result);
 					else
-						locationByFilepath[fp] = [result];
-
+						referenceByFilepath[fp] = [result];
 				}
 			}
 		}
 
 		if (debugMode) console.log("Reference update complete.");
-		if (debugMode) console.log(foundSomeLocations);
+		if (debugMode) console.log(foundSomeReferences);
 		currentlyRunningReferenceUpdate = false;
 	}).catch(output => {
 		if (debugMode) {
@@ -661,11 +667,11 @@ class JaiReferenceProvider implements vscode.ReferenceProvider {
 				}
 			}
 
-			console.log(foundSomeLocations);
-			console.log(locationByFilepath);
+			console.log(foundSomeReferences);
+			console.log(referenceByFilepath);
 
-			if (foundSomeLocations) {
-				let locations = findLocations(document.uri, position);
+			if (foundSomeReferences) {
+				let locations = findLocations(document.getText(document.getWordRangeAtPosition(position, /[a-zA-Z_]\w*/)), document.uri, position);
 				if (locations.length === 0)
 					reject();
 				else
@@ -737,6 +743,8 @@ class JaiDefinitionProvider implements vscode.DefinitionProvider {
 						if (wordRange !== undefined) {
 							let line = document.getText().split("\n")[position.line];
 							let word = line.slice(wordRange.start.character, wordRange.end.character);
+							if (asmCompletions.length === 0)
+								asmCompletions = loadAsmCompletions();
 							let url = asmURLs[word];
 							if (url === undefined) {
 								reject();
@@ -750,8 +758,8 @@ class JaiDefinitionProvider implements vscode.DefinitionProvider {
 					}
 				}
 
-				if (foundSomeLocations) {
-					let locations = findLocations(document.uri, position);
+				if (foundSomeReferences) {
+					let locations = findLocations(document.getText(document.getWordRangeAtPosition(position, /[a-zA-Z_]\w*/)), document.uri, position);
 					if (locations.length === 0)
 						reject();
 					else
@@ -938,9 +946,9 @@ function locationsFromString(locations: string, firstLineOnly: boolean = false):
 	for (let row of locations.split("\n")) {
 		if (!row.trim()) continue;
 		let items = row.split("|");
-		let uri = vscode.Uri.file(items[0]);
-		let startPosition = new vscode.Position(parseInt(items[1]) - 1, parseInt(items[2]) - 1);
-		let endPosition = new vscode.Position(parseInt(items[3]) - 1, parseInt(items[4]) - 1);
+		let uri = vscode.Uri.file(items[1]);
+		let startPosition = new vscode.Position(parseInt(items[2]) - 1, parseInt(items[3]) - 1);
+		let endPosition = new vscode.Position(parseInt(items[4]) - 1, parseInt(items[5]) - 1);
 		let location = new vscode.Location(uri, new vscode.Range(startPosition, endPosition));
 		result.push(location);
 		if (firstLineOnly) break;
@@ -950,20 +958,40 @@ function locationsFromString(locations: string, firstLineOnly: boolean = false):
 }
 
 
-function findLocations(uri: vscode.Uri, position: vscode.Position): vscode.Location[] {
-	let fileLocations = locationByFilepath[uri.fsPath.toLowerCase()];
-	if (!fileLocations) return [];
+function findLocations(name: string, uri: vscode.Uri, position: vscode.Position): vscode.Location[] {
+	let fileReferences = referenceByFilepath[uri.fsPath.toLowerCase()];
+	if (!fileReferences) return [];
 
-	for (let i = 0; i < fileLocations.length; i++) {
-		let locations = fileLocations[i];
-		for (let l = 0; l < locations.length; l++) {
-			let location = locations[l];
-			if (location.range.contains(position))
-				return locations;
+	let closestDistance = 999999;
+	let closestLocations : vscode.Location [] = [];
+
+	for (let i = 0; i < fileReferences.length; i++) {
+		let reference = fileReferences[i];
+		if (reference.name === name) {
+			for (let l = 0; l < reference.locations.length; l++) {
+				let location = reference.locations[l];
+				if (location.range.contains(position))
+					return reference.locations;
+				else {
+					let d = distanceFromLocation(position, location);
+					if (d < closestDistance) {
+						closestDistance = d;
+						closestLocations = reference.locations;
+					}
+				}
+			}
 		}
 	}
 
-	return [];
+	return closestLocations;
+}
+
+
+function distanceFromLocation(position: vscode.Position, location: vscode.Location): number {
+	if (position.isBefore(location.range.start))
+		return (location.range.start.line - position.line) * 100 + location.range.start.character - position.character;
+	else
+		return (position.line - location.range.end.line) * 100 + position.character - location.range.end.character;
 }
 
 

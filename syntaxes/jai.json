@@ -1334,7 +1334,7 @@
         {
             "patterns":
             [
-                { "match": "\\b([a-zA-Z_]\\w*)((\\s*,\\s*[a-zA-Z_]\\w*)*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(:)",
+                { "match": "\\b([a-zA-Z_]\\w*)((\\s*,\\s*[a-zA-Z_]\\w*)*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type(,(isa|distinct))?)|[a-zA-Z_]\\w*))?\\s*(:)",
                     "captures":
                     {
                         "1":
@@ -1371,13 +1371,13 @@
                         {
                             "name": "keyword.other.directive.jai"
                         },
-                        "10":
+                        "12":
                         {
                             "name": "keyword.declaration.jai"
                         }
                     }
                 },
-                { "match": "\\b([a-zA-Z_]\\w*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(:)",
+                { "match": "\\b([a-zA-Z_]\\w*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type(,(isa|distinct))?)|[a-zA-Z_]\\w*))?\\s*(:)",
                     "captures":
                     {
                         "1":
@@ -1407,7 +1407,7 @@
                         {
                             "name": "keyword.other.directive.jai"
                         },
-                        "8":
+                        "10":
                         {
                             "name": "keyword.declaration.jai"
                         }
@@ -1486,7 +1486,7 @@
                         }
                     }
                 },
-                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))((\\s*,\\s*[a-zA-Z_]\\w*)*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(=)?",
+                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))((\\s*,\\s*[a-zA-Z_]\\w*)*)\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type(,(isa|distinct))?)|[a-zA-Z_]\\w*))?\\s*(=)?",
                     "captures":
                     {
                         "1":
@@ -1527,13 +1527,13 @@
                         {
                             "name": "keyword.other.directive.jai"
                         },
-                        "12":
+                        "14":
                         {
                             "name": "keyword.declaration.jai"
                         }
                     }
                 },
-                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type)|[a-zA-Z_]\\w*))?\\s*(=)?",
+                { "match": "\\b((it_index|it)|([a-zA-Z_]\\w*))\\s*(:)\\s*(\\[[^\\]]*\\])?\\s*((\\**)((#type(,(isa|distinct))?)|[a-zA-Z_]\\w*))?\\s*(=)?",
                     "captures":
                     {
                         "1":
@@ -1567,7 +1567,7 @@
                         {
                             "name": "keyword.other.directive.jai"
                         },
-                        "10":
+                        "12":
                         {
                             "name": "keyword.declaration.jai"
                         }
@@ -4392,7 +4392,7 @@
                     "match": "\\b(__default_allocator|get_current_workspace|memcpy|memcmp|memset|running_at_compile_time|debug_break|write_string|write_strings|write_number|write_nonnegative_number|c_style_strlen|array_copy|array_copy|array_free|array_reset|array_add|array_add|array_add|array_add_if_unique|array_insert_at|array_unordered_remove_by_value|array_unordered_remove_by_index|array_ordered_remove_by_value|array_ordered_remove_by_index|array_find|peek|peek_pointer|pop|array_free|array_reset|array_reset_keeping_memory|array_reserve|array_resize|array_resize|maybe_grow|init_range|check_alloc|check_free|check_realloc|add_allocation_to_table|allocations_before_this_call_will_not_be_considered_leaks|this_allocation_is_not_a_leak|report_memory_leaks|make_leak_report|log_leak_report|deinit|init|get_memory_hash|report_use_of_unknown_memory|report_already_freed_memory|find_or_pack_stack_trace|report_allocation_of_already_live_memory|check_for_allocator_mismatch|my_log_stack_trace|trim_displayed_trace_based_on_options|procedures_match|get_hash_from_stack_trace|group_summaries|summary_should_be_grouped|intersect_call_stacks|nodes_match|commas|formatInt|formatFloat|formatStruct|buffer_to_string_without_copy|get_s64_from_void_pointer|get_u64_from_void_pointer|print_u64_base_n|print_float|print_integer|print_character|print|print_single_byte_character|sprint|tprint|log|log_error|append_indentation|append_struct_info|append_relative_pointer_size|print_type_to_builder|print_item_to_builder|is_digit|parse_number|print_to_builder|print_sequence_to_builder|isFormatter|print_bytes|print_array|type_to_string|get_full_sized_string|check_null_formatter|to_string|to_string|to_string|to_string|to_c_string|c_style_strlen|to_upper|to_lower|is_alpha|is_digit|is_alnum|is_space|is_print|is_any|advance|advance|temp_c_string|copy_temporary_string|copy_string|string_to_float|string_to_float64|string_to_float_type_T|to_integer|string_to_int|eat_spaces|init_string_builder|free_buffers|reset|ensure_contiguous_space|append|append|append|builder_string_length|builder_to_string|write_builder|consume_u8_and_length|get_current_buffer|expand|string_to_float|string_to_float64|multiply_and_convert_to_float|MUL_96|NORMALIZE|clz64|clz32|INRANGE|HOLE|print_int_tests|print_int_hex_tests|print_float_tests|simple_string_tests|string_builder_tests)\\b"
                 },
                 { "name": "support.class.jai",
-                    "match": "\\b(Operating_System_Tag|Type_Info_Tag|Type_Info|Type_Info_Integer|Type_Info_Float|Type_Info_String|Type_Info_Pointer|Type_Info_Procedure|Type_Info_Struct|Type_Info_Struct_Member|Type_Info_Array|Type_Info_Enum|Any|Allocator|Allocator_Mode|Logger|Log_Info|Log_Level|Stack_Trace_Procedure_Info|Stack_Trace_Node|Context_Base|Temporary_Storage|Source_Code_Location|Source_Code_Range|Newstring|Array_View_64|Array_View_32|Array_View_16|Array_View_8|Resizable_Array|Procedure_To_Elide|Leak_Report_Options|Leak_Report|Leak_Summary|Group_Info|Allocation|Packed_Stack_Trace|Formatter|FormatInt|FormatFloat|FormatStruct|FormatArray|Print_Style|String_Builder)\\b"
+                    "match": "\\b(Operating_System_Tag|Type_Info_Tag|Type_Info|Type_Info_Integer|Type_Info_Float|Type_Info_String|Type_Info_Pointer|Type_Info_Procedure|Type_Info_Struct|Type_Info_Struct_Member|Type_Info_Array|Type_Info_Enum|Type_Info_Variant|Any|__reg|Allocator|Allocator_Mode|Logger|Log_Info|Log_Level|Stack_Trace_Procedure_Info|Stack_Trace_Node|Context_Base|Temporary_Storage|Source_Code_Location|Source_Code_Range|Procedure_With_Data|Newstring|Array_View_64|Array_View_32|Array_View_16|Array_View_8|Resizable_Array|Procedure_To_Elide|Leak_Report_Options|Leak_Report|Leak_Summary|Group_Info|Allocation|Packed_Stack_Trace|Formatter|FormatInt|FormatFloat|FormatStruct|FormatArray|Print_Style|String_Builder)\\b"
                 }
             ]
         }

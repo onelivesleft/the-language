@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.0.73] - 2021-09-29
+* Added `#type,isa`, `#type,distinct`
+* Fixed asm goto-definition help not working until after lazy-load of asm definitions
+
+## [0.0.72] - 2021-09-20
+* Made reference-find smarter when file is currently ill-formed.
+
 ## [0.0.71] - 2021-09-19
 * Lazily load asm completions once user is in an asm block.
 * Added #asm feature-set syntax

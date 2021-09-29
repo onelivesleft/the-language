@@ -189,12 +189,12 @@ check_valid_message :: (message: *Message) {
                 if needle {
                     print(sentinel);
                     needle_range := format_range(needle);
-                    print("%\n", needle_range);
+                    print("%|%\n", needle.name, needle_range);
                     ranges, _ := table_find(locations, needle);
                     for ranges {
                         range := format_range(it);
                         if range != needle_range
-                            print("%\n", range);
+                            print("|%\n", range);
                     }
                 }
 
@@ -202,11 +202,11 @@ check_valid_message :: (message: *Message) {
                 print(sentinel);
                 for ranges, needle: locations {
                     needle_range := format_range(needle);
-                    print("%\n", needle_range);
+                    print("%|%\n", needle.name, needle_range);
                     for ranges {
                         range := format_range(it);
                         if range != needle_range
-                            print("%\n", range);
+                            print("|%\n", range);
                     }
                     print("\n");
                 }

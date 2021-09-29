@@ -492,7 +492,7 @@ repository:
       3: name: keyword.declaration.enum.jai
   declarations:
     patterns:
-      - match: \b(NAME)((COMMA_NAME*))\s*(:)([SPACED-ARRAY])*((\**)((#type)|NAME))?\s*(:)
+      - match: \b(NAME)((COMMA_NAME*))\s*(:)([SPACED-ARRAY])*((\**)((#type(,(isa|distinct))?)|NAME))?\s*(:)
         captures:
           1: name: variable.other.constant.declaration.jai
           2:
@@ -505,8 +505,8 @@ repository:
           6: name: storage.type.jai
           7: name: keyword.operator.pointer.jai
           9: name: keyword.other.directive.jai
-          10: name: keyword.declaration.jai
-      - match: \b(NAME)\s*(:)([SPACED-ARRAY])*((\**)((#type)|NAME))?\s*(:)
+          12: name: keyword.declaration.jai
+      - match: \b(NAME)\s*(:)([SPACED-ARRAY])*((\**)((#type(,(isa|distinct))?)|NAME))?\s*(:)
         captures:
           1: name: variable.other.constant.declaration.jai
           2: name: keyword.declaration.jai
@@ -516,7 +516,7 @@ repository:
           4: name: storage.type.jai
           5: name: keyword.operator.pointer.jai
           7: name: keyword.other.directive.jai
-          8: name: keyword.declaration.jai
+          10: name: keyword.declaration.jai
       - match: \b((it_index|it)|(NAME))((COMMA_NAME*))\s*(:)\s*((struct)|(enum)|(enum_flags))\b\s*(NAME)?
         captures:
           1: name: variable.other.declaration.jai
@@ -538,7 +538,7 @@ repository:
           7: name: keyword.declaration.enum.jai
           8: name: keyword.declaration.enum.jai
           9: name: storage.type.jai
-      - match: \b((it_index|it)|(NAME))((COMMA_NAME*))\s*(:)([SPACED-ARRAY])*((\**)((#type)|NAME))?\s*(=)?
+      - match: \b((it_index|it)|(NAME))((COMMA_NAME*))\s*(:)([SPACED-ARRAY])*((\**)((#type(,(isa|distinct))?)|NAME))?\s*(=)?
         captures:
           1: name: variable.other.declaration.jai
           2: name: support.variable.jai
@@ -552,8 +552,8 @@ repository:
           8: name: storage.type.jai
           9: name: keyword.operator.pointer.jai
           11: name: keyword.other.directive.jai
-          12: name: keyword.declaration.jai
-      - match: \b((it_index|it)|(NAME))\s*(:)([SPACED-ARRAY])*((\**)((#type)|NAME))?\s*(=)?
+          14: name: keyword.declaration.jai
+      - match: \b((it_index|it)|(NAME))\s*(:)([SPACED-ARRAY])*((\**)((#type(,(isa|distinct))?)|NAME))?\s*(=)?
         captures:
           1: name: variable.other.declaration.jai
           2: name: support.variable.jai
@@ -564,7 +564,7 @@ repository:
           6: name: storage.type.jai
           7: name: keyword.operator.pointer.jai
           9: name: keyword.other.directive.jai
-          10: name: keyword.declaration.jai
+          12: name: keyword.declaration.jai
   composite-literals:
     patterns:
       - match: '\b(NAME)?\s*(\.)(\{)'

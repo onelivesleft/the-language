@@ -11,6 +11,7 @@ debug :: false;
 
 // @TODO
 // [ ] Goto next error
+// [ ] Add check on upload.bat the changelog version matches package version and is valid
 
 // Language Server
 // [ ] What to do when program is not well formed?
@@ -28,6 +29,7 @@ debug :: false;
 // [ ] FoldingRangeProvider
 
 // Misc
+// [ ] Change asm help triggering on F12 to something else (context help?) - on F12 it also trigger on ctrl+mouseover
 // [ ] Maybe refine asm completions based on features specified
 // [ ] Show current proc in status bar
 // [ ] Show status in status bar (error state / has reference cache)
@@ -37,10 +39,10 @@ debug :: false;
 // [ ] setup tasks.json for module
 // [ ] whitespace before MD inner backticks behaves a bit weird
 // [ ] markdown codeblock
-// [ ] #expand after returns (syntax hghlight)
-// [ ] rework all parentheses to begin and end correctly
+// [ ] rework all parentheses to begin and end correctly (will fix comments with () in them not highlighting correctly after procedure calls)
 // [.] `#code,null`
 // [.] generate @tag comment grammar
+// [x] #expand after returns (syntax hghlight)
 // [x] Generate `support.function.jai` by scraping Preload et al
 // [x] Generate #deprecated pattern by searching procs in jai folder
 // [x] fix `number, is_number, leading_zero, c := read_int(format, c);` not marking first two vars as decl
@@ -64,7 +66,12 @@ Language :: struct {
 
 
 json : String_Builder;
-out :: #bake_arguments print_to_builder(builder = *json);
+//out :: #bake_arguments print_to_builder(builder = *json);
+
+out :: (format_string : string, args: .. Any) -> bool {
+    return print_to_builder(*json, format_string, .. args);
+}
+
 
 tab :: (depth: int) #expand {
     for 0..depth  out("    ");
