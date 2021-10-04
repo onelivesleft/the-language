@@ -28,6 +28,9 @@ mode : enum { SINGLE_REFERENCE; ALL_REFERENCES; };
 #run {
     #if debug  print("DEBUG ENABLED\n");
 
+    compiler_version : Version_Info = ---;
+    compiler_get_version_info(*compiler_version);
+
     args := compiler_get_command_line_arguments();
     if !args {
         print(help_text);
@@ -86,10 +89,11 @@ mode : enum { SINGLE_REFERENCE; ALL_REFERENCES; };
 
     build_options := get_build_options(workspace);
     build_options.output_type = .NO_OUTPUT;
-    build_options.emit_debug_info = .NONE;
-    enable_feature(*build_options.machine_options.x86_features.leaves, x86_Feature_Flag.AVX);
-    enable_feature(*build_options.machine_options.x86_features.leaves, x86_Feature_Flag.AVX2);
-
+    {
+        using compiler_version;
+        if !(major == 0 && minor == 0 && micro >= 84) // @TODO @Urgent set max when compiler fixed
+            build_options.emit_debug_info = .NONE;
+    }
 
     // @TODO make correct when Jai has a std lib way of finding this
     #if OS == .WINDOWS {
@@ -104,8 +108,6 @@ mode : enum { SINGLE_REFERENCE; ALL_REFERENCES; };
     chk := check_message;
     build_options.user_data_u64 = xx *chk;
     set_build_options(build_options, workspace);
-
-    init(*locations);
 
     compiler_begin_intercept(workspace);
 

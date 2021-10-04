@@ -1,17 +1,23 @@
 # Change Log
 
+## [0.0.77] - 2021-10-04
+* Errors & Warnings are now reported to Problems panel.
+* `jai.exe` call is now logged in full as a string when `Debug Mode` is enabled, for easy copypasting.
+* Fixed missing deprecated procedures.
+* Added FoldingRange provider.
+
 ## [0.0.76] - 2021-09-29
-* Added `#bake_constants`
+* Added `#bake_constants`.
 
 ## [0.0.75] - 2021-09-29
-* Added `#this`
+* Added `#this`.
 
 ## [0.0.74] - 2021-09-29
-* Actually added `#type,isa`, `#type,distinct`
+* Actually added `#type,isa`, `#type,distinct`.
 
 ## [0.0.73] - 2021-09-29
-* Added `#type,isa`, `#type,distinct`
-* Fixed asm goto-definition help not working until after lazy-load of asm definitions
+* Added `#type,isa`, `#type,distinct`.
+* Fixed asm goto-definition help not working until after lazy-load of asm definitions.
 
 ## [0.0.72] - 2021-09-20
 * Made reference-find smarter when file is currently ill-formed.

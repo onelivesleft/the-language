@@ -6,15 +6,20 @@ heap :: #import "Strings_Alloc";
 temp :: #import "Strings_Alloc"(__temporary_allocator);
 
 #load "languages.jai";
+#load "yaml_snippets.jai";
 
 debug :: false;
 
 // @TODO
-// [ ] Goto next error
-// [ ] Add check on upload.bat the changelog version matches package version and is valid
+// [x] Fix error diagnostics so that errors always show, along with multiple warnings
+// [x] Expand error diagnostics to include addtional locations (wrong split struct example)
+// [x] Fix deprecated scrape (for two-line deprecations?)
+// [x] Add check on upload.bat the changelog version matches package version and is valid
+// [x] Goto next error
 
 // Language Server
-// [ ] What to do when program is not well formed?
+// [ ] FoldingRangeProvider
+// [.] What to do when program is not well formed?
 // [x] Projects, build files, etc.
 // [x] Finds idents in libraries as well as in project
 
@@ -26,7 +31,6 @@ debug :: false;
 // [ ] DocumentHighlightProvider
 // [ ] DocumentSymbolProvider
 // [ ] DocumentLinkProvider
-// [ ] FoldingRangeProvider
 
 // Misc
 // [ ] Change asm help triggering on F12 to something else (context help?) - on F12 it also trigger on ctrl+mouseover
@@ -39,7 +43,7 @@ debug :: false;
 // [ ] setup tasks.json for module
 // [ ] whitespace before MD inner backticks behaves a bit weird
 // [ ] markdown codeblock
-// [ ] rework all parentheses to begin and end correctly (will fix comments with () in them not highlighting correctly after procedure calls)
+// [ ] rework all parentheses to begin and end correctly (will fix comments with () in them not highlighting correctly after procedure calls and namespaced deprated functions)
 // [.] `#code,null`
 // [.] generate @tag comment grammar
 // [x] #expand after returns (syntax hghlight)
@@ -57,13 +61,11 @@ in_file           :: "jai.yaml";
 out_file          :: "../syntaxes/jai.json";
 languages_ts_file :: "./languages.ts";
 
-
 Language :: struct {
     id      : string;
     source  : string;
     pattern : string;
 }
-
 
 json : String_Builder;
 //out :: #bake_arguments print_to_builder(builder = *json);
@@ -209,7 +211,7 @@ main :: () {
                 while check < replacements.count && replacements[check].from.count == from.count {
                     if replacements[check].from == from {
                         print("Duplicate variable label on line %\n", line_number);
-                        exit(1);
+                        exit(2);
                     }
                     check += 1;
                 }
@@ -258,7 +260,7 @@ main :: () {
         if spaces >= row.count  continue;
         if spaces % 2 {
             print("Irregular tab indent on line %\n", line_number);
-            exit(1);
+            exit(3);
         }
         depth = spaces / 2;
 
@@ -272,7 +274,7 @@ main :: () {
         if peek_stack() == .UNKNOWN {
             if depth <= previous_depth {
                 print("Expected indent on line %\n", line_number);
-                exit(1);
+                exit(4);
             }
 
             tab(previous_depth);
@@ -296,7 +298,7 @@ main :: () {
         else if depth > previous_depth && previous_depth >= 0 {
             if peek_stack() != .LIST {
                 print("Unexpected indent on line %\n", line_number);
-                exit(1);
+                exit(5);
             }
             out(",\n");
             push_stack(.DICT);
@@ -387,7 +389,7 @@ parse_row :: (row_data: string) -> key: string, value: string, is_list_entry: bo
     colon := first_index(row, #char ":");
     if colon == -1 {
         print("Missing ':' on line %\n", line_number);
-        exit(1);
+        exit(6);
     }
 
     key := slice(row, 0, colon);
@@ -476,6 +478,8 @@ scrape_modules_folder :: () {
 
         prev := "";
         for line_split(data) {
+            defer prev = it;
+
             index, found := first_index(it, "#deprecated");
             if !found  continue;
 
@@ -499,137 +503,3 @@ scrape_modules_folder :: () {
     support_class_names  = heap.join(support_classes, #char "|");
     deprecated_names = heap.join(deprecated_procs, #char "|");
 }
-
-
-
-
-// @Note bare-bones YAML parsing, so 2-space indents only!
-
-markdown_block_comments_header :: #string ___yaml
-  markdown-block-comments:
-    name: meta.embedded.block.markdown
-    begin: (\s*\/\*\*)
-    end: (\s*\*\/)
-    beginCaptures:
-      1:
-        name: punctuation.definition.comment.jai
-    endCaptures:
-      1:
-        name: punctuation.definition.comment.jai
-    patterns:
-      - include: '#block-comments'
-___yaml
-
-markdown_block_comments_language :: #string yaml
-      - begin: ((?i)```%1)
-        end: (```)
-        beginCaptures:
-          1:
-            name: markup.quote.code.comment.%2.jai
-        endCaptures:
-          1:
-            name: markup.quote.code.comment.%2.jai
-        patterns:
-          - include: %3
-yaml
-
-markdown_block_comments_footer :: #string yaml
-      - begin: (```)
-        end: (```)
-        beginCaptures:
-          1:
-            name: markup.quote.code.comment.jai
-        endCaptures:
-          1:
-            name: markup.quote.code.comment.jai
-        patterns:
-          - include: source.jai
-      - contentName: meta.embedded.block.markdown
-        include: text.html.markdown
-yaml
-
-
-strings_header :: #string ___yaml
-  strings:
-    patterns:
-      - name: string.quoted.double.empty.jai
-        match: (")(")
-        captures:
-          1:
-            name: punctuation.definition.string.empty.begin.jai
-          2:
-            name: punctuation.definition.string.empty.end.jai
-      - name: string.quoted.double.jai
-        begin: (")
-        end: ("|$)
-        beginCaptures:
-          1:
-            name: punctuation.definition.string.begin.jai
-        endCaptures:
-          1:
-            name: punctuation.definition.string.end.jai
-        patterns:
-          - name: constant.character.escape.jai
-            match: \\.
-          - name: constant.other.placeholder.jai
-            match: %[0-9]+
-          - match: (%)%
-            captures:
-              '1':
-                name: constant.character.escape.jai
-          - name: constant.other.placeholder.jai
-            match: %
-___yaml
-
-strings_language :: #string ___yaml
-      - name: string.here.embed.%2.jai
-        begin: (#string)\s+((?i)([A-Za-z_]\w*)?(%1))\b
-        end: \s*(\3)(\4)
-        beginCaptures:
-          1:
-            name: keyword.other.directive.string.%2.jai
-          2:
-            name: constant.other.stringdelimiter.here.embed.%2.jai
-          4:
-            name: constant.other.stringdelimiter.here.embed.language.%2.jai
-        endCaptures:
-          1:
-            name: constant.other.stringdelimiter.here.embed.%2.jai
-          2:
-            name: constant.other.stringdelimiter.here.embed.language.%2.jai
-        contentName: string.unquoted.here.embed.%2.jai
-        patterns:
-          - include: %3
-___yaml
-
-strings_footer :: #string ___yaml
-      - name: string.here.jai
-        begin: (#string)\s+([A-Za-z_]\w*)
-        end: \s*(\2)
-        beginCaptures:
-          1:
-            name: keyword.other.directive.string.jai
-          2:
-            name: constant.other.stringdelimiter.here.jai
-        endCaptures:
-          1:
-            name: constant.other.stringdelimiter.here.jai
-        contentName: string.unquoted.here.jai
-___yaml
-
-deprecated_names_insert :: #string __yaml
-  deprecated-names:
-    name: invalid.deprecated.jai
-    match: \b(%)\b
-__yaml
-
-support_names_insert :: #string __yaml
-  support:
-    patterns:
-      - name: support.function.jai
-        match: \b(align_of|type_of|size_of|type_info|initializer_of)\b
-      - name: support.function.jai
-        match: \b(%)\b
-      - name: support.class.jai
-        match: \b(%)\b
-__yaml

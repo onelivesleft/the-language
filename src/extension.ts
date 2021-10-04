@@ -2,77 +2,94 @@
 /* eslint-disable curly */
 
 
-import * as vscode from 'vscode';
+import {Selection, Range, DocumentFilter, CompletionItem, Location, Position, ProviderResult, FoldingRangeKind} from 'vscode';
+import {ExtensionContext, languages, workspace, window, extensions, CompletionItemKind} from 'vscode';
+import {Uri, Diagnostic, DiagnosticSeverity, DiagnosticRelatedInformation, TextEditorDecorationType} from 'vscode';
+import {TextEditor, DecorationOptions, CompletionItemProvider, TextDocument, CancellationToken} from 'vscode';
+import {CompletionContext, FoldingRangeProvider, ReferenceProvider, FoldingRange} from 'vscode';
+import {DefinitionProvider, Definition, DefinitionLink, env, RenameProvider, WorkspaceEdit} from 'vscode';
 import proc = require('child_process');
 import path = require('path');
 import fs = require('fs');
 import { start } from 'repl';
 
-import { languages } from "./languages";
+import { supportedLanguages } from "./languages";
 import { resourceLimits } from 'worker_threads';
 import { triggerAsyncId } from 'async_hooks';
 import { debug } from 'console';
+import { inflate } from 'zlib';
+import { resolve } from 'dns';
 
-const SELECTOR: vscode.DocumentFilter = { language: 'jai', scheme: 'file' };
+const SELECTOR: DocumentFilter = { language: 'jai', scheme: 'file' };
 
 let editTimeout: NodeJS.Timer | undefined = undefined;
 let saveTimeout: NodeJS.Timer | undefined = undefined;
-let selections: Array<vscode.Selection> = [];
-let decorationRanges: vscode.Range [] = [];
+let selections: Array<Selection> = [];
+let decorationRanges: Range [] = [];
 let selectionsIntersectDecoration = false;
 let sentinel = "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
-let asmRanges: vscode.Range [] = [];
-let asmCompletions: vscode.CompletionItem[] = [];
+let asmRanges: Range [] = [];
+let asmCompletions: CompletionItem [] = [];
 let asmURLs: { [id: string] : string; } = {};
+let foldingRanges: FoldingRange [] = [];
 
 interface Reference {
 	name: string;
-	locations: vscode.Location [];
+	locations: Location [];
 }
 let referenceByFilepath : { [id: string] : Reference []} = {};
 let foundSomeReferences = false;
 
+let errorProblemMatcher = /(([a-zA-Z]:)?[^:]*):(\d+),(\d+):\s+(Error):\s+([^\n]*)/;
+let warningProblemMatcher = /(([a-zA-Z]:)?[^:]*):(\d+),(\d+):\s+(Warning):\s+([^\n]*)/;
+let infoProblemMatcherWindows = /(.*?)(\(?([a-zA-Z]:[^\\:*?"<>|\t\n\r]+):(\d+)(,(\d+))?\)?)(.*)/;
+let infoProblemMatcherLinux = /(.*?)(\(?(\/[^\\:*?"<>|\t\n\r]+):(\d+)(,(\d+))?\)?)(.*)/;
+let infoProblemMatcher : RegExp;
+let diagnosticCollection = languages.createDiagnosticCollection();
 
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: ExtensionContext) {
 	updateConfig();
 
-	context.subscriptions.push(vscode.languages.registerReferenceProvider(SELECTOR, new JaiReferenceProvider()));
-	context.subscriptions.push(vscode.languages.registerDefinitionProvider(SELECTOR, new JaiDefinitionProvider()));
-	context.subscriptions.push(vscode.languages.registerRenameProvider(SELECTOR, new JaiRenameProvider()));
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(SELECTOR, new JaiCompletionItemProvider()));
+	infoProblemMatcher = path.sep === "\\" ? infoProblemMatcherWindows : infoProblemMatcherLinux;
+
+	context.subscriptions.push(languages.registerReferenceProvider(SELECTOR, new JaiReferenceProvider()));
+	context.subscriptions.push(languages.registerDefinitionProvider(SELECTOR, new JaiDefinitionProvider()));
+	context.subscriptions.push(languages.registerRenameProvider(SELECTOR, new JaiRenameProvider()));
+	context.subscriptions.push(languages.registerCompletionItemProvider(SELECTOR, new JaiCompletionItemProvider()));
+	context.subscriptions.push(languages.registerFoldingRangeProvider(SELECTOR, new JaiFoldingRangeProvider()));
 
 	if (activeEditor) {
 		triggerUpdateDecorations();
 		triggerUpdateReferences(activeEditor.document.fileName);
 	}
 
-	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
+	context.subscriptions.push(workspace.onDidChangeConfiguration(e => {
 		updateConfig();
 	}));
 
-	vscode.workspace.onDidOpenTextDocument(event => {
+	workspace.onDidOpenTextDocument(event => {
 		triggerUpdateReferences(event.fileName);
 	}, null, context.subscriptions);
 
-	vscode.workspace.onDidSaveTextDocument(event => {
+	workspace.onDidSaveTextDocument(event => {
 		triggerUpdateReferences(event.fileName);
 	}, null, context.subscriptions);
 
-	vscode.window.onDidChangeActiveTextEditor(editor => {
+	window.onDidChangeActiveTextEditor(editor => {
 		activeEditor = editor;
 		if (editor) {
 			updateSelectionAndDecorations();
 		}
 	}, null, context.subscriptions);
 
-	vscode.workspace.onDidChangeTextDocument(event => {
+	workspace.onDidChangeTextDocument(event => {
 		if (activeEditor && event.document === activeEditor.document) {
 			triggerUpdateDecorations();
 		}
 	}, null, context.subscriptions);
 
-	vscode.window.onDidChangeTextEditorSelection(event => {
+	window.onDidChangeTextEditorSelection(event => {
 		if (activeEditor === event.textEditor) {
 			selections = [];
 			for(let i = 0; i < event.selections.length; i++)
@@ -99,10 +116,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
-function loadAsmCompletions(): vscode.CompletionItem[] {
-	let items: vscode.CompletionItem[] = [];
+function loadAsmCompletions(): CompletionItem[] {
+	let items: CompletionItem[] = [];
 
-	let extension = vscode.extensions.getExtension("onelivesleft.the-language");
+	let extension = extensions.getExtension("onelivesleft.the-language");
 	if (extension === undefined) return items;
 	let modulepath = path.sep === "\\"
 		? path.join(extension.extensionPath, extension.extensionPath.toLowerCase().startsWith("c:\\repos") ? "src" : "out").replace(/\//, '\\')
@@ -122,7 +139,7 @@ function loadAsmCompletions(): vscode.CompletionItem[] {
 		if (!detail) detail = first_doc_line;
 		name += detail;
 
-		let item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Keyword);
+		let item = new CompletionItem(name, CompletionItemKind.Keyword);
 		item.insertText = completion;
 
 		// A human-readable string with additional information
@@ -162,6 +179,17 @@ function loadAsmCompletions(): vscode.CompletionItem[] {
 function triggerUpdateReferences(filepath: string) {
 	if (!filepath.endsWith(".jai")) return;
 
+	let uri = Uri.file(filepath);
+	for (let i = 0; i < workspace.textDocuments.length; i++) {
+		let document = workspace.textDocuments[i];
+		if (document.uri.path === uri.path) {
+			if (!document.getText().match(/^\s*main\s+::/gm)) {
+				if (debugMode) console.log("No main in " + filepath);
+				return;
+			}
+		}
+	}
+
 	if (saveTimeout) {
 		clearTimeout(saveTimeout);
 		saveTimeout = undefined;
@@ -192,17 +220,20 @@ function updateReferences(filepath: string) {
 	if (debugMode) console.log("Running reference update...");
 
 	jaiDump(filepath).then(output => {
-		if (output === undefined || output === "") {
+		if (output === undefined || output[0] === "") {
 			currentlyRunningReferenceUpdate = false;
 			if (debugMode) console.log("Reference update complete.");
 			if (debugMode) console.log("No output");
 			return;
 		}
 
+		let referenceOutput = output[0];
+		let errorOutput = output[1];
+
 		referenceByFilepath = {};
 		foundSomeReferences = false;
 		let result : Reference = { name: "", locations: []};
-		for (let row of output.split("\n")) {
+		for (let row of referenceOutput.split("\n")) {
 			if (!row.trim()) {
 				if (result.locations.length) {
 					foundSomeReferences = true;
@@ -225,14 +256,14 @@ function updateReferences(filepath: string) {
 			}
 			let items = row.split("|");
 			if (items[0]) result.name = items[0];
-			let uri = vscode.Uri.file(items[1]);
-			let startPosition = new vscode.Position(parseInt(items[2]) - 1, parseInt(items[3]) - 1);
+			let uri = Uri.file(items[1]);
+			let startPosition = new Position(parseInt(items[2]) - 1, parseInt(items[3]) - 1);
 			let endRow = parseInt(items[4]) - 1;
 			let endCol = parseInt(items[5]) - 1;
 			if (endRow < 0) endRow = startPosition.line;
 			if (endCol < 0) endCol = startPosition.character + 1;
-			let endPosition = new vscode.Position(endRow, endCol);
-			let location = new vscode.Location(uri, new vscode.Range(startPosition, endPosition));
+			let endPosition = new Position(endRow, endCol);
+			let location = new Location(uri, new Range(startPosition, endPosition));
 			result.locations.push(location);
 		}
 
@@ -255,12 +286,80 @@ function updateReferences(filepath: string) {
 
 		if (debugMode) console.log("Reference update complete.");
 		if (debugMode) console.log(foundSomeReferences);
+
+		let match = errorOutput.match(warningProblemMatcher);
+		if (match) {
+			let diagnostics : Array<[Uri, Diagnostic[] | undefined]> = [];
+			while (match) {
+				let filename = match[1];
+				let position = new Position(parseInt(match[3]) - 1, parseInt(match[4]) - 1);
+				let message = match[6];
+				let tail = match[7];
+				diagnostics.push([Uri.file(filename), [new Diagnostic(new Range(position, position), message, DiagnosticSeverity.Warning)]]);
+				if (match.index !== undefined) {
+					errorOutput = errorOutput.substring(match.index + match[0].length);
+					match = errorOutput.match(warningProblemMatcher);
+				}
+				else {
+					match = null;
+				}
+			}
+			diagnosticCollection.set(diagnostics);
+		}
+		else {
+			diagnosticCollection.clear();
+		}
+
 		currentlyRunningReferenceUpdate = false;
 	}).catch(output => {
 		if (debugMode) {
-			console.log("Failed to get references from jai compiler (probably because the code did not compile)");
 			console.log("Compiler output:\n" + output);
 		}
+
+		let text = output as string;
+		let match = text.match(errorProblemMatcher);
+		if (match) {
+			let filename = match[1];
+			let diagnosticUri = Uri.file(filename);
+			let position = new Position(parseInt(match[3]) - 1, parseInt(match[4]) - 1);
+			let message = match[6];
+			let diagnostic = [new Diagnostic(new Range(position, position), message, DiagnosticSeverity.Error)];
+			let related : DiagnosticRelatedInformation [] = [];
+			if (match.index !== undefined) {
+				let tail = text.substring(match.index + match[0].length);
+				match = tail.match(infoProblemMatcher);
+				if (match && match.index !== undefined) {
+					while (match && match.index !== undefined) {
+						console.log(match);
+						let startIndex = match.index;
+						filename = match[3];
+						if (match[6])
+							position = new Position(parseInt(match[4]) - 1, parseInt(match[6]) - 1);
+						else
+							position = new Position(parseInt(match[4]) - 1, 0);
+						let offset = match.index + match[0].length;
+						let locationString = match[2];
+						let remainder = tail.substring(offset);
+						match = remainder.match(infoProblemMatcher);
+						let endIndex : number;
+						if (match && match.index !== undefined)
+							endIndex = match.index + offset;
+						else
+							endIndex = tail.length;
+						message = tail.substring(startIndex, endIndex).replace(locationString, "");
+						related.push(new DiagnosticRelatedInformation(new Location(Uri.file(filename), position), message));
+						tail = remainder;
+					}
+					diagnostic[0].relatedInformation = related;
+				}
+			}
+			diagnosticCollection.set(diagnosticUri, diagnostic);
+		}
+		else {
+			diagnosticCollection.clear();
+			console.log("Failed to parse jai error:" + output);
+		}
+
 		currentlyRunningReferenceUpdate = false;
 	});
 }
@@ -275,7 +374,7 @@ function triggerUpdateDecorations() {
 	editTimeout = setTimeout(updateSelectionAndDecorations, 500);
 }
 
-let activeEditor = vscode.window.activeTextEditor;
+let activeEditor = window.activeTextEditor;
 
 
 function updateSelectionAndDecorations() {
@@ -298,8 +397,8 @@ function updateDecorations() {
 }
 
 
-function makeDecoration(color: string): vscode.TextEditorDecorationType {
-	return vscode.window.createTextEditorDecorationType({
+function makeDecoration(color: string): TextEditorDecorationType {
+	return window.createTextEditorDecorationType({
 		backgroundColor: color,
 		isWholeLine: true,
 	});
@@ -319,11 +418,11 @@ let projectCompilerArgs : string[] = [];
 let embedColorsConfig: EmbedLanguageColor[] | undefined;
 let embedColors: { [language: string] : string};
 let defaultEmbedColor = "#222222";
-let embedDecorations: { [color: string] : vscode.TextEditorDecorationType } = {};
+let embedDecorations: { [color: string] : TextEditorDecorationType } = {};
 
 
 function updateConfig() {
-	let config = vscode.workspace.getConfiguration('the-language');
+	let config = workspace.getConfiguration('the-language');
 	decorateEmbeds = config.get("decorateEmbeds");
 	if (decorateEmbeds === undefined) decorateEmbeds = true;
 
@@ -386,7 +485,7 @@ function argsFromString(args: string): string [] {
 }
 
 
-function areIntersecting(rangesA: vscode.Range [], rangesB: vscode.Range []): boolean {
+function areIntersecting(rangesA: Range [], rangesB: Range []): boolean {
 	if (rangesA === undefined || rangesB === undefined) return false;
 
 	for (let i = 0; i < rangesA.length; i++) {
@@ -401,9 +500,9 @@ function areIntersecting(rangesA: vscode.Range [], rangesB: vscode.Range []): bo
 }
 
 
-function subtract(range: vscode.Range, sorted_subtractors: vscode.Range []): [vscode.Range [], boolean] {
-	let result: vscode.Range [] = [];
-	let remainder: vscode.Range | undefined;
+function subtract(range: Range, sorted_subtractors: Range []): [Range [], boolean] {
+	let result: Range [] = [];
+	let remainder: Range | undefined;
 	remainder = range;
 	let changed = false;
 
@@ -420,19 +519,19 @@ function subtract(range: vscode.Range, sorted_subtractors: vscode.Range []): [vs
 			}
 			else {
 				changed = true;
-				remainder = new vscode.Range(to_remove.end, remainder.end);
+				remainder = new Range(to_remove.end, remainder.end);
 			}
 		}
 		else if (to_remove.end.isAfterOrEqual(remainder.end)) {
 			changed = true;
-			result.push(new vscode.Range(remainder.start, to_remove.start));
+			result.push(new Range(remainder.start, to_remove.start));
 			remainder = undefined;
 			break;
 		}
 		else { // to_subtract is strictly within range
 			changed = true;
-			result.push(new vscode.Range(remainder.start, to_remove.start));
-			remainder = new vscode.Range(to_remove.end, remainder.end);
+			result.push(new Range(remainder.start, to_remove.start));
+			remainder = new Range(to_remove.end, remainder.end);
 		}
 	}
 
@@ -443,7 +542,11 @@ function subtract(range: vscode.Range, sorted_subtractors: vscode.Range []): [vs
 }
 
 
-function decorate(editor: vscode.TextEditor) {
+enum FoldType {
+	Import, Comment, Block
+}
+
+function decorate(editor: TextEditor) {
 	if (!decorateEmbeds) {
 		for (let color in embedDecorations) {
 			editor.setDecorations(embedDecorations[color], []);
@@ -453,9 +556,10 @@ function decorate(editor: vscode.TextEditor) {
 
 	let sourceCode = editor.document.getText();
 	let hereString = /#string\s+([a-zA-Z_]\w*)\s*$/;
+	let blockComment = /^\s*\/\*/;
 	let docComment = /^\s*\/\*\*/;
 
-	let decorationsArrays: { [color: string] : vscode.DecorationOptions[] } = {};
+	let decorationsArrays: { [color: string] : DecorationOptions[] } = {};
 
 	const sourceCodeArr = sourceCode.split('\n');
 
@@ -463,24 +567,60 @@ function decorate(editor: vscode.TextEditor) {
 	let decorationColor = defaultEmbedColor;
 	let startLine = 0;
 	let insideDocComment = false;
+	let insideBlockComment = false;
+	let commentDepth = 0;
 	decorationRanges = [];
+	foldingRanges = [];
+
+	let regionStart = -1;
+	let importStart = -1;
+	let commentStart = -1;
+	let blockStart = -1;
+	let parenStart = -1;
 
 	selectionsIntersectDecoration = false;
+	let trimmedLineText : string = "";
 
 	for (let line = 0; line < sourceCodeArr.length; line++) {
+		let lineText = sourceCodeArr[line];
+		let prevLineWasEmpty = trimmedLineText === "";
+		trimmedLineText = lineText.trim();
 		if (endToken !== undefined) {
-			let match = sourceCodeArr[line].match(endToken);
+			if (insideBlockComment || insideDocComment) {
+				if (lineText.indexOf("/*") >= 0)
+					commentDepth++;
+			}
 
+			let match = lineText.match(endToken);
 			if (match !== null || line === sourceCodeArr.length - 1) {
+				const eol = 99999;
+
+				let endLine = (insideBlockComment || insideDocComment) ? line : line - 1;
+
+				if (insideBlockComment) {
+					commentDepth--;
+					if (commentDepth > 0) continue;
+					foldingRanges.push(new FoldingRange(startLine, endLine, FoldingRangeKind.Comment));
+				}
+				else if (insideDocComment) {
+					commentDepth--;
+					if (commentDepth > 0) continue;
+					foldingRanges.push(new FoldingRange(startLine, endLine, FoldingRangeKind.Comment));
+				}
+				else { // herestring
+					foldingRanges.push(new FoldingRange(startLine, endLine));
+				}
+
 				endToken = undefined;
 
-				const eol = 99999;
-				let endLine = insideDocComment ? line : line - 1;
+				if (insideBlockComment) {
+					insideBlockComment = false;
+					continue;
+				}
 
-
-				let range = new vscode.Range(
-					new vscode.Position(startLine, 0),
-					new vscode.Position(endLine, eol)
+				let range = new Range(
+					new Position(startLine, 0),
+					new Position(endLine, eol)
 				);
 				decorationRanges.push(range);
 
@@ -494,16 +634,16 @@ function decorate(editor: vscode.TextEditor) {
 					range = applicableRanges[i];
 					if (range.start.character !== 0) {
 						if (range.start.line + 1 > range.end.line) continue;
-						range = new vscode.Range(
-							new vscode.Position(range.start.line + 1, 0),
+						range = new Range(
+							new Position(range.start.line + 1, 0),
 							range.end
 						);
 					}
 					if (range.end.character !== eol) {
 						if (range.end.line - 1 < range.start.line) continue;
-						range = new vscode.Range(
+						range = new Range(
 							range.start,
-							new vscode.Position(range.end.line - 1, eol),
+							new Position(range.end.line - 1, eol),
 						);
 					}
 
@@ -513,12 +653,94 @@ function decorate(editor: vscode.TextEditor) {
 			}
 		}
 		else {
-			let match = sourceCodeArr[line].match(hereString);
+			let handled = false;
+
+			if (!insideDocComment && !insideBlockComment) {
+				if (trimmedLineText.startsWith("#scope_")) {
+					if (regionStart >= 0)
+						foldingRanges.push(new FoldingRange(regionStart, line - 1, FoldingRangeKind.Region));
+					regionStart = line;
+					handled = true;
+				}
+
+				if (importStart >= 0) {
+					if (trimmedLineText.indexOf("#import") === -1
+					&& trimmedLineText.indexOf("#load") === -1
+					&&  trimmedLineText !== "") {
+						let lineIndex = line - 1;
+						if (prevLineWasEmpty) lineIndex--;
+						if (lineIndex > importStart)
+							foldingRanges.push(new FoldingRange(importStart, lineIndex, FoldingRangeKind.Imports));
+						importStart = -1;
+					}
+				}
+				else if (trimmedLineText.indexOf("#import") >= 0
+					|| trimmedLineText.indexOf("#load") >= 0) {
+					importStart = line;
+					handled = true;
+				}
+
+				if (commentStart >= 0) {
+					if (!trimmedLineText.startsWith("//")
+					&&  trimmedLineText !== "") {
+						let lineIndex = line - 1;
+						if (prevLineWasEmpty) lineIndex--;
+						if (lineIndex > commentStart)
+							foldingRanges.push(new FoldingRange(commentStart, lineIndex, FoldingRangeKind.Comment));
+						commentStart = -1;
+					}
+				}
+				else if (trimmedLineText.startsWith("//")) {
+					commentStart = line;
+					handled = true;
+				}
+
+				if (blockStart >= 0) {
+					if (lineText.startsWith("}")) {
+						if (line > blockStart + 1)
+							foldingRanges.push(new FoldingRange(blockStart, line));
+						blockStart = -1;
+					}
+				}
+				else if (!lineText.startsWith(" ") && trimmedLineText.endsWith("{")) {
+					blockStart = line;
+					handled = true;
+				}
+
+				if (parenStart >= 0) {
+					if (lineText.startsWith(")")) {
+						if (line > parenStart + 1)
+							foldingRanges.push(new FoldingRange(parenStart, line));
+						parenStart = -1;
+					}
+				}
+				else if (!lineText.startsWith(" ") && trimmedLineText.endsWith("(")) {
+					parenStart = line;
+					handled = true;
+				}
+			}
+
+			if (handled) continue;
+
+			let match = lineText.match(hereString);
 			let isHereString = true;
 
-			if (match === null || match.index === undefined) {
-				match = sourceCodeArr[line].match(docComment);
+			if ((match === null || match.index === undefined) && !trimmedLineText.endsWith("*/")) {
+				match = lineText.match(docComment);
 				isHereString = false;
+
+				if (match === null || match.index === undefined) {
+					match = lineText.match(blockComment);
+					if (match && match.index !== undefined) {
+						startLine = line;
+						insideBlockComment = true;
+						insideDocComment = false;
+						commentDepth = 1;
+						isHereString = false;
+						endToken = "\\*\\/";
+						continue;
+					}
+				}
 			}
 
 			if (match !== null && match.index !== undefined) {
@@ -532,14 +754,15 @@ function decorate(editor: vscode.TextEditor) {
 				else {
 					startLine = line;
 					insideDocComment = true;
+					commentDepth = 1;
 					matchedLanguage = "md";
 					endToken = "\\*\\/";
 				}
 
 				decorationColor = defaultEmbedColor;
-				for (let i = 0; i < languages.length; i++) {
-					let language = languages[i][0] as string;
-					let pattern  = languages[i][1] as RegExp;
+				for (let i = 0; i < supportedLanguages.length; i++) {
+					let language = supportedLanguages[i][0] as string;
+					let pattern  = supportedLanguages[i][1] as RegExp;
 					if (matchedLanguage.match(pattern))
 					{
 						if (language in embedColors)
@@ -550,6 +773,25 @@ function decorate(editor: vscode.TextEditor) {
 			}
 		}
 	}
+
+	let lastLine = sourceCodeArr.length - 1;
+	if (sourceCodeArr[lastLine].trim() === "")
+		lastLine--;
+
+	if (regionStart >= 0 && regionStart < lastLine)
+		foldingRanges.push(new FoldingRange(regionStart, lastLine, FoldingRangeKind.Region));
+
+	if (importStart >= 0 && importStart < lastLine)
+		foldingRanges.push(new FoldingRange(importStart, lastLine, FoldingRangeKind.Imports));
+
+	if (commentStart >= 0 && commentStart < lastLine)
+		foldingRanges.push(new FoldingRange(commentStart, lastLine, FoldingRangeKind.Comment));
+
+	if (blockStart >= 0 && blockStart < lastLine)
+		foldingRanges.push(new FoldingRange(blockStart, lastLine));
+
+	if (parenStart >= 0 && parenStart < lastLine)
+		foldingRanges.push(new FoldingRange(parenStart, lastLine));
 
 	for (let color in decorationsArrays) {
 		editor.setDecorations(embedDecorations[color], decorationsArrays[color]);
@@ -573,8 +815,9 @@ function updateAsm(sourceCode: string) {
 	asmRanges = [];
 
 	for (let line = 0; line < sourceCodeArr.length; line++) {
+		let lineText = sourceCodeArr[line];
 		if (insideAsm) {
-			let match = sourceCodeArr[line].match(asmEnd);
+			let match = lineText.match(asmEnd);
 
 			if (match !== null || line === sourceCodeArr.length - 1) {
 				let eol;
@@ -582,27 +825,27 @@ function updateAsm(sourceCode: string) {
 					eol = 99999;
 				else
 					eol = match.index + 1;
-				let range = new vscode.Range(
-					new vscode.Position(startLine, startChar),
-					new vscode.Position(line, eol)
+				let range = new Range(
+					new Position(startLine, startChar),
+					new Position(line, eol)
 				);
 				asmRanges.push(range);
 				insideAsm = false;
 			}
 		}
 		else {
-			let match = sourceCodeArr[line].match(asmStart);
+			let match = lineText.match(asmStart);
 			if (match === null || match.index === undefined) continue;
-			let singleLineMatch = sourceCodeArr[line].slice(match.index + match[0].length).match(asmEnd);
+			let singleLineMatch = lineText.slice(match.index + match[0].length).match(asmEnd);
 			if (singleLineMatch === null || singleLineMatch.index === undefined) {
 				insideAsm = true;
 				startLine = line;
 				startChar = match.index + match[0].length;
 			}
 			else {
-				let range = new vscode.Range(
-					new vscode.Position(line, match.index + match[0].length),
-					new vscode.Position(line, match.index + match[0].length + singleLineMatch.index + 1)
+				let range = new Range(
+					new Position(line, match.index + match[0].length),
+					new Position(line, match.index + match[0].length + singleLineMatch.index + 1)
 				);
 
 				asmRanges.push(range);
@@ -612,10 +855,10 @@ function updateAsm(sourceCode: string) {
 }
 
 
-class JaiCompletionItemProvider implements vscode.CompletionItemProvider {
-	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position,
-								  token: vscode.CancellationToken, context: vscode.CompletionContext):
-		Thenable<vscode.CompletionItem[]> {
+class JaiCompletionItemProvider implements CompletionItemProvider {
+	public provideCompletionItems(document: TextDocument, position: Position,
+								  token: CancellationToken, context: CompletionContext):
+		Thenable<CompletionItem[]> {
 		return new Promise((resolve, reject) => {
 			let invalidCharacter = /[^a-z0-9]/;
 			for (let i = 0; i < asmRanges.length; i++) {
@@ -654,10 +897,19 @@ class JaiCompletionItemProvider implements vscode.CompletionItemProvider {
 }
 
 
-class JaiReferenceProvider implements vscode.ReferenceProvider {
-	public provideReferences(document: vscode.TextDocument, position: vscode.Position,
-							 options: { includeDeclaration: boolean }, token: vscode.CancellationToken):
-	Thenable<vscode.Location[]> {
+class JaiFoldingRangeProvider implements FoldingRangeProvider {
+	public provideFoldingRanges(document: TextDocument): ProviderResult<FoldingRange[]> {
+		return new Promise(resolve => {
+			resolve(foldingRanges);
+		});
+	}
+}
+
+
+class JaiReferenceProvider implements ReferenceProvider {
+	public provideReferences(document: TextDocument, position: Position,
+							 options: { includeDeclaration: boolean }, token: CancellationToken):
+	Thenable<Location[]> {
 		return new Promise((resolve, reject) => {
 			for (let i = 0; i < asmRanges.length; i++) {
 				let range = asmRanges[i];
@@ -667,8 +919,10 @@ class JaiReferenceProvider implements vscode.ReferenceProvider {
 				}
 			}
 
-			console.log(foundSomeReferences);
-			console.log(referenceByFilepath);
+			if (debugMode) {
+				console.log(foundSomeReferences);
+				console.log(referenceByFilepath);
+			}
 
 			if (foundSomeReferences) {
 				let locations = findLocations(document.getText(document.getWordRangeAtPosition(position, /[a-zA-Z_]\w*/)), document.uri, position);
@@ -693,11 +947,11 @@ class JaiReferenceProvider implements vscode.ReferenceProvider {
 }
 
 
-class JaiDefinitionProvider implements vscode.DefinitionProvider {
-	public provideDefinition(document: vscode.TextDocument, position: vscode.Position,
-							 token: vscode.CancellationToken):
-	vscode.ProviderResult<vscode.Definition | vscode.DefinitionLink[]> {
-		return new Promise<vscode.Definition>((resolve, reject) => {
+class JaiDefinitionProvider implements DefinitionProvider {
+	public provideDefinition(document: TextDocument, position: Position,
+							 token: CancellationToken):
+	ProviderResult<Definition | DefinitionLink[]> {
+		return new Promise<Definition>((resolve, reject) => {
 			if (path.basename(document.fileName).startsWith(".added_strings_")) {
 				// @Robustness This relies on .added_strings formatting being a block
 				// of 3 comments above the code block, with the middle row containing
@@ -719,12 +973,12 @@ class JaiDefinitionProvider implements vscode.DefinitionProvider {
 
 				let m = lines[row].match(encoded_location);
 				if (m !== null && m !== undefined) {
-					let uri = vscode.Uri.file(m[1]);
+					let uri = Uri.file(m[1]);
 					let posRow = parseInt(m[2]) - 1;
-					let startPosition = new vscode.Position(posRow, 0);
-					let endPosition = new vscode.Position(posRow, 0);
-					let location = new vscode.Location(uri, new vscode.Range(startPosition, endPosition));
-					let result : vscode.Location[] = [];
+					let startPosition = new Position(posRow, 0);
+					let endPosition = new Position(posRow, 0);
+					let location = new Location(uri, new Range(startPosition, endPosition));
+					let result : Location[] = [];
 					result.push(location);
 					resolve(result);
 				}
@@ -750,7 +1004,7 @@ class JaiDefinitionProvider implements vscode.DefinitionProvider {
 								reject();
 							}
 							else {
-								vscode.env.openExternal(vscode.Uri.parse(url));
+								env.openExternal(Uri.parse(url));
 								reject();
 							}
 						}
@@ -782,18 +1036,18 @@ class JaiDefinitionProvider implements vscode.DefinitionProvider {
 }
 
 
-class JaiRenameProvider implements vscode.RenameProvider {
-	public provideRenameEdits(document: vscode.TextDocument, position: vscode.Position, newName: string,
-							  token: vscode.CancellationToken):
-	Thenable<vscode.WorkspaceEdit> {
-		return new Promise<vscode.WorkspaceEdit>((resolve, reject) => {
+class JaiRenameProvider implements RenameProvider {
+	public provideRenameEdits(document: TextDocument, position: Position, newName: string,
+							  token: CancellationToken):
+	Thenable<WorkspaceEdit> {
+		return new Promise<WorkspaceEdit>((resolve, reject) => {
 			jaiLocate(document.fileName, position, "Rename").then(output => {
 				if (output === undefined) {
 					reject();
 				}
 				else {
 					let locations = locationsFromString(output);
-					let result = new vscode.WorkspaceEdit();
+					let result = new WorkspaceEdit();
 					for (let i = 0; i < locations.length; i++) {
 						let location = locations[i];
 						if (debugMode) console.log(location.uri.fsPath);
@@ -808,15 +1062,15 @@ class JaiRenameProvider implements vscode.RenameProvider {
 }
 
 
-async function jaiLocate(filepath: string, position: vscode.Position, operation: string): Promise<string | undefined> {
-	let config = vscode.workspace.getConfiguration('the-language');
+async function jaiLocate(filepath: string, position: Position, operation: string): Promise<string | undefined> {
+	let config = workspace.getConfiguration('the-language');
 	let exe_path = config.get("pathToJaiExecutable");
 	if (exe_path === undefined) return;
 
 	if (debugMode) console.log("projectPath is [" + projectPath + "]");
 	let fileToCompile = projectPath !== "" ? projectPath as string : filepath;
 
-	let extension = vscode.extensions.getExtension("onelivesleft.the-language");
+	let extension = extensions.getExtension("onelivesleft.the-language");
 	if (extension === undefined) return;
 	let modulepath = path.sep === "\\"
 		? path.join(extension.extensionPath, extension.extensionPath.toLowerCase().startsWith("c:\\repos") ? "src" : "out").replace(/\//, '\\')
@@ -842,20 +1096,21 @@ async function jaiLocate(filepath: string, position: vscode.Position, operation:
 	args.push((position.line + 1).toString());
 	args.push((position.character + 1).toString());
 
-	if (debugMode) console.log(exe_path, args);
+	if (debugMode) logCommand(exe_path as string, args);
+
 	return execCommand(exe_path as string, args);
 }
 
 
-async function jaiDump(filepath: string): Promise<string | undefined> {
-	let config = vscode.workspace.getConfiguration('the-language');
+async function jaiDump(filepath: string): Promise<[string, string] | undefined> {
+	let config = workspace.getConfiguration('the-language');
 	let exe_path = config.get("pathToJaiExecutable");
 	if (exe_path === undefined) return;
 
 	if (debugMode) console.log("projectPath is [" + projectPath + "]");
 	let fileToCompile = projectPath !== "" ? projectPath as string : filepath;
 
-	let extension = vscode.extensions.getExtension("onelivesleft.the-language");
+	let extension = extensions.getExtension("onelivesleft.the-language");
 	if (extension === undefined) return;
 	let modulepath = path.sep === "\\"
 		? path.join(extension.extensionPath, extension.extensionPath.toLowerCase().startsWith("c:\\repos") ? "src" : "out").replace(/\//, '\\')
@@ -878,21 +1133,34 @@ async function jaiDump(filepath: string): Promise<string | undefined> {
 	args.push("--");
 	args.push("Dump");
 
-	if (debugMode) console.log(exe_path, args);
+	if (debugMode) logCommand(exe_path as string, args);
+
 	return spawnCommand(exe_path as string, args);
+}
+
+function logCommand(command: string, args: string[]) {
+	let commandLine = [command];
+	for(let i = 0; i < args.length; i++) {
+		if (args[i].match(/ /)) {
+			commandLine.push("\"" + args[i] + "\"");
+		}
+		else
+			commandLine.push(args[i]);
+	}
+	console.log(commandLine.join(" "));
 }
 
 
 function execCommand(exe_path: string, args: string[]): Promise<string | undefined> {
 	return new Promise((resolve, reject) => {
 		proc.execFile(exe_path, args, (error, stdout, stderr) => {
-			if (error) {
+			if (error) { // @TODO does a warning trigger this?
 				console.log(error);
 				console.log(stderr);
 				reject(error);
 			}
 			else {
-				if (debugMode) console.log(stdout);
+				if (debugMode) console.log(stdout.substring(0, 256));
 				let index = stdout.indexOf(sentinel);
 				if (index < 0)
 					reject();
@@ -906,7 +1174,7 @@ function execCommand(exe_path: string, args: string[]): Promise<string | undefin
 
 let spawnedChild : proc.ChildProcessWithoutNullStreams | null;
 
-function spawnCommand(exe_path: string, args: string[]): Promise<string | undefined> {
+function spawnCommand(exe_path: string, args: string[]): Promise<[string, string] | undefined> {
 	return new Promise((resolve, reject) => {
 		if (spawnedChild) spawnedChild.kill();
 
@@ -928,28 +1196,28 @@ function spawnCommand(exe_path: string, args: string[]): Promise<string | undefi
 				reject("Error: " + code + "\n" + errors.join(""));
 			else {
 				let stdout = data.join("");
-				if (debugMode) console.log(stdout);
+				if (debugMode) console.log(errors.join("").substring(0, 256), stdout.substring(0, 256));
 				let index = stdout.indexOf(sentinel);
 				if (index < 0)
 					reject(errors.join("") + "\n" + stdout);
 				else
-					resolve(stdout.slice(index + sentinel.length));
+					resolve([stdout.slice(index + sentinel.length), errors.join("")]);
 			}
 		});
 	});
 }
 
 
-function locationsFromString(locations: string, firstLineOnly: boolean = false): vscode.Location[] {
+function locationsFromString(locations: string, firstLineOnly: boolean = false): Location[] {
 	//console.log(locations);
-	let result : vscode.Location[] = [];
+	let result : Location[] = [];
 	for (let row of locations.split("\n")) {
 		if (!row.trim()) continue;
 		let items = row.split("|");
-		let uri = vscode.Uri.file(items[1]);
-		let startPosition = new vscode.Position(parseInt(items[2]) - 1, parseInt(items[3]) - 1);
-		let endPosition = new vscode.Position(parseInt(items[4]) - 1, parseInt(items[5]) - 1);
-		let location = new vscode.Location(uri, new vscode.Range(startPosition, endPosition));
+		let uri = Uri.file(items[1]);
+		let startPosition = new Position(parseInt(items[2]) - 1, parseInt(items[3]) - 1);
+		let endPosition = new Position(parseInt(items[4]) - 1, parseInt(items[5]) - 1);
+		let location = new Location(uri, new Range(startPosition, endPosition));
 		result.push(location);
 		if (firstLineOnly) break;
 	}
@@ -958,12 +1226,12 @@ function locationsFromString(locations: string, firstLineOnly: boolean = false):
 }
 
 
-function findLocations(name: string, uri: vscode.Uri, position: vscode.Position): vscode.Location[] {
+function findLocations(name: string, uri: Uri, position: Position): Location[] {
 	let fileReferences = referenceByFilepath[uri.fsPath.toLowerCase()];
 	if (!fileReferences) return [];
 
 	let closestDistance = 999999;
-	let closestLocations : vscode.Location [] = [];
+	let closestLocations : Location [] = [];
 
 	for (let i = 0; i < fileReferences.length; i++) {
 		let reference = fileReferences[i];
@@ -987,7 +1255,7 @@ function findLocations(name: string, uri: vscode.Uri, position: vscode.Position)
 }
 
 
-function distanceFromLocation(position: vscode.Position, location: vscode.Location): number {
+function distanceFromLocation(position: Position, location: Location): number {
 	if (position.isBefore(location.range.start))
 		return (location.range.start.line - position.line) * 100 + location.range.start.character - position.character;
 	else
