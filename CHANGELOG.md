@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.0.78] - 2021-10-06
+* Restored VSCodeLocate not emitting debug output (was workaround for compiler bug).
+* Added option to disable background compilation (and therefor IDE-like features).
+* Added missing support functions from `Basic`.
+
 ## [0.0.77] - 2021-10-04
 * Errors & Warnings are now reported to Problems panel.
 * `jai.exe` call is now logged in full as a string when `Debug Mode` is enabled, for easy copypasting.

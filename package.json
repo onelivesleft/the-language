@@ -2,7 +2,7 @@
     "name": "the-language",
     "displayName": "The Language",
     "description": "Support for the Jai language.",
-    "version": "0.0.77",
+    "version": "0.0.78",
     "repository": {
         "type": "git",
         "url": "https://github.com/onelivesleft/the-language"
@@ -52,6 +52,11 @@
         "configuration": {
             "title": "Jai",
             "properties": {
+                "the-language.enableBackgroundCompilation" : {
+                    "type": "boolean",
+                    "default": "true",
+                    "description": "Run the Jai compiler in the background to analyse editted code.  Used for IDE-like features."
+                },
                 "the-language.projectFile": {
                     "type": "string",
                     "default": "",

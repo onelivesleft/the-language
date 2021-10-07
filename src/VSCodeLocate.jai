@@ -91,7 +91,7 @@ mode : enum { SINGLE_REFERENCE; ALL_REFERENCES; };
     build_options.output_type = .NO_OUTPUT;
     {
         using compiler_version;
-        if !(major == 0 && minor == 0 && micro >= 84) // @TODO @Urgent set max when compiler fixed
+        if !(major == 0 && minor == 0 && micro >= 84 && micro <= 85)
             build_options.emit_debug_info = .NONE;
     }
 

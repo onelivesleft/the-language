@@ -2,7 +2,7 @@
 /* eslint-disable curly */
 
 
-import {Selection, Range, DocumentFilter, CompletionItem, Location, Position, ProviderResult, FoldingRangeKind} from 'vscode';
+import {Selection, Range, DocumentFilter, CompletionItem, Location, Position, ProviderResult, FoldingRangeKind, IndentAction} from 'vscode';
 import {ExtensionContext, languages, workspace, window, extensions, CompletionItemKind} from 'vscode';
 import {Uri, Diagnostic, DiagnosticSeverity, DiagnosticRelatedInformation, TextEditorDecorationType} from 'vscode';
 import {TextEditor, DecorationOptions, CompletionItemProvider, TextDocument, CancellationToken} from 'vscode';
@@ -412,6 +412,7 @@ interface EmbedLanguageColor {
 
 
 let debugMode : boolean | undefined = false;
+let useCompiler : boolean | undefined = true;
 let decorateEmbeds : boolean | undefined = true;
 let projectPath : string | undefined = "";
 let projectCompilerArgs : string[] = [];
@@ -423,6 +424,9 @@ let embedDecorations: { [color: string] : TextEditorDecorationType } = {};
 
 function updateConfig() {
 	let config = workspace.getConfiguration('the-language');
+	useCompiler = config.get("enableBackgroundCompilation");
+	if (useCompiler === undefined) useCompiler = true;
+
 	decorateEmbeds = config.get("decorateEmbeds");
 	if (decorateEmbeds === undefined) decorateEmbeds = true;
 
@@ -1063,6 +1067,8 @@ class JaiRenameProvider implements RenameProvider {
 
 
 async function jaiLocate(filepath: string, position: Position, operation: string): Promise<string | undefined> {
+	if (!useCompiler) return;
+
 	let config = workspace.getConfiguration('the-language');
 	let exe_path = config.get("pathToJaiExecutable");
 	if (exe_path === undefined) return;
@@ -1103,6 +1109,8 @@ async function jaiLocate(filepath: string, position: Position, operation: string
 
 
 async function jaiDump(filepath: string): Promise<[string, string] | undefined> {
+	if (!useCompiler) return;
+
 	let config = workspace.getConfiguration('the-language');
 	let exe_path = config.get("pathToJaiExecutable");
 	if (exe_path === undefined) return;
