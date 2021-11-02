@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.79] - 2021-10-12
+* Added `Jai: Run Snippet` command: allows you to run jai code selected in any document.  If no code selected then will check for surrounding ```.
+
 ## [0.0.78] - 2021-10-06
 * Restored VSCodeLocate not emitting debug output (was workaround for compiler bug).
 * Added option to disable background compilation (and therefor IDE-like features).

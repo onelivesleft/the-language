@@ -2,7 +2,7 @@
     "name": "the-language",
     "displayName": "The Language",
     "description": "Support for the Jai language.",
-    "version": "0.0.78",
+    "version": "0.0.79",
     "repository": {
         "type": "git",
         "url": "https://github.com/onelivesleft/the-language"
@@ -15,7 +15,8 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "onLanguage:jai"
+        "onLanguage:jai",
+        "onCommand:the-language.runSnippet"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -42,17 +43,23 @@
                 "scopeName": "markdown.jai.codeblock",
                 "path": "./syntaxes/codeblock.json",
                 "injectTo": [
-                  "text.html.markdown"
+                    "text.html.markdown"
                 ],
                 "embeddedLanguages": {
-                  "meta.embedded.block.jai": "jai"
+                    "meta.embedded.block.jai": "jai"
                 }
+            }
+        ],
+        "commands": [
+            {
+                "command": "the-language.runSnippet",
+                "title": "Jai: Run Snippet"
             }
         ],
         "configuration": {
             "title": "Jai",
             "properties": {
-                "the-language.enableBackgroundCompilation" : {
+                "the-language.enableBackgroundCompilation": {
                     "type": "boolean",
                     "default": "true",
                     "description": "Run the Jai compiler in the background to analyse editted code.  Used for IDE-like features."
@@ -72,7 +79,7 @@
                     "default": "c:/jai/bin/jai.exe",
                     "description": "The path to the jai compiler executable."
                 },
-                "the-language.decorateEmbeds" : {
+                "the-language.decorateEmbeds": {
                     "type": "boolean",
                     "default": "true",
                     "description": "Decorate embedded language blocks with a background color"
@@ -92,11 +99,14 @@
                         }
                     },
                     "default": [
-                        {"language": "default", "color": "#222222"}
+                        {
+                            "language": "default",
+                            "color": "#222222"
+                        }
                     ],
                     "description": "Background colors used when language is embedded in a #string or Markdown code block."
                 },
-                "the-language.debugMode" : {
+                "the-language.debugMode": {
                     "type": "boolean",
                     "default": "false",
                     "description": "Log extra debug output to console."
@@ -105,26 +115,26 @@
         }
     },
     "scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile && npm run lint",
-		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
-	},
-	"devDependencies": {
-		"@types/vscode": "^1.52.0",
-		"@types/glob": "^7.1.3",
-		"@types/mocha": "^8.0.4",
-		"@types/node": "^12.11.7",
-		"eslint": "^7.15.0",
-		"@typescript-eslint/eslint-plugin": "^4.9.0",
-		"@typescript-eslint/parser": "^4.9.0",
-		"glob": "^7.1.6",
-		"mocha": "^8.1.3",
-		"typescript": "^4.1.2",
-		"vscode-test": "^1.4.1"
-	},
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/glob": "^7.1.3",
+        "@types/mocha": "^8.0.4",
+        "@types/node": "^12.11.7",
+        "@types/vscode": "^1.52.0",
+        "@typescript-eslint/eslint-plugin": "^4.9.0",
+        "@typescript-eslint/parser": "^4.9.0",
+        "eslint": "^7.15.0",
+        "glob": "^7.1.6",
+        "mocha": "^9.1.2",
+        "typescript": "^4.1.2",
+        "vscode-test": "^1.4.1"
+    },
     "keywords": [
         "Jai",
         "Language",

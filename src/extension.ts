@@ -2,15 +2,18 @@
 /* eslint-disable curly */
 
 
-import {Selection, Range, DocumentFilter, CompletionItem, Location, Position, ProviderResult, FoldingRangeKind, IndentAction} from 'vscode';
+import {Selection, Range, DocumentFilter, CompletionItem, Location, Position, ProviderResult, FoldingRangeKind, IndentAction, commands} from 'vscode';
 import {ExtensionContext, languages, workspace, window, extensions, CompletionItemKind} from 'vscode';
 import {Uri, Diagnostic, DiagnosticSeverity, DiagnosticRelatedInformation, TextEditorDecorationType} from 'vscode';
 import {TextEditor, DecorationOptions, CompletionItemProvider, TextDocument, CancellationToken} from 'vscode';
 import {CompletionContext, FoldingRangeProvider, ReferenceProvider, FoldingRange} from 'vscode';
 import {DefinitionProvider, Definition, DefinitionLink, env, RenameProvider, WorkspaceEdit} from 'vscode';
+import {Terminal} from 'vscode';
+
 import proc = require('child_process');
 import path = require('path');
 import fs = require('fs');
+import os = require('os');
 import { start } from 'repl';
 
 import { supportedLanguages } from "./languages";
@@ -47,6 +50,7 @@ let infoProblemMatcherLinux = /(.*?)(\(?(\/[^\\:*?"<>|\t\n\r]+):(\d+)(,(\d+))?\)
 let infoProblemMatcher : RegExp;
 let diagnosticCollection = languages.createDiagnosticCollection();
 
+let runningSnippet = false;
 
 export function activate(context: ExtensionContext) {
 	updateConfig();
@@ -112,6 +116,82 @@ export function activate(context: ExtensionContext) {
 			}
 		}
 	});
+
+	{
+		const command = "the-language.runSnippet";
+		const commandHandler = () => {
+			if (runningSnippet) return;
+			runningSnippet = true;
+
+			let editor = window.activeTextEditor;
+			if (!editor) { runningSnippet = false; return; }
+			let text = editor.document.getText();
+			let selection = editor.selection;
+			let snippet : string;
+			if (selection.isEmpty) {
+				let start = editor.document.offsetAt(selection.active);
+				let end = start;
+				start = text.lastIndexOf("```", start);
+				if (start < 0) { runningSnippet = false; return; }
+				start = text.indexOf("\n", start);
+				if (start < 0) { runningSnippet = false; return; }
+				start += 1;
+
+				end = text.indexOf("```", end);
+				if (end < 0) { runningSnippet = false; return; }
+
+				snippet = text.slice(start, end);
+			}
+			else {
+				let start = editor.document.offsetAt(selection.start);
+				let end = editor.document.offsetAt(selection.end);
+				snippet = text.slice(start, end);
+			}
+			let prefix = "";
+			let postfix = "";
+			if (!snippet.match(/#import "Basic";/)) {
+				prefix = "#import \"Basic\";\n\n";
+			}
+			if (!snippet.match(/\bmain\s*::\s*\(\s*\)\s*{/)) {
+				prefix += "main :: () {\n";
+				postfix = "\n}\n";
+			}
+
+			snippet = prefix + snippet + postfix;
+
+			let tempdir = os.tmpdir();
+			let filepath = tempdir + path.sep + "jai_snippet.jai";
+			fs.writeFileSync(filepath, snippet);
+			let config = workspace.getConfiguration('the-language');
+			let exepath = config.get("pathToJaiExecutable");
+			if (exepath === undefined) { runningSnippet = false; return; }
+
+			let outputpath = filepath.slice(0, filepath.length - 4);
+			if (path.sep === "\\") outputpath += ".exe";
+
+			if (fs.existsSync(outputpath))
+				fs.unlinkSync(outputpath);
+			Term.run(exepath + " " + filepath);
+			Term.run(outputpath);
+			runningSnippet = false;
+
+			/*execCommand(exepath as string, [filepath]).then(output => {
+				filepath = filepath.slice(0, filepath.length - 4);
+				if (path.sep === "\\") filepath += ".exe";
+				execCommand(filepath, []).then(output => {
+					console.log("1: " + output);
+					runningSnippet = false;
+				}).catch(error => {
+					console.log("2: " + error);
+					runningSnippet = false;
+				});
+			}).catch(error => {
+				console.log("3: " + error);
+				runningSnippet = false;
+			});*/
+		};
+		context.subscriptions.push(commands.registerCommand(command, commandHandler));
+	}
 }
 
 export function deactivate() {}
@@ -440,11 +520,11 @@ function updateConfig() {
 	projectCompilerArgs = args === undefined ? [] : argsFromString(args as string);
 
 	embedColorsConfig = config.get("embedColors");
-	const isColor = /#[a-fA-F0-9]{6}/;
 	if (embedColorsConfig !== undefined) {
+		const isColor = /#[a-fA-F0-9]{6}/;
 		embedColors = {};
 		for (let i = 0; i < embedColorsConfig.length; i++) {
-			let embedColor = embedColorsConfig[i];
+			let embedColor : EmbedLanguageColor = embedColorsConfig[i];
 			if (embedColor.color.match(isColor)) {
 				if (!(embedColor.color in embedDecorations))
 					embedDecorations[embedColor.color] = makeDecoration(embedColor.color);
@@ -1070,8 +1150,8 @@ async function jaiLocate(filepath: string, position: Position, operation: string
 	if (!useCompiler) return;
 
 	let config = workspace.getConfiguration('the-language');
-	let exe_path = config.get("pathToJaiExecutable");
-	if (exe_path === undefined) return;
+	let exepath = config.get("pathToJaiExecutable");
+	if (exepath === undefined) return;
 
 	if (debugMode) console.log("projectPath is [" + projectPath + "]");
 	let fileToCompile = projectPath !== "" ? projectPath as string : filepath;
@@ -1102,9 +1182,9 @@ async function jaiLocate(filepath: string, position: Position, operation: string
 	args.push((position.line + 1).toString());
 	args.push((position.character + 1).toString());
 
-	if (debugMode) logCommand(exe_path as string, args);
+	if (debugMode) logCommand(exepath as string, args);
 
-	return execCommand(exe_path as string, args);
+	return execCommand(exepath as string, args);
 }
 
 
@@ -1112,8 +1192,8 @@ async function jaiDump(filepath: string): Promise<[string, string] | undefined> 
 	if (!useCompiler) return;
 
 	let config = workspace.getConfiguration('the-language');
-	let exe_path = config.get("pathToJaiExecutable");
-	if (exe_path === undefined) return;
+	let exepath = config.get("pathToJaiExecutable");
+	if (exepath === undefined) return;
 
 	if (debugMode) console.log("projectPath is [" + projectPath + "]");
 	let fileToCompile = projectPath !== "" ? projectPath as string : filepath;
@@ -1141,9 +1221,9 @@ async function jaiDump(filepath: string): Promise<[string, string] | undefined> 
 	args.push("--");
 	args.push("Dump");
 
-	if (debugMode) logCommand(exe_path as string, args);
+	if (debugMode) logCommand(exepath as string, args);
 
-	return spawnCommand(exe_path as string, args);
+	return spawnCommand(exepath as string, args);
 }
 
 function logCommand(command: string, args: string[]) {
@@ -1159,9 +1239,9 @@ function logCommand(command: string, args: string[]) {
 }
 
 
-function execCommand(exe_path: string, args: string[]): Promise<string | undefined> {
+function execCommand(exepath: string, args: string[]): Promise<string | undefined> {
 	return new Promise((resolve, reject) => {
-		proc.execFile(exe_path, args, (error, stdout, stderr) => {
+		proc.execFile(exepath, args, (error, stdout, stderr) => {
 			if (error) { // @TODO does a warning trigger this?
 				console.log(error);
 				console.log(stderr);
@@ -1182,11 +1262,11 @@ function execCommand(exe_path: string, args: string[]): Promise<string | undefin
 
 let spawnedChild : proc.ChildProcessWithoutNullStreams | null;
 
-function spawnCommand(exe_path: string, args: string[]): Promise<[string, string] | undefined> {
+function spawnCommand(exepath: string, args: string[]): Promise<[string, string] | undefined> {
 	return new Promise((resolve, reject) => {
 		if (spawnedChild) spawnedChild.kill();
 
-		spawnedChild = proc.spawn(exe_path, args);
+		spawnedChild = proc.spawn(exepath, args);
 		let data : string [] = [];
 		let errors : string [] = [];
 
@@ -1273,4 +1353,34 @@ function distanceFromLocation(position: Position, location: Location): number {
 
 function min(a: number, b: number): number {
 	if (a <= b) return a; else return b;
+}
+
+
+class Term {
+	static termName: string = "jai-terminal";
+	static term: Terminal | undefined; //eslint-disable-line no-undef
+
+	static _term() {
+		if (!Term.term) {
+			Term.term = window.createTerminal(Term.termName);
+			Term.term.show(true);
+			window.onDidCloseTerminal(event => {
+				if (Term._term() && event.name === Term.termName) {
+					Term.term = undefined;
+				}
+			});
+		}
+		return Term.term;
+	}
+
+	static run(command: string) {
+		Term._term().sendText(command, true);
+	}
+
+	static dispose() {
+		if (Term._term()) {
+			Term._term().dispose();
+			Term.term = undefined;
+		}
+	}
 }
