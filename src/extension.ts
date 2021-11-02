@@ -2,7 +2,7 @@
 /* eslint-disable curly */
 
 
-import {Selection, Range, DocumentFilter, CompletionItem, Location, Position, ProviderResult, FoldingRangeKind, IndentAction, commands} from 'vscode';
+import {Selection, Range, DocumentFilter, CompletionItem, Location, Position, ProviderResult, FoldingRangeKind, IndentAction, commands, SnippetString} from 'vscode';
 import {ExtensionContext, languages, workspace, window, extensions, CompletionItemKind} from 'vscode';
 import {Uri, Diagnostic, DiagnosticSeverity, DiagnosticRelatedInformation, TextEditorDecorationType} from 'vscode';
 import {TextEditor, DecorationOptions, CompletionItemProvider, TextDocument, CancellationToken} from 'vscode';
@@ -149,9 +149,14 @@ export function activate(context: ExtensionContext) {
 			}
 			let prefix = "";
 			let postfix = "";
-			if (!snippet.match(/#import "Basic";/)) {
-				prefix = "#import \"Basic\";\n\n";
-			}
+			if (runSnippetHeader === undefined)  runSnippetHeader = "#import \"Basic\";";
+			runSnippetHeader.split(";").forEach(function (word) {
+				word = word.trim();
+				if (!snippet.match(word)) {
+					prefix = prefix + word + ";\n";
+				}
+			});
+			prefix += "\n";
 			if (!snippet.match(/\bmain\s*::\s*\(\s*\)\s*{/)) {
 				prefix += "main :: () {\n";
 				postfix = "\n}\n";
@@ -496,6 +501,7 @@ let useCompiler : boolean | undefined = true;
 let decorateEmbeds : boolean | undefined = true;
 let projectPath : string | undefined = "";
 let projectCompilerArgs : string[] = [];
+let runSnippetHeader : string | undefined = "";
 let embedColorsConfig: EmbedLanguageColor[] | undefined;
 let embedColors: { [language: string] : string};
 let defaultEmbedColor = "#222222";
@@ -518,6 +524,9 @@ function updateConfig() {
 
 	let args = config.get("projectJaiArgs");
 	projectCompilerArgs = args === undefined ? [] : argsFromString(args as string);
+
+	runSnippetHeader = config.get("runSnippetHeader");
+	if (runSnippetHeader === undefined) runSnippetHeader = "#import \"Basic\";";
 
 	embedColorsConfig = config.get("embedColors");
 	if (embedColorsConfig !== undefined) {

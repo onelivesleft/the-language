@@ -11,6 +11,7 @@ temp :: #import "Strings_Alloc"(__temporary_allocator);
 debug :: false;
 
 // @TODO
+// [x] `inline` keyword
 // [x] Add setting to control autocompilation
 // [x] Fix error diagnostics so that errors always show, along with multiple warnings
 // [x] Expand error diagnostics to include addtional locations (wrong split struct example)

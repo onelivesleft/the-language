@@ -8,6 +8,7 @@ export const supportedLanguages = [
     ["cs", /.*c(sharp|#|s)/i],
     ["c", /.*c/i],
     ["glsl", /.*glsl/i],
+    ["guy", /.*guy/i],
     ["hlsl", /.*hlsl/i],
     ["jai", /.*jai/i],
     ["java", /.*java/i],

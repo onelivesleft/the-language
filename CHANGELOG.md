@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.80] - 2021-11-02
+* Added `Run Snippet Header` setting.
+* Added `inline` keyword.
+
 ## [0.0.79] - 2021-10-12
 * Added `Jai: Run Snippet` command: allows you to run jai code selected in any document.  If no code selected then will check for surrounding ```.
 

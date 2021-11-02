@@ -6,6 +6,7 @@ languages :: Language.[
     .{id = "cs",        pattern = "c(sharp|#|s)",       source = "source.cs"           },
     .{id = "c",         pattern = "c",                  source = "source.c"            },
     .{id = "glsl",      pattern = "glsl",               source = "source.glsl"         },
+    .{id = "guy",       pattern = "guy",                source = "source.guy"          },
     .{id = "hlsl",      pattern = "hlsl",               source = "source.hlsl"         },
     .{id = "jai",       pattern = "jai",                source = "source.jai"          },
     .{id = "java",      pattern = "java",               source = "source.java"         },
