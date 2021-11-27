@@ -360,6 +360,8 @@ repository:
         match: \b(context|push_context)\b
       - name: keyword.other.using.jai
         match: \b(using)\b
+      - name: keyword.other.allocator.jai
+        match: \b(temp)\b
       - name: constant.language.true.jai
         match: \b(true)\b
       - name: constant.language.false.jai

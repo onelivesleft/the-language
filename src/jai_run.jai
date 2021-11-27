@@ -46,7 +46,7 @@ set_options :: (using options: *Build_Options) {
         executable := path_strip_extension(basename(filepath));
 
     set_working_directory(output_path);
-    set_build_options_dc(.{do_output = false});
+    set_build_options_dc(.{do_output=false, write_added_strings=false});
 
     build_options := get_build_options();
     build_options.output_type = .NO_OUTPUT;

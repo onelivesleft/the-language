@@ -3,7 +3,6 @@
 #import "File_Utilities";
 #import "Strings";
 heap :: #import "Strings_Alloc";
-temp :: #import "Strings_Alloc"(__temporary_allocator);
 
 #load "languages.jai";
 #load "yaml_snippets.jai";
@@ -36,6 +35,7 @@ debug :: false;
 
 // Misc
 // [ ] Change asm help triggering on F12 to something else (context help?) - on F12 it also trigger on ctrl+mouseover
+// [ ] Make custom syntax highlighting for #asm
 // [ ] Maybe refine asm completions based on features specified
 // [ ] Show current proc in status bar
 // [ ] Show status in status bar (error state / has reference cache)
@@ -62,6 +62,8 @@ debug :: false;
 in_file           :: "jai.yaml";
 out_file          :: "../syntaxes/jai.json";
 languages_ts_file :: "./languages.ts";
+
+deprecated_extra_names :: string.["__temporary_allocator"];
 
 Language :: struct {
     id      : string;
@@ -439,13 +441,15 @@ scrape_modules_folder :: () {
     support_functions : [..] string;
     support_classes : [..] string;
 
+    for deprecated_extra_names  array_add(*deprecated_procs, it);
+
     for filepath: files {
         mark := get_temporary_storage_mark();
         defer set_temporary_storage_mark(mark);
 
         data : string = ---;
         {
-            push_allocator(__temporary_allocator);
+            push_allocator(temp);
             data = read_entire_file(filepath);
         }
 

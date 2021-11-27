@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.81] - 2021-11-27
+* Updated jai_run to not leave as many files lying around.
+* Added `__temporary_allocator` to deprecated
+
 ## [0.0.80] - 2021-11-02
 * Added `Run Snippet Header` setting.
 * Added `inline` keyword.
