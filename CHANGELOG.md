@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.82] - 2021-12-01
+* Updated for v97
+
 ## [0.0.81] - 2021-11-27
 * Updated jai_run to not leave as many files lying around.
 * Added `__temporary_allocator` to deprecated

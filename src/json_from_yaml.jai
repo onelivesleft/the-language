@@ -63,7 +63,7 @@ in_file           :: "jai.yaml";
 out_file          :: "../syntaxes/jai.json";
 languages_ts_file :: "./languages.ts";
 
-deprecated_extra_names :: string.["__temporary_allocator"];
+deprecated_extra_names :: string.["temporary_allocator", "__temporary_allocator"];
 
 Language :: struct {
     id      : string;
@@ -476,9 +476,9 @@ scrape_modules_folder :: () {
 
                 trimmed = trim_end_from(trimmed, "//");
                 if contains(trimmed, " struct ") || contains(trimmed, " enum ") || contains(trimmed, " #type ")
-                    array_add(*support_classes, heap.copy(name));
+                    array_add(*support_classes, heap.copy_string(name));
                 else if contains(trimmed, "(")
-                    array_add(*support_functions, heap.copy(name));
+                    array_add(*support_functions, heap.copy_string(name));
             }
         }
 
@@ -497,7 +497,7 @@ scrape_modules_folder :: () {
             name := trim(slice(line, 0, index));
             if contains(name, " ")  continue;
 
-            array_add(*deprecated_procs, heap.copy(name));
+            array_add(*deprecated_procs, heap.copy_string(name));
         }
     }
 
