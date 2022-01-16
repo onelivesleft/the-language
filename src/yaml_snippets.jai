@@ -122,7 +122,7 @@ support_names_insert :: #string __yaml
   support:
     patterns:
       - name: support.function.jai
-        match: \b(align_of|type_of|size_of|type_info|initializer_of)\b
+        match: \b(align_of|code_of|type_of|size_of|type_info|initializer_of)\b
       - name: support.function.jai
         match: \b(%)\b
       - name: support.class.jai
