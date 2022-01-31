@@ -1,7 +1,10 @@
 # Change Log
 
-## [0.0.84] - 2022-0
-*
+## [0.0.85] - 2022-01-31
+* Fixed errors not clearing when fixed.
+
+## [0.0.84] - 2022-01-16
+* Added backslash spacing of names (`last\ time : float64`)
 
 ## [0.0.83] - 2022-01-15
 * Updated for v0.1.003

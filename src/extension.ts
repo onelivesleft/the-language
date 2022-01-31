@@ -303,6 +303,7 @@ function updateReferences(filepath: string) {
 	referenceUpdateAttempts = 0;
 	currentlyRunningReferenceUpdate = true;
 	if (debugMode) console.log("Running reference update...");
+	diagnosticCollection.clear();
 
 	jaiDump(filepath).then(output => {
 		if (output === undefined || output[0] === "") {

@@ -4,9 +4,9 @@
 
 # (DATE) :: ([0-9]{4}-[0-9]{2}-[0-9]{2})
 
-# NAME             :: [a-zA-Z_]\w*
-# (NAME)           :: ([a-zA-Z_]\w*)
-# (SPACED-NAME)    :: \s*([a-zA-Z_]\w*)\s*
+# NAME             :: [a-zA-Z_](?:\w|\\ *)*
+# (NAME)           :: ([a-zA-Z_](?:\w|\\ *)*)
+# (SPACED_NAME)    :: \s*([a-zA-Z_](?:\w|\\ *)*)\s*
 # ((COMMA_NAME*))  :: ((\s*,\s*NAME)*)
 
 # ([SPACED-ARRAY]) :: \s*(\[[^\]]*\])?\s
@@ -304,7 +304,7 @@ repository:
           3: name: comment.line.double-slash.signature.date.jai
   imports:
     patterns:
-      - match: ^(SPACED-NAME)(::)\s*(#import)\s+(")(QUOTED)(")
+      - match: ^(SPACED_NAME)(::)\s*(#import)\s+(")(QUOTED)(")
         captures:
           1: name: entity.name.namespace.jai
           2: name: keyword.declaration.jai
@@ -323,7 +323,7 @@ repository:
           1: name: keyword.control.import.directive.jai
           2: name: punctuation.definition.string.import.begin.jai
           3: name: string-quoted.other.import.jai
-      - match: ^(SPACED-NAME)(::)\s*(#foreign_(system_)?library)\s+(")(QUOTED)(")
+      - match: ^(SPACED_NAME)(::)\s*(#foreign_(system_)?library)\s+(")(QUOTED)(")
         captures:
           1: name: constant.other.import.jai
           2: name: keyword.declaration.jai
@@ -331,7 +331,7 @@ repository:
           5: name: punctuation.definition.string.import.begin.jai
           6: name: string-quoted.other.import.jai
           7: name: punctuation.definition.string.import.end.jai
-      - match: ^(SPACED-NAME)(::)\s*(#foreign_(system_)?library)\s+("[^"]*)?$
+      - match: ^(SPACED_NAME)(::)\s*(#foreign_(system_)?library)\s+("[^"]*)?$
         captures:
           1: name: constant.other.import.jai
           2: name: keyword.declaration.jai
@@ -461,7 +461,7 @@ repository:
           2: name: variable.annotation.jai
   fors:
     patterns:
-      - match: '\b(for)\s+([*<\s]*)(SPACED-NAME)(,)(SPACED-NAME)(:)'
+      - match: '\b(for)\s+([*<\s]*)(SPACED_NAME)(,)(SPACED_NAME)(:)'
         captures:
           1: name: keyword.control.loop.for.jai
           2: name: keyword.operator.jai
@@ -469,7 +469,7 @@ repository:
           4: name: punctuation.separator.jai
           5: name: variable.other.declaration.jai
           6: name: keyword.declaration.jai
-      - match: '\b(for)\s+([*<\s]*)(SPACED-NAME)(:)'
+      - match: '\b(for)\s+([*<\s]*)(SPACED_NAME)(:)'
         captures:
           1: name: keyword.control.loop.for.jai
           2: name: keyword.operator.jai
@@ -772,7 +772,7 @@ repository:
                   - include: '#expression'
       return-declarations:
         patterns:
-          - match: (,)?(SPACED-NAME)(:)\s*((\[[^\]]*\])?\s*(\**)(\$*)NAME)\s*(#must)?\s*((@)(NAME))?\s*(#expand)?\s*(((#foreign\s+([A-Z-a-z_]\w*(\s*(")((QUOTED))("))?)|#compiler|#intrinsic|#runtime_support)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)\s*(EOL_COMMENT)
+          - match: (,)?(SPACED_NAME)(:)\s*((\[[^\]]*\])?\s*(\**)(\$*)NAME)\s*(#must)?\s*((@)(NAME))?\s*(#expand)?\s*(((#foreign\s+([A-Z-a-z_]\w*(\s*(")((QUOTED))("))?)|#compiler|#intrinsic|#runtime_support)\s*)+\s*(#deprecated\s*((")((QUOTED))("))?)?\s*(;)?)?(FUNCTION_EOL)\s*(EOL_COMMENT)
             captures:
               1: name: punctuation.separator.parameters.jai
               2: name: variable.parameter.return.jai
