@@ -2,11 +2,11 @@
 /* eslint-disable curly */
 
 
-import {Selection, Range, DocumentFilter, CompletionItem, Location, Position, ProviderResult, FoldingRangeKind, IndentAction, commands, SnippetString} from 'vscode';
+import {Selection, Range, DocumentFilter, CompletionItem, Location, Position, ProviderResult, FoldingRangeKind, IndentAction, commands, SnippetString, SymbolInformation, DocumentSymbol, SymbolKind} from 'vscode';
 import {ExtensionContext, languages, workspace, window, extensions, CompletionItemKind} from 'vscode';
 import {Uri, Diagnostic, DiagnosticSeverity, DiagnosticRelatedInformation, TextEditorDecorationType} from 'vscode';
 import {TextEditor, DecorationOptions, CompletionItemProvider, TextDocument, CancellationToken} from 'vscode';
-import {CompletionContext, FoldingRangeProvider, ReferenceProvider, FoldingRange} from 'vscode';
+import {CompletionContext, DocumentSymbolProvider, FoldingRangeProvider, ReferenceProvider, FoldingRange} from 'vscode';
 import {DefinitionProvider, Definition, DefinitionLink, env, RenameProvider, WorkspaceEdit} from 'vscode';
 import {Terminal} from 'vscode';
 
@@ -35,6 +35,7 @@ let asmRanges: Range [] = [];
 let asmCompletions: CompletionItem [] = [];
 let asmURLs: { [id: string] : string; } = {};
 let foldingRanges: FoldingRange [] = [];
+let documentSymbols: DocumentSymbol[] = [];
 
 interface Reference {
 	name: string;
@@ -62,6 +63,7 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(languages.registerRenameProvider(SELECTOR, new JaiRenameProvider()));
 	context.subscriptions.push(languages.registerCompletionItemProvider(SELECTOR, new JaiCompletionItemProvider()));
 	context.subscriptions.push(languages.registerFoldingRangeProvider(SELECTOR, new JaiFoldingRangeProvider()));
+	context.subscriptions.push(languages.registerDocumentSymbolProvider(SELECTOR, new JaiDocumentSymbolProvider()));
 
 	if (activeEditor) {
 		triggerUpdateDecorations();
@@ -640,6 +642,8 @@ enum FoldType {
 	Import, Comment, Block
 }
 
+type char = number;
+
 function decorate(editor: TextEditor) {
 	if (!decorateEmbeds) {
 		for (let color in embedDecorations) {
@@ -666,6 +670,159 @@ function decorate(editor: TextEditor) {
 	decorationRanges = [];
 	foldingRanges = [];
 
+	let documentRange = editor.document.validateRange(new Range(editor.document.positionAt(0), editor.document.validatePosition(editor.document.positionAt(9999999))));
+	//documentSymbols = [new DocumentSymbol(path.basename(editor.document.fileName), "", SymbolKind.File, documentRange, documentRange)];
+	documentSymbols = [];
+	let documentSymbolStack : DocumentSymbol[] = [];
+	// The root documentSymbol is the #scope: if there are no #scope directives in the file this will be the entire document
+	// 		If there are #scope directives, this will be amended to be the top section (default #scope_export) until the first #scope
+
+	enum ParseState {
+		Dormant, InExpression, InString, InStringEscaped, InHereString, InBlockComment, Error
+	}
+	let parseState = ParseState.Dormant as ParseState;
+	let parseStateBeforeComment = ParseState.Dormant as ParseState;
+	let inFirstTokenOfExpression = false;
+	let firstTokenOfExpression = '';
+	let expressionStartIndex = 0;
+	let expressionStartLine = 0;
+
+	const chara: char = 'a'.charCodeAt(0);
+	const charg: char = 'g'.charCodeAt(0);
+	const charz: char = 'z'.charCodeAt(0);
+	const charA: char = 'A'.charCodeAt(0);
+	const charZ: char = 'Z'.charCodeAt(0);
+	const char0: char = '0'.charCodeAt(0);
+	const char9: char = '9'.charCodeAt(0);
+	const char_: char = '_'.charCodeAt(0);
+	const charSpace: char = ' '.charCodeAt(0);
+	const charQuote: char = '"'.charCodeAt(0);
+	const charBackslash: char = '\\'.charCodeAt(0);
+	const charStar: char = '*'.charCodeAt(0);
+	const charSlash: char = '/'.charCodeAt(0);
+	const charNull: char = '\0'.charCodeAt(0);
+	const charSemicolon: char = ';'.charCodeAt(0);
+	const charOpenBracket: char = '{'.charCodeAt(0);
+	const charCloseBracket: char = '}'.charCodeAt(0);
+	function isAlpha(c: char): boolean { return c >= chara && c <= charz || c >= charA && c <= charZ; }
+	function isAlpha_(c: char): boolean { return isAlpha(c) || c === char_; }
+	function isAlNum(c: char): boolean { return isAlpha(c) || c >= char0 && c <= char9; }
+	function isAlNum_(c: char): boolean { return isAlNum(c) || c === char_; }
+
+	for (let line = 0; line < sourceCodeArr.length; line++) {
+		let lineText = sourceCodeArr[line];
+		let lineTextTrimmed = lineText.trim();
+		let c = charNull;
+		for (let index = 0; index < lineText.length; index++) {
+			const prev = c;
+			c = lineText.charCodeAt(index);
+			let break_to_next_line = false;
+
+			if (parseState === ParseState.Dormant || parseState === ParseState.InExpression) {
+				if (parseState === ParseState.Dormant) {
+					if (c <= charSpace) continue;
+
+					if (isAlpha_(c)) {
+						inFirstTokenOfExpression = true;
+						expressionStartLine = line;
+						expressionStartIndex = index;
+						parseState = ParseState.InExpression;
+					}
+				}
+
+				if (inFirstTokenOfExpression) {
+					if (!isAlNum_(c)) {
+						inFirstTokenOfExpression = false;
+						firstTokenOfExpression = lineText.substring(expressionStartIndex, index);
+					}
+				}
+
+				if (c <= charSpace) continue;
+
+				if (c === charQuote) {
+					parseState = ParseState.InString;
+				}
+				else if (c === charSlash) {
+					if (prev === charSlash) // line comment, so ignore rest of line
+						break_to_next_line = true;
+				}
+				else if (c === charStar) {
+					if (prev === charSlash)
+						parseState = ParseState.InBlockComment;
+				}
+				else if (c === charSemicolon) {
+					parseState = ParseState.Dormant;
+				}
+				else if (c === charOpenBracket) {
+					let range = editor.document.validateRange(new Range(new Position(line, index), editor.document.validatePosition(editor.document.positionAt(9999999))));
+					let name = lineText.substring(0, index).trim();
+					let symbolKind = symbolKindFromName(name);
+					let documentSymbol = new DocumentSymbol(name, "", symbolKind, range, range);
+					let parentSymbolList = documentSymbolStack.length > 0 ? documentSymbolStack[documentSymbolStack.length - 1].children : documentSymbols;
+					parentSymbolList.push(documentSymbol);
+					documentSymbolStack.push(documentSymbol);
+				}
+				else if (c === charCloseBracket) {
+					let documentSymbol = documentSymbolStack.pop();
+					if (documentSymbol) {
+						let position = editor.document.validatePosition(new Position(line, index));
+						let range = editor.document.validateRange(new Range(documentSymbol.range.start, position));
+						documentSymbol.range = range;
+						documentSymbol.selectionRange = range;
+					}
+				}
+
+				if (break_to_next_line) break;
+				continue;
+			}
+
+			switch (parseState) {
+				case ParseState.InString:{
+					if (c === charQuote)
+						parseState = ParseState.InExpression;
+					else if (c === charBackslash)
+						parseState = ParseState.InStringEscaped;
+					break;
+				}
+				case ParseState.InStringEscaped:{
+					parseState = ParseState.InString;
+					break;
+				}
+				case ParseState.InHereString:{
+					if (lineTextTrimmed.startsWith(endToken as string)) {
+						parseState = ParseState.InExpression;
+						index = lineText.indexOf(endToken as string) + (endToken as string).length - 1;
+					}
+					else {
+						break_to_next_line = true;
+					}
+					break;
+				}
+				case ParseState.InBlockComment:{
+					if (c === charStar) {
+						if (prev === charSlash) {
+							commentDepth++;
+							c = charNull; // so we don't trigger on `/*/`
+						}
+					}
+					else if (c === charSlash) {
+						if (prev === charStar) commentDepth--;
+						if (commentDepth === 0) parseState = parseStateBeforeComment;
+					}
+					break;
+				}
+			}
+			if (break_to_next_line || parseState === ParseState.Error) break;
+		}
+		if (parseState === ParseState.Error) break;
+	}
+
+	for (let i = 0; i < documentSymbols.length; i++) {
+		let symbol = documentSymbols[i];
+		foldingRanges.push(new FoldingRange(symbol.range.start.line, symbol.range.end.line));
+	}
+
+	commentDepth = 0;
 	let regionStart = -1;
 	let importStart = -1;
 	let commentStart = -1;
@@ -674,11 +831,13 @@ function decorate(editor: TextEditor) {
 
 	selectionsIntersectDecoration = false;
 	let trimmedLineText : string = "";
+	const eol = 99999;
 
 	for (let line = 0; line < sourceCodeArr.length; line++) {
 		let lineText = sourceCodeArr[line];
 		let prevLineWasEmpty = trimmedLineText === "";
 		trimmedLineText = lineText.trim();
+
 		if (endToken !== undefined) {
 			if (insideBlockComment || insideDocComment) {
 				if (lineText.indexOf("/*") >= 0)
@@ -687,22 +846,21 @@ function decorate(editor: TextEditor) {
 
 			let match = lineText.match(endToken);
 			if (match !== null || line === sourceCodeArr.length - 1) {
-				const eol = 99999;
 
 				let endLine = (insideBlockComment || insideDocComment) ? line : line - 1;
 
 				if (insideBlockComment) {
 					commentDepth--;
 					if (commentDepth > 0) continue;
-					foldingRanges.push(new FoldingRange(startLine, endLine, FoldingRangeKind.Comment));
+					//foldingRanges.push(new FoldingRange(startLine, endLine, FoldingRangeKind.Comment));
 				}
 				else if (insideDocComment) {
 					commentDepth--;
 					if (commentDepth > 0) continue;
-					foldingRanges.push(new FoldingRange(startLine, endLine, FoldingRangeKind.Comment));
+					//foldingRanges.push(new FoldingRange(startLine, endLine, FoldingRangeKind.Comment));
 				}
 				else { // herestring
-					foldingRanges.push(new FoldingRange(startLine, endLine));
+					//foldingRanges.push(new FoldingRange(startLine, endLine));
 				}
 
 				endToken = undefined;
@@ -751,20 +909,20 @@ function decorate(editor: TextEditor) {
 
 			if (!insideDocComment && !insideBlockComment) {
 				if (trimmedLineText.startsWith("#scope_")) {
-					if (regionStart >= 0)
-						foldingRanges.push(new FoldingRange(regionStart, line - 1, FoldingRangeKind.Region));
+					//if (regionStart >= 0)
+					//	foldingRanges.push(new FoldingRange(regionStart, line - 1, FoldingRangeKind.Region));
 					regionStart = line;
 					handled = true;
 				}
 
 				if (importStart >= 0) {
 					if (trimmedLineText.indexOf("#import") === -1
-					&& trimmedLineText.indexOf("#load") === -1
-					&&  trimmedLineText !== "") {
+					 && trimmedLineText.indexOf("#load") === -1
+					 && trimmedLineText !== "") {
 						let lineIndex = line - 1;
 						if (prevLineWasEmpty) lineIndex--;
-						if (lineIndex > importStart)
-							foldingRanges.push(new FoldingRange(importStart, lineIndex, FoldingRangeKind.Imports));
+						//if (lineIndex > importStart)
+						//	foldingRanges.push(new FoldingRange(importStart, lineIndex, FoldingRangeKind.Imports));
 						importStart = -1;
 					}
 				}
@@ -779,8 +937,8 @@ function decorate(editor: TextEditor) {
 					&&  trimmedLineText !== "") {
 						let lineIndex = line - 1;
 						if (prevLineWasEmpty) lineIndex--;
-						if (lineIndex > commentStart)
-							foldingRanges.push(new FoldingRange(commentStart, lineIndex, FoldingRangeKind.Comment));
+						//if (lineIndex > commentStart)
+						//	foldingRanges.push(new FoldingRange(commentStart, lineIndex, FoldingRangeKind.Comment));
 						commentStart = -1;
 					}
 				}
@@ -791,8 +949,8 @@ function decorate(editor: TextEditor) {
 
 				if (blockStart >= 0) {
 					if (lineText.startsWith("}")) {
-						if (line > blockStart + 1)
-							foldingRanges.push(new FoldingRange(blockStart, line));
+						//if (line > blockStart + 1)
+						//	foldingRanges.push(new FoldingRange(blockStart, line));
 						blockStart = -1;
 					}
 				}
@@ -803,8 +961,8 @@ function decorate(editor: TextEditor) {
 
 				if (parenStart >= 0) {
 					if (lineText.startsWith(")")) {
-						if (line > parenStart + 1)
-							foldingRanges.push(new FoldingRange(parenStart, line));
+						//if (line > parenStart + 1)
+						//	foldingRanges.push(new FoldingRange(parenStart, line));
 						parenStart = -1;
 					}
 				}
@@ -872,6 +1030,7 @@ function decorate(editor: TextEditor) {
 	if (sourceCodeArr[lastLine].trim() === "")
 		lastLine--;
 
+/*
 	if (regionStart >= 0 && regionStart < lastLine)
 		foldingRanges.push(new FoldingRange(regionStart, lastLine, FoldingRangeKind.Region));
 
@@ -886,6 +1045,7 @@ function decorate(editor: TextEditor) {
 
 	if (parenStart >= 0 && parenStart < lastLine)
 		foldingRanges.push(new FoldingRange(parenStart, lastLine));
+*/
 
 	for (let color in decorationsArrays) {
 		editor.setDecorations(embedDecorations[color], decorationsArrays[color]);
@@ -896,6 +1056,24 @@ function decorate(editor: TextEditor) {
 			editor.setDecorations(embedDecorations[color], []);
 	}
 }
+
+
+function symbolKindFromName(name: string): SymbolKind {
+	let parts = name.split(/\s+/, 3);
+	if (parts.length < 3) return SymbolKind.Null;
+
+	let middle = parts[1];
+	let tail = parts[2];
+	if (middle === "::" || middle === ":") {
+		if (tail.startsWith("(") || tail === "inline") return SymbolKind.Function;
+		if (tail === "struct") return SymbolKind.Struct;
+		if (tail.startsWith("[")) return SymbolKind.Array;
+		if (tail === "enum" || tail === "enum_flags") return SymbolKind.Enum;
+	}
+
+	return SymbolKind.Null;
+}
+
 
 function updateAsm(sourceCode: string) {
 	let asmStart = /#asm\b.*{/;
@@ -1038,6 +1216,15 @@ class JaiReferenceProvider implements ReferenceProvider {
 			}
 		});
     }
+}
+
+
+class JaiDocumentSymbolProvider implements DocumentSymbolProvider {
+	public provideDocumentSymbols(document: TextDocument, token: CancellationToken): ProviderResult<SymbolInformation[] | DocumentSymbol[]> {
+		return new Promise(resolve => {
+			resolve(documentSymbols);
+		});
+	}
 }
 
 

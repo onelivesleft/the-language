@@ -821,7 +821,7 @@
         {
             "patterns":
             [
-                { "match": "^\\s*([a-zA-Z_](?:\\w|\\\\ *)*)\\s*(::)\\s*(#import)\\s+(\")([^\"]+)(\")",
+                { "match": "^\\s*([a-zA-Z_](?:\\w|\\\\ *)*)\\s*(::)\\s*(#import(,file|,dir|,string)?)\\s+(\")([^\"]+)(\")",
                     "captures":
                     {
                         "1":
@@ -833,6 +833,27 @@
                             "name": "keyword.declaration.jai"
                         },
                         "3":
+                        {
+                            "name": "keyword.control.import.directive.jai"
+                        },
+                        "6":
+                        {
+                            "name": "punctuation.definition.string.import.begin.jai"
+                        },
+                        "7":
+                        {
+                            "name": "string-quoted.other.import.jai"
+                        },
+                        "8":
+                        {
+                            "name": "punctuation.definition.string.import.end.jai"
+                        }
+                    }
+                },
+                { "match": "(#import(,file|,dir|,string)?|#load)\\s+(\")([^\"]+)(\")",
+                    "captures":
+                    {
+                        "1":
                         {
                             "name": "keyword.control.import.directive.jai"
                         },
@@ -850,39 +871,18 @@
                         }
                     }
                 },
-                { "match": "(#import|#load)\\s+(\")([^\"]+)(\")",
+                { "match": "(#import(,file|,dir|,string)?|#load)\\s+(\"[^\"]*)?$",
                     "captures":
                     {
                         "1":
                         {
                             "name": "keyword.control.import.directive.jai"
-                        },
-                        "2":
-                        {
-                            "name": "punctuation.definition.string.import.begin.jai"
-                        },
-                        "3":
-                        {
-                            "name": "string-quoted.other.import.jai"
                         },
                         "4":
                         {
-                            "name": "punctuation.definition.string.import.end.jai"
-                        }
-                    }
-                },
-                { "match": "(#import|#load)\\s+(\"[^\"]*)?$",
-                    "captures":
-                    {
-                        "1":
-                        {
-                            "name": "keyword.control.import.directive.jai"
-                        },
-                        "2":
-                        {
                             "name": "punctuation.definition.string.import.begin.jai"
                         },
-                        "3":
+                        "5":
                         {
                             "name": "string-quoted.other.import.jai"
                         }
@@ -964,7 +964,7 @@
                     "match": "\\b(defer)\\b"
                 },
                 { "name": "keyword.other.directive.jai",
-                    "match": "(#add_context|#align|#assert|#bake(_arguments|_constants)?|#caller_code|#caller_location|#code(,(null|typed))?|#complete|#dump|#expand|#file|#filepath|#if|\\binline\\b|#insert|#insert_internal|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#no_reset|#place|#placeholder|#procedure_of_call|#program_export|#run|#specified|#symmetric|#this|#through|#type(,(isa|distinct))?|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint|#unshared)\\b"
+                    "match": "(#add_context|#align|#as|#assert|#bake(_arguments|_constants)?|#bytes|#caller_code|#caller_location|#code(,(null|typed))?|#compile_time|#complete|#dump|#elsewhere|#expand|#file|#filepath|#ifx|#if|\\binline\\b|#insert(,scope)?|#intrinsic|#modify|#module_parameters|#must|#no_abc|#no_alias|#no_padding|#no_reset|#place|#placeholder|#procedure_name|#procedure_of_call|#program_export|#run|#specified|#symmetric|#this|#through|#type(,(isa|distinct))?|#type_info_none|#type_info_procedures_are_void_pointers|#type_info_no_size_complaint|#unshared)\\b"
                 },
                 { "name": "keyword.other.directive.scope.jai",
                     "match": "(#scope_export|#scope_file|#scope_module)"
@@ -976,7 +976,7 @@
                     "match": "\\b(context|push_context)\\b"
                 },
                 { "name": "keyword.other.using.jai",
-                    "match": "\\b(using)\\b"
+                    "match": "\\b(using(,map|,except|,only)?)\\b"
                 },
                 { "name": "keyword.other.allocator.jai",
                     "match": "\\b(temp)\\b"
@@ -2068,7 +2068,7 @@
                 {
                     "patterns":
                     [
-                        { "match": "(,)?\\s*(using\\s*)?((\\$*)[a-zA-Z_](?:\\w|\\\\ *)*)(\\s*:=)([^,]*)",
+                        { "match": "(,)?\\s*(using\\s*((,except|,only|,map)\\([^)]*\\)\\s*)?)?((\\$*)[a-zA-Z_](?:\\w|\\\\ *)*)(\\s*:=)([^,]*)",
                             "captures":
                             {
                                 "1":
@@ -2079,19 +2079,19 @@
                                 {
                                     "name": "keyword.other.jai"
                                 },
-                                "3":
+                                "5":
                                 {
                                     "name": "variable.parameter.jai"
                                 },
-                                "4":
+                                "6":
                                 {
                                     "name": "punctuation.definition.generic.jai"
                                 },
-                                "5":
+                                "7":
                                 {
                                     "name": "keyword.declaration.jai"
                                 },
-                                "6":
+                                "8":
                                 {
                                     "patterns":
                                     [
@@ -2100,7 +2100,7 @@
                                 }
                             }
                         },
-                        { "match": "(,)?\\s*(using\\s*)?((\\$*)[a-zA-Z_](?:\\w|\\\\ *)*)\\s*(:)\\s*(\\.\\.)?\\s*(\\[[^\\]]*\\])?\\s*((\\**)($)?[a-zA-Z_](?:\\w|\\\\ *)*)?(\\s*=)?([^,]*)",
+                        { "match": "(,)?\\s*(using\\s*((,except|,only|,map)\\([^)]*\\)\\s*)?)?((\\$*)[a-zA-Z_](?:\\w|\\\\ *)*)\\s*(:)\\s*(\\.\\.)?\\s*(\\[[^\\]]*\\])?\\s*((\\**)($)?[a-zA-Z_](?:\\w|\\\\ *)*)?(\\s*=)?([^,]*)",
                             "captures":
                             {
                                 "1":
@@ -2111,43 +2111,43 @@
                                 {
                                     "name": "keyword.other.jai"
                                 },
-                                "3":
+                                "5":
                                 {
                                     "name": "variable.parameter.jai"
                                 },
-                                "4":
-                                {
-                                    "name": "punctuation.definition.generic.jai"
-                                },
-                                "5":
-                                {
-                                    "name": "keyword.declaration.jai"
-                                },
                                 "6":
                                 {
-                                    "name": "punctuation.jai"
+                                    "name": "punctuation.definition.generic.jai"
                                 },
                                 "7":
                                 {
-                                    "include": "#array"
+                                    "name": "keyword.declaration.jai"
                                 },
                                 "8":
                                 {
-                                    "name": "storage.type.jai"
+                                    "name": "punctuation.jai"
                                 },
                                 "9":
                                 {
-                                    "name": "keyword.operator.pointer.jai"
+                                    "include": "#array"
                                 },
                                 "10":
                                 {
-                                    "name": "punctuation.definition.generic.jai"
+                                    "name": "storage.type.jai"
                                 },
                                 "11":
                                 {
-                                    "name": "keyword.declaration.jai"
+                                    "name": "keyword.operator.pointer.jai"
                                 },
                                 "12":
+                                {
+                                    "name": "punctuation.definition.generic.jai"
+                                },
+                                "13":
+                                {
+                                    "name": "keyword.declaration.jai"
+                                },
+                                "14":
                                 {
                                     "patterns":
                                     [
@@ -4463,7 +4463,7 @@
         "deprecated-names":
         {
             "name": "invalid.deprecated.jai",
-            "match": "\\b(temporary_allocator|__temporary_allocator|CreateWindowExA|SetWindowTextA|GetWindowLongA|RegisterClassExA|SetWindowLongA|ExtractIconA|GetIconInfoExA|LoadIconA|LoadCursorA|DispatchMessageA|PeekMessageA|DefWindowProcA|GetMonitorInfoA|GetComputerNameA|GetSystemDirectoryA|GetUserNameA|GetVersionExA|CreateEventA|CreateSemaphoreA|GetModuleFileNameA|GetModuleHandleA|CreateDirectoryA|GetCurrentDirectoryA|RemoveDirectoryA|MessageBoxA|CreateFileA|CreateHardLinkA|DeleteFileA|FindFirstFileA|FindNextFileA|GetFileAttributesA|GetFullPathNameA|MoveFileA|FormatMessageA|SystemParametersInfoA|SHFileOperationA|Push_Temporary|enum_values|get_system_time_local|NSIsSymbolNameDefined|NSLookupAndBindSymbol|NSAddressOfSymbol|compiler_report_error|compiler_info|compiler_warning|compiler_error|SHGetFolderPathA|is_a_window_resized|has_a_window_moved|LZ4_decompress_fast|LZ4_decompress_fast_continue|LZ4_decompress_fast_usingDict|LZ4_resetStream|get_string_width_in_pixels|simp_init|load_texture_from_file|load_texture_from_bitmap|AUGraphStart|NewAUGraph|AUGraphAddNode|AUGraphNodeInfo|AUGraphOpen|AUGraphConnectNodeInput|AUGraphInitialize|index_of_string|last_index_of_string|index_of_char|last_index_of_char|index_of_any_char|last_index_of_any_char|skip_any_char|concatenate|find_character_from_right|split_by_character_from_right|find_character_from_left|find_character_from_left_v2|read_until_any_char)\\b"
+            "match": "\\b(temporary_allocator|__temporary_allocator|table_find_pointer|table_find|table_find_multiple|hotloader_init|filetime_to_localtime|filetime_to_localtime|CreateWindowExA|SetWindowTextA|GetWindowLongA|RegisterClassExA|SetWindowLongA|ExtractIconA|GetIconInfoExA|LoadIconA|LoadCursorA|DispatchMessageA|PeekMessageA|DefWindowProcA|GetMonitorInfoA|GetComputerNameA|GetSystemDirectoryA|GetUserNameA|GetVersionExA|CreateEventA|CreateSemaphoreA|GetModuleFileNameA|GetModuleHandleA|CreateDirectoryA|GetCurrentDirectoryA|RemoveDirectoryA|MessageBoxA|CreateFileA|CreateHardLinkA|DeleteFileA|FindFirstFileA|FindNextFileA|GetFileAttributesA|GetFullPathNameA|MoveFileA|SystemParametersInfoA|SHFileOperationA|NSIsSymbolNameDefined|NSLookupAndBindSymbol|NSAddressOfSymbol|compiler_get_command_line_arguments|SHGetFolderPathA|LZ4_decompress_fast|LZ4_decompress_fast_continue|LZ4_decompress_fast_usingDict|LZ4_resetStream|os_run_command|AUGraphStart|NewAUGraph|AUGraphAddNode|AUGraphNodeInfo|AUGraphOpen|AUGraphConnectNodeInput|AUGraphInitialize)\\b"
         },
         "support":
         {
@@ -4473,10 +4473,10 @@
                     "match": "\\b(align_of|code_of|type_of|size_of|type_info|initializer_of)\\b"
                 },
                 { "name": "support.function.jai",
-                    "match": "\\b(__default_allocator_proc|get_current_workspace|memcpy|memcmp|memset|running_at_compile_time|debug_break|write_string|write_strings|write_number|write_nonnegative_number|c_style_strlen|array_copy|array_copy|array_view|array_view|array_free|array_reset|array_add|array_add|array_add|array_add_if_unique|array_insert_at|array_unordered_remove_by_value|array_unordered_remove_by_index|array_ordered_remove_by_value|array_ordered_remove_by_index|array_find|peek|peek_pointer|pop|array_free|array_reset|array_reset_keeping_memory|array_reserve|array_resize|array_resize|maybe_grow|init_range|check_alloc|check_free|check_realloc|add_allocation_to_table|allocations_before_this_call_will_not_be_considered_leaks|this_allocation_is_not_a_leak|report_memory_leaks|make_leak_report|log_leak_report|deinit|init|get_memory_hash|report_use_of_unknown_memory|report_already_freed_memory|find_or_pack_stack_trace|report_allocation_of_already_live_memory|check_for_allocator_mismatch|my_log_stack_trace|trim_displayed_trace_based_on_options|procedures_match|get_hash_from_stack_trace|group_summaries|summary_should_be_grouped|intersect_call_stacks|nodes_match|commas|get_command_line_arguments|alloc|free|realloc|alloc_string|talloc_string|free|push_allocator|push_allocator|Push_Temporary|get_field|min|max|OnlyScalars|max|min|clamp|Swap|swap|enum_names|enum_values_as_s64|enum_values_as_enum|enum_values|enum_highest_value|enum_range|enum_range_given_info|talloc|temporary_alloc|temporary_allocator_proc|get_temporary_storage_mark|set_temporary_storage_mark|reset_temporary_storage|auto_release_temp|decode_relative_pointer|decode_relative_pointer_static|write_relative_pointer|Construct|New|NewArray|align_forward|free_pages_down_to|add_new_page|pack_stack_trace|pack_stack_trace|print_stack_trace|log_stack_trace|remember_allocators|resizable|get_integer_range|clamp_to_another_integer_type|is_integer_type|get_system_time_local|formatInt|formatFloat|formatStruct|buffer_to_string_without_copy|get_s64_from_void_pointer|get_u64_from_void_pointer|print_u64_base_n|print_float|print_integer|print_character|print|print_single_byte_character|sprint|tprint|log|log_error|append_indentation|append_struct_info|append_relative_pointer_size|print_type_to_builder|print_item_to_builder|is_digit|parse_number|print_to_builder|print_sequence_to_builder|isFormatter|print_bytes|print_array|type_to_string|get_full_sized_string|check_null_formatter|to_string|to_string|to_string|to_string|to_c_string|c_style_strlen|to_upper|to_lower|is_alpha|is_digit|is_alnum|is_space|is_print|is_any|advance|advance|temp_c_string|copy_temporary_string|copy_string|string_to_float|string_to_float64|string_to_float_type_T|to_integer|string_to_int|eat_spaces|STRING_BUILDER_BUFFER_SIZE|init_string_builder|free_buffers|reset|ensure_contiguous_space|append|append|append|builder_string_length|builder_to_string|write_builder|consume_u8_and_length|get_current_buffer|get_base_buffer|get_buffer_data|simple_memcpy|expand|string_to_float|string_to_float64|multiply_and_convert_to_float|MUL_96|NORMALIZE|clz64|clz32|INRANGE|HOLE)\\b"
+                    "match": "\\b(__default_allocator_proc|get_current_workspace|memcpy|memcmp|memset|debug_break|write_string|write_strings|write_number|write_nonnegative_number|to_string|c_style_strlen|array_copy|array_copy|array_view|array_view|array_free|array_reset|array_add|array_add|array_add|array_add_if_unique|array_insert_at|array_unordered_remove_by_value|array_unordered_remove_by_index|array_ordered_remove_by_value|array_ordered_remove_by_index|array_find|peek|peek_pointer|pop|array_free|array_reset|array_reset_keeping_memory|array_reserve|array_resize|array_resize|maybe_grow|init_range|Preamble|_check_alloc|_check_free|_check_realloc|add_allocation_to_table|add_allocation_this_frame|add_free_this_frame|allocations_before_this_call_will_not_be_considered_leaks|this_allocation_is_not_a_leak|this_allocation_leaks_todo|report_memory_leaks|make_leak_report|log_leak_report|deinit|init|get_memory_hash|report_use_of_unknown_memory|report_already_freed_memory|find_or_pack_stack_trace|report_allocation_of_already_live_memory|check_for_allocator_mismatch|my_log_stack_trace|trim_displayed_trace_based_on_options|procedures_match|get_hash_from_stack_trace|group_summaries|summary_should_be_grouped|intersect_call_stacks|nodes_match|commas|hash_alloc_and_free_traces|get_command_line_arguments|alloc|free|realloc|alloc_string|talloc_string|free|push_allocator|push_allocator|get_field|min|max|IsScalar|max|min|clamp|Swap|swap|enum_names|enum_values_as_s64|enum_values_as_enum|enum_highest_value|enum_range|enum_range_given_info|talloc|temporary_alloc|temporary_allocator_proc|get_temporary_storage_mark|set_temporary_storage_mark|reset_temporary_storage|auto_release_temp|decode_relative_pointer|decode_relative_pointer_static|write_relative_pointer|Initialize|New|Dynamic_New|NewArray|align_forward|free_pages_down_to|add_new_page|pack_stack_trace|pack_stack_trace|print_stack_trace|log_stack_trace|get_stack_trace_string|remember_allocators|resizable|get_integer_range|clamp_to_another_integer_type|is_integer_type|find_dynamic_context|add_dynamic_context|find_or_add_dynamic_context|formatInt|formatFloat|formatStruct|buffer_to_string_without_copy|get_s64_from_void_pointer|get_u64_from_void_pointer|print_u64_base_n|print_float|print_integer|print_character|print|sprint|tprint|log|log|log_error|log_error|append_indentation|append_struct_info|append_relative_pointer_size|print_type_to_builder|print_item_to_builder|is_digit|parse_number|print_to_builder|print_sequence_to_builder|isFormatter|print_bytes|print_array|type_to_string|get_full_sized_string|check_null_formatter|to_string|to_string|to_string|to_string|to_c_string|c_style_strlen|to_upper|to_lower|is_alpha|is_digit|is_alnum|is_space|is_print|is_any|advance|advance|temp_c_string|copy_temporary_string|copy_string|string_to_float|string_to_float64|string_to_float_type_T|to_integer|string_to_int|eat_spaces|STRING_BUILDER_BUFFER_SIZE|init_string_builder|free_buffers|reset|ensure_contiguous_space|ensure_contiguous_space_and_return_available_range|advance_through_ensured_space|append|append|append|append_by_pointer|builder_string_length|builder_to_string|write_builder|consume_u8_and_length|get_current_buffer|get_base_buffer|get_buffer_data|simple_memcpy|expand|string_to_float|string_to_float64|multiply_and_convert_to_float|MUL_96|NORMALIZE|clz64|clz32|INRANGE|HOLE)\\b"
                 },
                 { "name": "support.class.jai",
-                    "match": "\\b(Operating_System_Tag|Type_Info_Tag|Type_Info|Type_Info_Integer|Type_Info_Float|Type_Info_String|Type_Info_Pointer|Type_Info_Procedure|Type_Info_Struct|Type_Info_Struct_Member|Type_Info_Array|Type_Info_Enum|Type_Info_Variant|Any|Allocator_Proc|Allocator|Allocator_Mode|Logger|Log_Info|Log_Level|Stack_Trace_Procedure_Info|Stack_Trace_Node|Context_Base|Temporary_Storage|Source_Code_Location|Source_Code_Range|Procedure_With_Data|Newstring|Array_View_64|Array_View_32|Array_View_16|Array_View_8|Resizable_Array|Procedure_To_Elide|Leak_Report_Options|Leak_Report|Leak_Summary|Group_Info|Allocation|Packed_Stack_Trace|Temporary_Storage_State|SystemTime|Formatter|FormatInt|FormatFloat|FormatStruct|FormatArray|Print_Style|String_Builder)\\b"
+                    "match": "\\b(Operating_System_Tag|Type_Info_Tag|Type_Info|Type_Info_Integer|Type_Info_Float|Type_Info_String|Type_Info_Pointer|Type_Info_Procedure|Struct_Textual_Flags|Type_Info_Struct|Type_Info_Struct_Member|Type_Info_Array|Type_Info_Enum|Type_Info_Variant|Any_Struct|Allocator_Proc|Allocator|Allocator_Mode|Logger|Log_Info|Log_Level|Log_Section|Stack_Trace_Procedure_Info|Stack_Trace_Node|Dynamic_Context_Entry|Context_Base|Temporary_Storage|Source_Code_Location|Source_Code_Range|Procedure_With_Data|Newstring|Array_View_64|Array_View_32|Array_View_16|Array_View_8|Resizable_Array|Name_Mapper|Procedure_To_Elide|Leak_Report_Options|Leak_Report|Leak_Summary|Group_Info|Allocation|Packed_Stack_Trace|Memory_Debugger_Interface|Temporary_Storage_State|SystemTime|Formatter|FormatInt|FormatFloat|FormatStruct|FormatArray|Print_Style|String_Builder)\\b"
                 }
             ]
         }

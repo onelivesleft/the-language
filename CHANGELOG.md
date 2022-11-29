@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.0.86] - 2022-11-29
+* Added Outlining/Folding/Sticky Scroll
+* Updated for v0.1.046
+
 ## [0.0.85] - 2022-01-31
 * Fixed errors not clearing when fixed.
 
