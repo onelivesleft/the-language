@@ -15,7 +15,7 @@ help_text :: #string __sh
         Dump                          # Will return references for evey token.
 __sh;
 
-sentinel :: "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
+sentinel :: "fe955110-fc9e-4c28-be65-93cdffdb26c9";
 
 
 target_path : string;
@@ -24,128 +24,54 @@ target_char : int;
 finished_typechecking := false;
 mode : enum { SINGLE_REFERENCE; ALL_REFERENCES; };
 
+get_plugin :: () -> *Metaprogram_Plugin {
+  plugin := New(Metaprogram_Plugin);
 
-#run {
-    #if debug  print("DEBUG ENABLED\n");
+  plugin.before_intercept = before_intercept;
+  plugin.handle_one_option = handle_one_option;
+  plugin.message = check_valid_message;
+  return plugin;
+}
 
-    compiler_version : Version_Info = ---;
-    compiler_get_version_info(*compiler_version);
+handle_one_option :: (p: *Metaprogram_Plugin, options: [] string, cursor: int) -> (new_cursor: int) {
+    new_cursor := cursor;
 
-    args := compiler_get_command_line_arguments();
-    if !args {
-        print(help_text);
-        exit(1);
-    }
-
-    line_ok, char_ok : bool;
-
-    operation := args[0];
-    if operation == "Find" {
-        if args.count < 4 {
-            print(help_text);
+    operation := options[cursor];
+    if operation == "-Find" {
+        if options.count < cursor + 4 {
+            write_string(help_text);
             exit(1);
         }
+        new_cursor = cursor + 4;
+
         mode = .SINGLE_REFERENCE;
-        target_path = args[1];
+        target_path = options[cursor + 1];
         normalize_path(target_path);
-        target_line, line_ok = parse_int(*args[2]);
-        target_char, char_ok = parse_int(*args[3]);
+
+
+        line_ok, char_ok: bool;
+
+        target_line, line_ok = parse_int(*options[cursor + 2]);
+        target_char, char_ok = parse_int(*options[cursor + 3]);
 
         if !(line_ok && char_ok) {
-            print(help_text);
+            write_string(help_text);
             exit(1);
         }
     }
-    else if operation == "Dump" {
+    else if operation == "-Dump" {
         mode = .ALL_REFERENCES;
-    }
-    else {
-        print(help_text);
-        exit(1);
+        new_cursor = cursor + 1;
     }
 
-    workspace := compiler_create_workspace("Target Program");
-    if !workspace {
-        print("Workspace creation failed.\n");
-        exit(2);
-    }
+    return new_cursor;
+}
 
-    files, run_strings := compiler_get_source_files();
-    if files {
-        basename, path := get_basename_and_path(files[0]);
-        if path {
-            old_wd := get_working_directory();
-            set_working_directory(path);
-
-            for * files {
-                //print("%\n", it);
-                old_filename := <<it;
-                if is_absolute_path(old_filename) continue;
-                <<it = sprint("%/%", old_wd, old_filename);
-                #if debug  print("%\n", <<it);
-            }
-        }
-    }
-
-    build_options := get_build_options(workspace);
-    build_options.output_type = .NO_OUTPUT;
-    {
-        using compiler_version;
-        if !(major == 0 && minor == 0 && micro >= 84 && micro <= 85)
-            build_options.emit_debug_info = .NONE;
-    }
-
-    // @TODO make correct when Jai has a std lib way of finding this
-    #if OS == .WINDOWS {
-        build_options.output_path = "c:/temp/";
-        build_options.intermediate_path = "c:/temp/";
-    }
-    else {
-        build_options.output_path = "/tmp/";
-        build_options.intermediate_path = "/tmp/";
-    }
-
-    chk := check_message;
-    build_options.user_data_u64 = xx *chk;
-    set_build_options(build_options, workspace);
-
-    compiler_begin_intercept(workspace);
-
-    for files        add_build_file(it, workspace);
-    for run_strings  add_build_string(tprint("#run %;\n", it), workspace);
-
-    while !finished_typechecking {
-        message := compiler_wait_for_message();
-        valid, complete := check_message(message);
-        if complete  break;
-    }
-
-    compiler_end_intercept(workspace);
-
-    exit(0);
-
-
-    check_message :: (message: *Message) -> valid: bool, complete: bool {
-        if !message return false, false;
-        if message.kind == .COMPLETE return false, true;
-
-        check_valid_message(message);
-
-        return true, false;
-    }
-
-
-    is_absolute_path :: (path: string) -> bool { // This routine is probably not as correct as we'd like. We'd like to put in a better one! But maybe we will stop doing the cwd thing, or do it differently; hard to say.
-        if !path return false;
-
-        if path[0] == #char "/" return true;  // Backslashes have already been converted to forward slashes by this point.
-        if path.count >= 3 {
-            // @Robustness: Check for a drive letter in character 0?  Anything else?
-            if path[1] == #char ":" return true;
-        }
-
-        return false;
-    }
+before_intercept :: (p: *Metaprogram_Plugin, flags: *Intercept_Flags) {
+    #if debug  print("DEBUG ENABLED\n");
+    options := get_build_options(p.workspace);
+    options.output_type = .NO_OUTPUT;
+    set_build_options(options, p.workspace);
 }
 
 
@@ -158,7 +84,7 @@ expressions : [..] *Code_Node;
 to_revisit : [..] *Code_Ident;
 
 
-check_valid_message :: (message: *Message) {
+check_valid_message :: (p: *Metaprogram_Plugin, message: *Message) {
     if message.kind == {
         case .TYPECHECKED;
         code := cast(*Message_Typechecked) message;
@@ -192,7 +118,7 @@ check_valid_message :: (message: *Message) {
                     print(sentinel);
                     needle_range := format_range(needle);
                     print("%|%\n", needle.name, needle_range);
-                    ranges, _ := table_find(locations, needle);
+                    ranges, _ := table_find(*locations, needle);
                     for ranges {
                         range := format_range(it);
                         if range != needle_range
@@ -243,7 +169,7 @@ process_decl_or_ident :: (node: *Code_Node) {
 
 
 check_add_decl :: (decl: *Code_Declaration) -> Location_List {
-    location_list, found := table_find(locations, decl);
+    location_list, found := table_find(*locations, decl);
     if found {
         return location_list;
     }
@@ -329,6 +255,11 @@ make_code_range :: (node: *Code_Node) -> Source_Code_Range {
 
 
 normalize_path :: (path: string) {
-    path_overwrite_separators(path);
-    to_lower(path);
+    if path {
+        path_overwrite_separators(path);
+
+        for c_index: 0 .. path.count-1 {
+            path[c_index] = to_lower(path[c_index]);
+        }
+    }
 }

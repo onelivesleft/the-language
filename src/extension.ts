@@ -30,7 +30,7 @@ let saveTimeout: NodeJS.Timer | undefined = undefined;
 let selections: Array<Selection> = [];
 let decorationRanges: Range [] = [];
 let selectionsIntersectDecoration = false;
-let sentinel = "\nfe955110-fc9e-4c28-be65-93cdffdb26c9\n";
+let sentinel = "fe955110-fc9e-4c28-be65-93cdffdb26c9"; // This used to be enclosed in LF, but Windows stdout seems to convert them to CRLF... Sigh!
 let asmRanges: Range [] = [];
 let asmCompletions: CompletionItem [] = [];
 let asmURLs: { [id: string] : string; } = {};
@@ -481,6 +481,8 @@ function updateSelectionAndDecorations() {
 function updateDecorations() {
 	if (!activeEditor) return;
 
+	console.log('activeEditor: ', activeEditor);
+
 	decorate(activeEditor);
 }
 
@@ -756,11 +758,13 @@ function decorate(editor: TextEditor) {
 				else if (c === charOpenBracket) {
 					let range = editor.document.validateRange(new Range(new Position(line, index), editor.document.validatePosition(editor.document.positionAt(9999999))));
 					let name = lineText.substring(0, index).trim();
-					let symbolKind = symbolKindFromName(name);
-					let documentSymbol = new DocumentSymbol(name, "", symbolKind, range, range);
-					let parentSymbolList = documentSymbolStack.length > 0 ? documentSymbolStack[documentSymbolStack.length - 1].children : documentSymbols;
-					parentSymbolList.push(documentSymbol);
-					documentSymbolStack.push(documentSymbol);
+					if(name !== '') {
+						let symbolKind = symbolKindFromName(name);
+						let documentSymbol = new DocumentSymbol(name, "", symbolKind, range, range);
+						let parentSymbolList = documentSymbolStack.length > 0 ? documentSymbolStack[documentSymbolStack.length - 1].children : documentSymbols;
+						parentSymbolList.push(documentSymbol);
+						documentSymbolStack.push(documentSymbol);
+					}
 				}
 				else if (c === charCloseBracket) {
 					let documentSymbol = documentSymbolStack.pop();
@@ -1362,22 +1366,22 @@ async function jaiLocate(filepath: string, position: Position, operation: string
 	let normalized = filepath.replace(/\\/g, '/');
 
 	let args : string [] = [
-		"-import_dir",
-		modulepath,
-		"-meta",
+		"-plug",
 		"VSCodeLocate",
 		fileToCompile,
 		"-no_dce"
 	];
+	args.push("-Find");
+	args.push(normalized);
+	args.push((position.line + 1).toString());
+	args.push((position.character + 1).toString());
 
 	for (let i = 0; i < projectCompilerArgs.length; i++)
 		args.push(projectCompilerArgs[i]);
 
 	args.push("--");
-	args.push("Find");
-	args.push(normalized);
-	args.push((position.line + 1).toString());
-	args.push((position.character + 1).toString());
+	args.push("import_dir");
+	args.push(modulepath);
 
 	if (debugMode) logCommand(exepath as string, args);
 
@@ -1404,19 +1408,19 @@ async function jaiDump(filepath: string): Promise<[string, string] | undefined> 
 	let normalized = filepath.replace(/\\/g, '/');
 
 	let args : string [] = [
-		"-import_dir",
-		modulepath,
-		"-meta",
+		"-plug",
 		"VSCodeLocate",
 		fileToCompile,
 		"-no_dce"
 	];
+	args.push("-Dump");
 
 	for (let i = 0; i < projectCompilerArgs.length; i++)
 		args.push(projectCompilerArgs[i]);
 
 	args.push("--");
-	args.push("Dump");
+	args.push("import_dir");
+	args.push(modulepath);
 
 	if (debugMode) logCommand(exepath as string, args);
 

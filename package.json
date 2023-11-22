@@ -2,7 +2,7 @@
     "name": "the-language",
     "displayName": "The Language",
     "description": "Support for the Jai language.",
-    "version": "0.0.86",
+    "version": "0.0.87",
     "repository": {
         "type": "git",
         "url": "https://github.com/onelivesleft/the-language"

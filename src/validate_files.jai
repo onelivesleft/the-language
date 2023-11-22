@@ -1,14 +1,50 @@
 #import "Basic";
 #import "File";
-#import "Strings";
+#import "String";
 
 package_file      :: "../package.json";
 changelog_file    :: "../CHANGELOG.md";
 
 
 main :: () {
-    changelog_report := trim_start_past(changelog_file, #char "/");
-    package_report := trim_start_past(package_file, #char "/");
+    trim_start :: (s: string, delimiter: $T) -> trimmed: string, found: bool {
+      trim_count := find_index_from_left(s, delimiter);
+
+      trimmed := "";
+      found := trim_count != -1;
+      if found {
+          trimmed = slice(s, trim_count, s.count - trim_count);
+      }
+
+      return trimmed, found;
+    }
+
+    trim_start_past :: (s: string, delimiter: $T) -> trimmed: string, found: bool {
+      trim_count := find_index_from_left(s, delimiter) + 1;
+
+      trimmed := "";
+      found := trim_count != -1;
+      if found {
+          trimmed = slice(s, trim_count, s.count - trim_count);
+      }
+
+      return trimmed, found;
+    }
+
+    trim_through :: (s: string, delimiter: $T) -> trimmed: string {
+      left := find_index_from_left(s, delimiter) + 1;
+      trimmed := slice(s, left, s.count - left);
+      right := find_index_from_left(trimmed, delimiter);
+      trimmed.count = right;
+      return trimmed;
+    }
+
+    advance_past :: (s: *string, delimiter: u8) {
+      << s = trim_start_past(<< s, delimiter);
+    }
+
+    changelog_report := trim_start_past(changelog_file, cast(u8) #char "/");
+    package_report := trim_start_past(package_file, cast(u8) #char "/");
 
     package, package_ok := read_entire_file(package_file);
     if !package_ok {
@@ -17,10 +53,10 @@ main :: () {
     }
 
     package_version : string;
-    for line: line_split(package) {
+    for line: split(package, "\n") {
         text, found := trim_start_past(line, "\"version\"");
         if found {
-            package_version = trim_through(text, #char "\"");
+            package_version = trim_through(text, cast(u8) #char "\"");
             break;
         }
     }
@@ -38,12 +74,12 @@ main :: () {
 
     changelog_version : string;
     changelog_date : string;
-    for line: line_split(changelog) {
-        text := trim_start(line);
+    for line: split(changelog, "\n") {
+        text := trim_left(line);
         // ## [0.0.77] - 2021-10-
         if starts_with(text, "## ") {
             advance_past(*text, #char "[");
-            changelog_version, changelog_date = split_into_two(text, #char "]");
+            changelog_ok, changelog_version, changelog_date = split_from_left(text, #char "]");
             changelog_date = trim_start_past(changelog_date, " - ");
             break;
         }
