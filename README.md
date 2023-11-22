@@ -25,53 +25,14 @@ Autocomplete x64 instructions
 
 *Note: this feature is far from polished!*
 
-The extention provides Rename, Definition and Reference Providers.  These work using the compiler, so you need to set the compiler location extension setting (the path to the executable).  If you want to use them in a project then you need to tell the extension what your root jai file is for the project (i.e. the file you compile to build the project).  To do so, in the project folder make a `.vscode/settings.json` file that looks like this:
+The extention provides Rename, Definition and Reference Providers. These work using the compiler, using the now-standard metaprogram plugin interface, so you only have to specify the compiler's location (path to the executable) and which .jai file you use to build your project in the extension settings. To do so, in the project folder make a `.vscode/settings.json` file that looks like this:
 
 ```json
 // Place your settings in this file to overwrite default and user settings.
 {
+    "the-language.pathToJaiExecutable": "c:\\path\\to\\jai.exe", // You might want to set a good default path for this in VS Code's graphical "Extension Settings" editor. 
     "the-language.projectFile": "c:\\path\\to\\build.jai"
 }
 ```
 
-If that file sets up its own compiler workspaces when compiling then you will need to get those workspaces to co-operate with the extension (or the extension will not see its compiler messages).  The extension will set `build_options.user_data_u64` to point to a function with this signature:
-
-```jai
-    check_message :: (message: *Message) -> valid: bool, complete: bool
-```
-
-You need to use this function in your message loop.  Example:
-
-```jai
-default_check_message :: (message: *Message) -> valid: bool, complete: bool {
-    if !message return false, false;
-    if message.kind == .COMPLETE return false, true;
-    return true, false;
-}
-
-check_message := default_check_message;
-is_dummy_compile := false;
-build_options := get_build_options();
-if build_options.user_data_u64 {
-    check_message = <<cast(*type_of(default_check_message)) build_options.user_data_u64;
-    is_dummy_compile = true;
-}
-
-if !is_dummy_compile {
-    // extra work when you're actually building like choosing build mode
-    // that we want to skip when we're just using the compiler to parse the
-    // codebase.
-}
-
-compiler_begin_intercept(workspace);
-while true {
-    message := compiler_wait_for_message();
-
-    valid, complete := check_message(message);
-    if complete  break;
-    if !valid    continue;
-
-    do_what_you_want_with(message);
-}
-compiler_end_intercept(workspace);
-```
+This method works both for simple programs that use the Default_Metaprogram, and for projects that setup their own workspaces.
