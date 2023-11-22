@@ -25,7 +25,7 @@ Autocomplete x64 instructions
 
 *Note: this feature is far from polished!*
 
-The extention provides Rename, Definition and Reference Providers. These work using the compiler, using the now-standard metaprogram plugin interface, so you only have to specify the compiler's location (path to the executable) and which .jai file you use to build your project in the extension settings. To do so, in the project folder make a `.vscode/settings.json` file that looks like this:
+The extension provides Rename, Definition and Reference Providers. These work using the compiler, using the now-standard metaprogram plugin interface, so you only have to specify the compiler's location (path to the executable) and which .jai file you use to build your project in the extension settings. To do so, in the project folder make a `.vscode/settings.json` file that looks like this:
 
 ```json
 // Place your settings in this file to overwrite default and user settings.
