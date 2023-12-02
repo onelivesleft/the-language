@@ -1,8 +1,7 @@
 #import "Basic";
 #import "File";
 #import "File_Utilities";
-#import "Strings";
-heap :: #import "Strings_Alloc";
+#import "String";
 
 #load "languages.jai";
 #load "yaml_snippets.jai";
@@ -176,7 +175,7 @@ main :: () {
     processed_line_count := 0;
     array_add(*line_offsets, 0);
 
-    for raw_row, index: line_split(builder_to_string(*yaml)) {
+    for raw_row, index: split(builder_to_string(*yaml), "\n") {
         row := raw_row;
         line_number = index + 1;
 
@@ -191,15 +190,15 @@ main :: () {
         if row[spaces] == #char "#" {
             line_offsets[processed_line_count] += 1;
 
-            row = trim_start(advance(row, spaces + 1));
-            i := first_index(row, #char ":");
+            row = trim_left(advance(row, spaces + 1));
+            i := find_index_from_left(row, #char ":");
             if i == -1 || i >= row.count - 2 || row[i + 1] != #char ":"
                 continue;
 
             from : string = ---;
             from.data = row.data;
             from.count = i;
-            from = trim_end(from);
+            from = trim_right(from);
 
             to := trim(advance(row, i + 2));
 
@@ -230,7 +229,7 @@ main :: () {
             digits_end += 1;
         if digits_end > digits_start && row.count > digits_end + 1 && row[digits_end] == #char ":" {
             split_at := digits_end + 1;
-            tail := trim(slice(row, split_at + 1));
+            tail := trim(slice(row, split_at + 1, row.count - split_at - 1));
             if tail != "" {
               append(*preprocess, slice(row, 0, split_at));
               append(*preprocess, "\n");
@@ -252,7 +251,7 @@ main :: () {
 
     yaml_string := builder_to_string(*preprocess);
 
-    for raw_row, index: line_split(yaml_string) {
+    for raw_row, index: split(yaml_string, "\n") {
         row := raw_row;
         line_number = index + 1 + line_offsets[index];
         if noisey  print("% %\n", line_number, row);
@@ -269,7 +268,7 @@ main :: () {
 
         if contains_upper_case(row) {
             for replacement: replacements
-                row = heap.replace(row, replacement.from, replacement.to);
+                row = replace(row, replacement.from, replacement.to);
         }
 
         key, value, is_list_entry := parse_row(row);
@@ -367,11 +366,24 @@ main :: () {
     write_entire_file(out_file, json_string);
 
     if noisey  for replacements  print("% -> %\n", it.from, it.to);
+    
+    count :: (s: string, c: u8) -> int {
+        result := 0;
+        for 0 .. s.count-1 {
+            if s[it] == c {
+                result += 1;
+            }
+        }
+        return result;
+    }
 
-    set_simd_mode(.OFF); // @TODO remove when we've finished fixing `count`
     print("OK! (% YAML lines -> % JSON lines)\n", count(yaml_string, #char "\n"), count(json_string, #char "\n"));
 }
 
+is_upper :: inline (c: u8) -> bool {
+    result := (c >= #char "A") && (c <= #char "Z");
+    return result;
+}
 
 contains_upper_case :: (s: string) -> bool {
     for i: 0 .. s.count - 1
@@ -381,7 +393,11 @@ contains_upper_case :: (s: string) -> bool {
 }
 
 parse_row :: (row_data: string) -> key: string, value: string, is_list_entry: bool {
-    row := heap.replace(trim_start(row_data), "\\", "\\\\");
+    fix_up :: (s: string) -> string {
+        return replace(trim(s, "'"), "\"", "\\\"");
+    }
+
+    row := replace(trim_left(row_data), "\\", "\\\\");
 
     is_list_entry := false;
     if starts_with(row, "- ") {
@@ -390,25 +406,20 @@ parse_row :: (row_data: string) -> key: string, value: string, is_list_entry: bo
         row.count -= 2;
     }
 
-    colon := first_index(row, #char ":");
+    colon := find_index_from_left(row, #char ":");
     if colon == -1 {
         print("Missing ':' on line %\n", line_number);
         exit(6);
     }
 
     key := slice(row, 0, colon);
-    value := slice(row, colon + 1);
+    value := slice(row, colon + 1, row.count - colon - 1);
     value = trim(value);
 
     key = fix_up(key);
     value = fix_up(value);
 
     return key, value, is_list_entry;
-
-
-    fix_up :: (s: string) -> string {
-        return heap.replace(trim(s, "'"), "\"", "\\\"");
-    }
 }
 
 
@@ -455,7 +466,7 @@ scrape_modules_folder :: () {
 
         if contains(support_module_paths, filepath) {
             exporting := true;
-            for line: line_split(data) {
+            for line: split(data, "\n") {
                 trimmed := trim(line);
                 if trimmed == "#scope_module" || trimmed == "#scope_file" {
                     exporting = false;
@@ -468,36 +479,48 @@ scrape_modules_folder :: () {
 
                 if starts_with(line, " ")  continue;
 
-                index, found := first_index(trimmed, "::");
-                if !found  continue;
+                index := find_index_from_left(trimmed, "::");
+                if index < 0  continue;
 
                 name := trim(slice(trimmed, 0, index));
                 if contains(name, " ")  continue;
+                
+                trim_end_from :: (s: string, delimiter: $T) -> trimmed: string, found: bool {
+                  from := find_index_from_right(s, delimiter);
+
+                  trimmed := "";
+                  found := from != -1;
+                  if found {
+                      trimmed = slice(s, 0, from);
+                  }
+
+                  return trimmed, found;
+                }
 
                 trimmed = trim_end_from(trimmed, "//");
                 if contains(trimmed, " struct ") || contains(trimmed, " enum ") || contains(trimmed, " #type ")
-                    array_add(*support_classes, heap.copy_string(name));
+                    array_add(*support_classes, copy_string(name));
                 else if contains(trimmed, "(")
-                    array_add(*support_functions, heap.copy_string(name));
+                    array_add(*support_functions, copy_string(name));
             }
         }
 
         prev := "";
-        for line_split(data) {
+        for split(data, "\n") {
             defer prev = it;
 
-            index, found := first_index(it, "#deprecated");
-            if !found  continue;
+            index := find_index_from_left(it, "#deprecated");
+            if index < 0  continue;
 
             line := ifx index == 0 then prev else it;
 
-            index, found = first_index(line, "::");
-            if !found  continue;
+            index = find_index_from_left(line, "::");
+            if index < 0  continue;
 
             name := trim(slice(line, 0, index));
             if contains(name, " ")  continue;
 
-            array_add(*deprecated_procs, heap.copy_string(name));
+            array_add(*deprecated_procs, copy_string(name));
         }
     }
 
@@ -505,7 +528,7 @@ scrape_modules_folder :: () {
     print("% support classes.\n", support_classes.count);
     print("% deprecated procs.\n", deprecated_procs.count);
 
-    support_function_names  = heap.join(support_functions, #char "|");
-    support_class_names  = heap.join(support_classes, #char "|");
-    deprecated_names = heap.join(deprecated_procs, #char "|");
+    support_function_names  = join(.. support_functions, separator = "|");
+    support_class_names  = join(.. support_classes, separator = "|");
+    deprecated_names = join(.. deprecated_procs, separator = "|");
 }
