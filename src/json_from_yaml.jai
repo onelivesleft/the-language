@@ -366,7 +366,7 @@ main :: () {
     write_entire_file(out_file, json_string);
 
     if noisey  for replacements  print("% -> %\n", it.from, it.to);
-    
+
     count :: (s: string, c: u8) -> int {
         result := 0;
         for 0 .. s.count-1 {
@@ -484,7 +484,7 @@ scrape_modules_folder :: () {
 
                 name := trim(slice(trimmed, 0, index));
                 if contains(name, " ")  continue;
-                
+
                 trim_end_from :: (s: string, delimiter: $T) -> trimmed: string, found: bool {
                   from := find_index_from_right(s, delimiter);
 
