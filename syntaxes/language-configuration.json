@@ -12,7 +12,7 @@
         ["{", "}", ["string", "comment"]],
         ["[", "]", ["string", "comment"]],
         ["(", ")",  ["string", "comment"]],
-        ["\"", "\"",  ["string"]],
+        ["\"", "\"",  ["string"]]
     ],
     "surroundingPairs": [
         ["{", "}"],
