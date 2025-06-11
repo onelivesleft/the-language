@@ -630,7 +630,7 @@
                     {
                         "1":
                         {
-                            "name": "punctuation.definition.comment.jai"
+                            "name": "comment.line.double-slash.jai"
                         },
                         "2":
                         {
